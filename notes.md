@@ -8,6 +8,16 @@
 - [Canvas](https://byu.instructure.com)
 - [MDN](https://developer.mozilla.org)
 
+## GitHub Notes
+I have learned how to use Markdown this is something I should have learned a while ago but with it you can:
+1. Create lists 
+   - including nested lists like this one
+2. create a task list
+   - [x] create a checkbox that I won't fill
+   - [ ] goof off in class
+3. *Use* all kinds of ~~terrible~~ **Wonderful** formatting options
+
+
 ## AWS Notes
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.

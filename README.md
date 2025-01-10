@@ -1,8 +1,8 @@
-# Your startup name here
+# Project Yggdrasil
 
 [My Notes](notes.md)
 
-A brief description of the application here. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+A shared Authoring Site where you can submitt writing prompts and build off of other people's stories. What makes it special is that you are able to create branching timelines at the chapter level, meaning if you want to continue the story, you can, if you feel like a chapter could have gone another way, and the characters could have taken a different path, go ahead and write it, make a new branch of the timeline who knows maybe the story overseer (the other of the original story part) will decide that your timeline is actuatually the main timeline. The goal is to create a site that allows for expansive multiverses, where creators can feel free to try out many different possibilites, and **colaborate** as they improve their worldbuilding, writing, and charactor development skills in an environment where they can get feedback and see examples of other people's work on the same story.
 
 
 > [!NOTE]
@@ -18,7 +18,7 @@ A brief description of the application here. Lorem ipsum dolor sit amet, consect
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] Proper use of Markdown
+- [x] Proper use of Markdown
 - [ ] A concise and compelling elevator pitch
 - [ ] Description of key features
 - [ ] Description of how you will use each technology
