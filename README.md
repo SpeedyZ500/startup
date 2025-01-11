@@ -91,8 +91,7 @@ I am going to use the required technologies in the following ways.
 - **Service** - Backend servicce with endpoints for:
   - Login
   - retrive user stories and prompts
-  - submitting prompts and stories?
-  - retrive follower count?
+  - submitting prompts and stories
 - **DB/Login** - Store users, prompts, stories, comments, likes, and follows in database. Register and login users. Credentials securly stored in database. Can't submit stories or prompts, like, comment, or follow unless authenticated.
 - **WebSocket** - As a story is branched or added to, or created, Notify users following the story or user, as well as displaying stories, prompts, and all other data to be read, also will render follower count on account page.
 
