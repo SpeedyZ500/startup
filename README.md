@@ -19,10 +19,10 @@ A shared Authoring Site where you can submitt writing prompts and build off of o
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
 - [x] Proper use of Markdown
-- [ ] A concise and compelling elevator pitch
-- [ ] Description of key features
-- [ ] Description of how you will use each technology
-- [ ] One or more rough sketches of your application. Images must be embedded in this file using Markdown image references.
+- [x] A concise and compelling elevator pitch
+- [x] Description of key features
+- [x] Description of how you will use each technology
+- [x] One or more rough sketches of your application. Images must be embedded in this file using Markdown image references.
 
 ### Elevator pitch
 
@@ -73,20 +73,28 @@ sequenceDiagram
 
 ### Key features
 
-- Describe your key feature
-- Describe your key feature
-- Describe your key feature
+- Secure login over HTTPS
+- Ability to submit Story Prompts
+- Display of Stories based on any given prompt
+- Like, Comment, and Follow Stories/branches, will notify when a new branch is added to the story or Branch
+- Ability to split off at the chapter level to an alternate posibility for the story
+- Ability to follow Story Prompt to be notified of any stories generated from that prompt by users
+- Can't use User Generated content for AI Training models by AI Scraper Bots if possible
 
 ### Technologies
 
 I am going to use the required technologies in the following ways.
 
-- **HTML** - Description here
-- **CSS** - Description here
-- **React** - Description here
-- **Service** - Description here
-- **DB/Login** - Description here
-- **WebSocket** - Description here
+- **HTML** - Uses correct HTML structure for application. Many HTML pages, Login page, home page, story prompts page, explore stories page, search page, potentially some wiki style pages for Worldbuilding stuff, such as races, countries, cities, and Magic Systems.
+- **CSS** - Application styling that loogs good on different screen sizes, and will morph such that all menue items are accessible across all devices, uses good whitespace, color choice and contrast.
+- **React** - Provides login, Prompt and story display, liking and following of prompts and stories, comments, and use of React for routing and components.
+- **Service** - Backend servicce with endpoints for:
+  - Login
+  - retrive user stories and prompts
+  - submitting prompts and stories?
+  - retrive follower count?
+- **DB/Login** - Store users, prompts, stories, comments, likes, and follows in database. Register and login users. Credentials securly stored in database. Can't submit stories or prompts, like, comment, or follow unless authenticated.
+- **WebSocket** - As a story is branched or added to, or created, Notify users following the story or user, as well as displaying stories, prompts, and all other data to be read, also will render follower count on account page.
 
 ## 🚀 AWS deliverable
 
