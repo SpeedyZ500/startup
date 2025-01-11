@@ -26,19 +26,49 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 ### Elevator pitch
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Have you ever had an idea for a story, but not known how to write it, or a part of a story but you don't know how to start it, or a start of a story that you don't know how to continue? Have you ever been reading/listening to/watching a story/movie/tv show and asked yourself what if **X** happened instead or **X** was there? Project Yggdrasil makes all this and more possible to work with just start by sharing what you have, the Norse Myth of Yggdrasil the World Tree is that of a tree that connects the Nine Relms, but the tree of Project Yggdrasil is the endless branching timelines, users are able to use it to read and create endlessly branching stories, provide each other feedback on their storytelling, and share writing tips. If a user is reading an otherwise compelling story, they can go to the chapter where things started going in the wrong direction and create their own branch of the story, their own timeline that others can build off of.
 
 ### Design
 
 ![Mock](Project_Yggdrisil_HomePage.png)
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Here is a sequence diagram that shows how people would interact with the backend to submit a writing prompt, write a story or story part for it, and then continue or split off of the orignial branches to move in a different direction.
 
 ```mermaid
 sequenceDiagram
-    actor You
-    actor Website
-    You->>Website: Replace this with your design
+    actor Tanner
+    actor Kora
+    actor Ryan
+    actor Taran
+    actor Dallan
+    
+    Tanner->>Server: Prompt, A world with regular natural disasters and yet life still persists on it
+    Server->>Kora: Prompt, A world with regular natural disasters and yet life still persists on it
+    Server->>Ryan: Prompt, A world with regular natural disasters and yet life still persists on it
+    Server->>Taran: Prompt, A world with regular natural disasters and yet life still persists on it
+    Server->>Dallan: Prompt, A world with regular natural disasters and yet life still persists on it
+    Kora->>Server: Story, The Land of the Eternal Storm
+    Server->>Tanner: Story, The Land of the Eternal Storm, by Kora
+    Server->>Ryan: Story, The Land of the Eternal Storm, by Kora
+    Server->>Taran: Story, The Land of the Eternal Storm, by Kora
+    Server->>Dallan:  Story, The Land of the Eternal Storm, by Kora
+    Ryan->>Server: Branch, The Land of the Eternal Storm, by Kora, Warriors forged from Storm and Ash
+    Server->>Tanner: Branch, The Land of the Eternal Storm, ..., chapter 2, Warriors forged from Storm and Ash, by Ryan
+    Server->>Kora: Branch, The Land of the Eternal Storm, ..., chapter 2, Warriors forged from Storm and Ash, by Ryan
+    Server->>Taran: Branch, The Land of the Eternal Storm, ..., chapter 2, Warriors forged from Storm and Ash, by Ryan
+    Server->>Dallan: Branch, The Land of the Eternal Storm, ..., chapter 2, Warriors forged from Storm and Ash, by Ryan
+    Taran->>Server: Branch, The Land of the Eternal Storm, ..., chapter 2, Warriors forged from Storm and Ash, by Ryan, The Conquering Storm
+    Server->>Tanner: Branch, The Land of the Eternal Storm, ..., from chapter 2, Warriors forged from Storm and Ash, ..., chapter 3, The Conquering Storm, by Taran
+    Server->>Kora: Branch, The Land of the Eternal Storm, ..., from chapter 2, Warriors forged from Storm and Ash, ..., chapter 3, The Conquering Storm, by Taran
+    Server->>Ryan: Branch, The Land of the Eternal Storm,  ..., from chapter 2, Warriors forged from Storm and Ash, ..., chapter 3, The Conquering Storm, by Taran
+    Server->>Dallan: Branch, The Land of the Eternal Storm,  ..., from chapter 2, Warriors forged from Storm and Ash, ..., chapter 3, The Conquering Storm, by Taran
+    Dallan->>Server: Branch, The Land of the Eternal Storm, ..., chapter 2, Warriors forged from Storm and Ash, by Ryan, The Nurturing Rains
+    Server->>Tanner: Branch, The Land of the Eternal Storm,  ..., from chapter 2, Warriors forged from Storm and Ash, ..., chapter 3, The Nurturing Rains, by Dallan
+    Server->>Kora: Branch, The Land of the Eternal Storm,  ..., from chapter 2, Warriors forged from Storm and Ash, ..., chapter 3, The Nurturing Rains, by Dallan
+    Server->>Ryan: Branch, The Land of the Eternal Storm,  ..., from chapter 2, Warriors forged from Storm and Ash, ..., chapter 3, The Nurturing Rains, by Dallan
+    Server->>Taran: Branch, The Land of the Eternal Storm,  ..., from chapter 2, Warriors forged from Storm and Ash, ..., chapter 3, The Nurturing Rains, by Dallan
+
+    
 ```
 
 ### Key features
