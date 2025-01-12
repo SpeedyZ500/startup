@@ -80,6 +80,7 @@ sequenceDiagram
 - Ability to split off at the chapter level to an alternate posibility for the story
 - Ability to follow Story Prompt to be notified of any stories generated from that prompt by users
 - Can't use User Generated content for AI Training models by AI Scraper Bots if possible
+- persistently store stories comments likes edits and branches
 
 ### Technologies
 
