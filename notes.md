@@ -26,4 +26,12 @@ I also learned what Sudo does it makes you the super user
 
 ## HTML Notes
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Learned you need to use href = "" to insert hyperlinks
+need to specify width and height
+make sure you are copying the image address not a link to the image location
+use width and height to specify image size or you can use fit and you don't nessisaraly need to specify height
+I also learned how all the inputs work, will be very useful for my site
+Use <search> var type for search bar
+Multiple ways to embed audio
+Must have warn when connecting to http: to go live for whatever reason
+Should be able to store the html in a sub-folder hopefully

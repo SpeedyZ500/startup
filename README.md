@@ -1,5 +1,5 @@
 # Project Yggdrasil
-![PROJECT_YGGDRASIL](ProjectYggdrasil.png)
+![PROJECT_YGGDRASIL](ui/public/ProjectYggdrasil.png)
 
 [My Notes](notes.md)
 
@@ -108,13 +108,13 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] **HTML pages** - I did not complete this part of the deliverable.
+- [ ] **HTML pages** - Create pages for the main page, worldbuilding, stories, characters, login, etc.
 - [ ] **Proper HTML element usage** - I did not complete this part of the deliverable.
-- [ ] **Links** - I did not complete this part of the deliverable.
+- [ ] **Links** - Link between pages and page groups, make use of sub-pages under the main set such as under worldbuilding put magic systsems
 - [ ] **Text** - I did not complete this part of the deliverable.
-- [ ] **3rd party API placeholder** - I did not complete this part of the deliverable.
-- [ ] **Images** - I did not complete this part of the deliverable.
-- [ ] **Login placeholder** - I did not complete this part of the deliverable.
+- [ ] **3rd party API placeholder** - Put a placeholder toggle for profanity filter under settings
+- [x] **Images** - add logo image, and create webpage main image
+- [x] **Login placeholder** - On the login page put a placeholder for the login stuff, as well as a placeholder for the create account.
 - [ ] **DB data placeholder** - I did not complete this part of the deliverable.
 - [ ] **WebSocket placeholder** - I did not complete this part of the deliverable.
 
