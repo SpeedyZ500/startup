@@ -95,7 +95,7 @@ I am going to use the required technologies in the following ways.
   - retrive user stories and prompts
   - submitting prompts and stories
   - PurgoMalum third-party for prophanity filter
-- **DB/Login** - Store users, prompts, stories, comments, likes, and follows in database. Register and login users. Credentials securly stored in database. Can't submit stories or prompts, like, comment, or follow unless authenticated.
+- **DB/Login** - Store users, prompts, stories, comments, likes, and follows in database. Register and login users. Credentials securly stored in database. Can't submit stories or prompts, like, comment, or follow unless authenticated. 
 - **WebSocket** - As a story is branched or added to, or created, Notify users following the story or user, as well as displaying stories, prompts, and all other data to be read, also will render follower count on account page.
 
 ## 🚀 AWS deliverable
@@ -108,15 +108,15 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] **HTML pages** - Create pages for the main page, worldbuilding, stories, characters, login, etc.
-- [ ] **Proper HTML element usage** - I did not complete this part of the deliverable.
-- [ ] **Links** - Link between pages and page groups, make use of sub-pages under the main set such as under worldbuilding put magic systsems
-- [ ] **Text** - I did not complete this part of the deliverable.
-- [ ] **3rd party API placeholder** - Put a placeholder toggle for profanity filter under settings
+- [x] **HTML pages** - Create pages for the main page, worldbuilding, stories, characters, login, etc.
+- [ ] **Proper HTML element usage** - Using divs headder etc. appropriatly to format pages, and to store text.
+- [x] **Links** - Link between pages and page groups, make use of sub-pages under the main set such as under worldbuilding put magic systsems
+- [x] **Text** - About page, sections and other examples and descripter sections
+- [x] **3rd party API placeholder** - Put a placeholder toggle for profanity filter under settings
 - [x] **Images** - add logo image, and create webpage main image
 - [x] **Login placeholder** - On the login page put a placeholder for the login stuff, as well as a placeholder for the create account.
-- [ ] **DB data placeholder** - I did not complete this part of the deliverable.
-- [ ] **WebSocket placeholder** - I did not complete this part of the deliverable.
+- [ ] **DB data placeholder** - Example pages and data for the database, as well as a way to put the text into a form to post. input and submission box for the various post types, each in a class on the pages they are supposed to be on, will be a popup later, also may have more fields
+- [ ] **WebSocket placeholder** - New stories section on home page, reacently updated section as well.
 
 ## 🚀 CSS deliverable
 

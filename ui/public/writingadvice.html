@@ -5,6 +5,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Writing Advice</title>
         <link rel="icon" href = "favicon.ico"/>
+        <style>
+            .worldbuilding{
+                display: none
+            }
+        </style>
     </head>
     <body>
         
@@ -16,6 +21,17 @@
                     <li><a href = "writingprompts.html">Writing Prompts</a></li>
                     <li><a href = "characters.html">Characters</a></li>
                     <li><a href = "worldbuilding.html">World Building</a></li>
+                    <ul class="worldbuilding">
+                        <li><a href = "worldbuilding/magicsystems.html">Magic Systems</a></li>
+                        <li><a href = "worldbuilding/races.html">Races</a></li>
+                        <li><a href = "worldbuilding/countries.html">Countries</a></li>
+                        <li><a href = "worldbuilding/wildlife.html">Wildlife</a></li>
+                        <li><a href = "worldbuilding/flora.html">Flora</a></li>
+                        <li><a href = "worldbuilding/worlds.html">Worlds</a></li>
+                        <li><a href = "worldbuilding/organizations.html">Organizations</a></li>
+
+
+                    </ul>
                     <li><a href = "writingadvice.html">Writing Advice</a></li>
                     <li><a href = "about.html">About</a></li>
                     <li>
@@ -28,7 +44,28 @@
                 
             </nav>
             <hr />
+            <h1>Writing Advice</h1>
         </header>
+        <main>
+            <!-- A button to open the form to submit advice -->
+            <div class="advice">
+                <button class="open-button" onClick="openForm()">Give Advice</button>
+                <div class="form-popup" id="giveAdvice">
+                    <form class="form-container">
+                        <h1>New Writing Advice</h1>
+                        <lable for = "advice">Advice:</lable>
+                        <textarea id="advice" placheolder="Your advice" name="advice" required> </textarea>
+                        <button type="submit">Create</button> 
+                        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+                    </form>
+                </div>
+            </div>
+            <div class = "advice">
+                <ul>
+                    <li>It doesn't matter what it is you write, just start writing, getting ideas on a page is more impoartant than if it looks good.</li>
+                </ul>
+            </div>
+        </main>
 
         <footer>
             <hr />

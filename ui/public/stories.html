@@ -5,6 +5,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Stories</title>
         <link rel="icon" href = "favicon.ico"/>
+        <style>
+            .worldbuilding{
+                display: none
+            }
+        </style>
     </head>
     <body>
         <header>
@@ -15,6 +20,17 @@
                     <li><a href = "writingprompts.html">Writing Prompts</a></li>
                     <li><a href = "characters.html">Characters</a></li>
                     <li><a href = "worldbuilding.html">World Building</a></li>
+                    <ul class="worldbuilding">
+                        <li><a href = "worldbuilding/magicsystems.html">Magic Systems</a></li>
+                        <li><a href = "worldbuilding/races.html">Races</a></li>
+                        <li><a href = "worldbuilding/countries.html">Countries</a></li>
+                        <li><a href = "worldbuilding/wildlife.html">Wildlife</a></li>
+                        <li><a href = "worldbuilding/flora.html">Flora</a></li>
+                        <li><a href = "worldbuilding/worlds.html">Worlds</a></li>
+                        <li><a href = "worldbuilding/organizations.html">Organizations</a></li>
+
+
+                    </ul>
                     <li><a href = "writingadvice.html">Writing Advice</a></li>
                     <li><a href = "about.html">About</a></li>
                     <li>
@@ -27,7 +43,81 @@
                 
             </nav>
             <hr />
+            <h1>Stories</h1>
+            <p> All the wonderful User Generated Stories.</p>
+            <hr />
         </header>
+        <main>
+            <div class="newStory">
+                <button class="open-button" onClick="openForm()">New Story</button>
+                <div class="form-popup" id="newPrompt">
+                    <form class="form-container">
+                        <h1>New Story</h1>
+                        <lable for = "title">Title:</lable>
+                        <input type="text" placheolder="title" name="title" required> 
+                        <br />
+                        <lable for = "descripton">Description:</lable>
+                        <input type="text" placheolder="description" name="description" > 
+                        <br />
+                        <br />
+                        <lable for="story">Story Body</lable>
+                        <textarea id="story" placheolder="your story" name="story" required> </textarea>
+                        <br />
+                        <lable for = "genre">Genre(s):</lable>
+                        <input type="text" placheolder="genre" name="genre"> 
+                        <br />
+                        <lable for = "contentwarning">Content Warning(s):</lable>
+                        <input type="text" placheolder="content warning" name="contentwarning"> 
+                        <br />
+                        <button type="submit">Create</button> 
+                        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+
+                    </form>
+
+                </div>
+            </div>
+            <hr />
+            <div class ="new">
+                <h2>New</h2>
+                <table>
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Discription</th>
+                        <th>Genres</th>
+                        <th>Content Warnings</th>
+                    </tr>
+                    <tr>
+                        <td>The Moonlit Alchemist</td>
+                        <td>Spencer Zaugg</td>
+                        <td>The story of a mysterious Alchemist who's alchemy is enhanced by moonlight, displaced from his world</td>
+                        <td>Example</td>
+                        <td>Fallen Universe</td>
+                    </tr>
+                </table>
+            <hr />
+            </div>
+            <div class="popular">
+                <h2>Popular</h2>
+                <table>
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Discription</th>
+                        <th>Genres</th>
+                        <th>Content Warnings</th>
+                    </tr>
+                    <tr>
+                        <td>The Moonlit Alchemist</td>
+                        <td>Spencer Zaugg</td>
+                        <td>The story of a mysterious Alchemist who's alchemy is enhanced by moonlight</td>
+                        <td>Example</td>
+                        <td>Fallen Universe</td>
+                    </tr>
+                </table>
+            </div>
+            
+        </main>
         
 
         <footer>

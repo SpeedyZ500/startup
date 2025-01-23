@@ -1,10 +1,15 @@
-<!DOCTYPE html lang = "en">
-<html>
+<!DOCTYPE html>
+<html lang = "en">
     <head>
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Characters</title>
         <link rel="icon" href = "favicon.ico"/>
+        <style>
+            .worldbuilding{
+                display: none
+            }
+        </style>
     </head>
     <body>
         <header>
@@ -15,6 +20,17 @@
                     <li><a href = "writingprompts.html">Writing Prompts</a></li>
                     <li><a href = "characters.html">Characters</a></li>
                     <li><a href = "worldbuilding.html">World Building</a></li>
+                    <ul class="worldbuilding">
+                        <li><a href = "worldbuilding/magicsystems.html">Magic Systems</a></li>
+                        <li><a href = "worldbuilding/races.html">Races</a></li>
+                        <li><a href = "worldbuilding/countries.html">Countries</a></li>
+                        <li><a href = "worldbuilding/wildlife.html">Wildlife</a></li>
+                        <li><a href = "worldbuilding/flora.html">Flora</a></li>
+                        <li><a href = "worldbuilding/worlds.html">Worlds</a></li>
+                        <li><a href = "worldbuilding/organizations.html">Organizations</a></li>
+
+
+                    </ul>
                     <li><a href = "writingadvice.html">Writing Advice</a></li>
                     <li><a href = "about.html">About</a></li>
                     <li>
@@ -26,8 +42,111 @@
                 </menue>
                 
             </nav>
+            
+            <h1>Characters</h1>
+            <p>All the Characters that are currently on the site.</p>
             <hr />
-            <h1>About</h1>
         </header>
+        <main>
+            <div class="newCharacter">
+                <button class="open-button" onClick="openForm()">New Character</button>
+                <div class="form-popup" id="newCharacter">
+                    <form class="form-container">
+                        <h1>New Character</h1>
+                        <lable for = "name">Name/Title:</lable>
+                        <input type="text" placheolder="name/title" name="name" required> 
+                        <br />
+                        <lable for = "type">Type:</lable>
+                        <input type="text" placheolder="type" name="type" required> 
+                        <br />
+                        <lable for = "titles">title(s):</lable>
+                        <input type="text" placheolder="title(s)" name="titles"> 
+                        <br />
+                        <lable for = "descripton">Description:</lable>
+                        <input type="text" placheolder="description" name="description" > 
+                        <br />
+                        <br />
+                        <lable for="descripton">Description:</lable>
+                        <textarea id="description" placheolder="Describe your Character" name="description" required> </textarea>
+                        <br />
+                        <lable for = "genre">Race:</lable>
+                        <input type="text" placheolder="race" name="race"> 
+                        <br />
+                        <lable for = "abilities">Abilities:</lable>
+                        <input type="text" placheolder="abilities" name="abilities"> 
+                        <br />
+                        <lable for = "allies">allies:</lable>
+                        <input type="text" placheolder="Ally" name="allies"> 
+                        <br />
+                        <lable for = "enemies">Enemies:</lable>
+                        <input type="text" placheolder="Enemy" name="enemies"> 
+                        <br />
+                        <lable for = "relation">Related to:</lable>
+                        <input type="text" placheolder="Related to" name="relation"> 
+
+                        <br />
+
+                        <button type="submit">Create</button> 
+                        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+
+                    </form>
+
+                </div>
+            </div>
+            <hr />
+            <h4>World Hoppers</h4>
+            <hr />
+            <li>The Curator</li>
+            <li>The Moonlit Alchemist</li>
+
+            <hr />
+            <h4>New Characters</h4>
+            <hr /> 
+            <li>The Curator</li>
+            <li>The Moonlit Alchemist</li>
+            <hr />
+            <h4>Popular</h4>
+            <hr /> 
+            <li>The Curator</li>
+            <aside>No we cannot move The Curator from popular Characters, thier power is beyond our ability to do so.</aside>
+            <hr />
+            <h4>Protaganists</h4>
+            <hr /> 
+            <li>The Curator</li>
+            <aside>No we cannot move The Curator from protaganists, thier power is beyond our ability to do so. This is after all a window into thier relm.</aside>
+            <hr /> 
+            <h4>Heroes</h4>
+            <hr /> 
+            <li>The Curator</li>
+            <aside>No we cannot move The Curator from Heroes, thier power is beyond our ability to do so. They see themself as a hero.</aside>
+            <hr />
+            <h4>Anti-Heros</h4>
+            <hr /> 
+            <hr />
+            <h4>Vilalans</h4>
+            <hr /> 
+            <hr />
+            <h4>Anti-Vilalans</h4>
+            <hr /> 
+            <hr />
+            <h4>Anti-Vilalans</h4>
+            <hr /> 
+            <h4>Side Characters</h4>
+            <hr />
+            <li>The Moonlit Alchemist</li>
+            <aside>Yes we know he has his own story, but his view of himself as a side character is so powerful we can't make him a protaganist.
+                He wants to be a hero but doesn't see himself as one.
+            </aside>
+            <hr /> 
+        
+
+        </main>
+        <footer>
+            <hr />
+            <span class="text-restet">Author Name:</span>
+            <td>Spencer Zaugg</td>
+            <br />
+            <a href = "https://github.com/SpeedyZ500/startup.git"> GitHub</a>
+        </footer>
     </body>
 </html>
