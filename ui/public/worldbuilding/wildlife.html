@@ -48,6 +48,92 @@
             </p>
             <hr />
         </header>
+        <main>
+            <div class="newWildlife">
+                <button class="open-button" onClick="openForm()">New Creature</button>
+                <div class="form-popup" id="newWildlife">
+                    <form class="form-container">
+                        <h1>New Creature</h1>
+                        <lable for = "name">Name:</lable>
+                        <input type="text" placheolder="name" name="name" required> 
+                        <br />
+                        <lable for="type">Type:</lable>
+                        <input type="text" placeholder="Monster, Bird, rodent, etc." name ="type">
+                        <br />
+                        <lable for="descripton">Description:</lable>
+                        <textarea id="description" placheolder="Describe your Creature" name="description" required> </textarea>
+                        <br />
+                        <lable for="abilities">Abilities:</lable>
+                        <textarea id="description" placheolder="what abilities does it have? is it poisonous? Venomous?" name="description" required> </textarea>
+                        <br />
+                        <lable for="origin">Origin/habitat:</lable>
+                        <input type="text" placeholder="Where is your creature from? what habitat" name ="origin">
+                        <br />
+                        <lable for="world">World:</lable>
+                        <input type="text" placeholder="What world(s) do your creature appear in?" name ="world">
+                        <br />
+                        
+                        <button type="submit">Create</button> 
+                        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+                        
+                    </form>
+                </div>
+            </div>
+            <hr />
+            <div class = "filterAndSort">
+                <aside>Filter</aside>
+                <form action="" method="get">
+                    <lable for="type">Type: </lable>
+                    <select id = "type" name="varType">
+                        <option selected>All</option>
+                        <option>Monster</option>
+                    </select>
+                    <lable for="world">world: </lable>
+                    <select id = "world" name="varWorld">
+                        <option selected>All</option>
+                        <option>The Void</option>
+                    </select>
+                    <lable for="author">Author: </lable>
+                    <select id = "author" name="varAuthor">
+                        <option selected>All</option>
+                        <option>Spencer Zaugg</option>
+                    </select>
+                    <lable for="sort">Sort: </lable>
+                    <select id = "sort" name="varSort">
+                        <option selected>Popular</option>
+                        <option>New to Old</option>
+                        <option>Old to New</option>
+                        <option>A-Z Name</option>
+                        <option>Z-A Name</option>
+                        <option>A-Z Author</option>
+                        <option>Z-A Author</option>
+                        <option>A-Z World</option>
+                        <option>Z-A World</option>
+                    </select>
+                </form>
+            </div>
+            <hr />
+
+            
+
+
+            <div>
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>World</th>
+                        <th>Author</th>
+                    </tr>
+                    <tr>
+                        <td><a href = "templates/voidreacher.html">Void Reacher</a></td>
+                        <td>Monster</td>
+                        <td><a href="templates/thevoid.html">The Void</a></td>
+                        <td>Spencer Zaugg</td>
+                    </tr>
+                </table>
+            </div>
+        </main>
 
         <footer>
             <hr />

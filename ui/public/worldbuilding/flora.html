@@ -53,6 +53,88 @@
             <hr />
         </header>
 
+        <main>
+
+            <div class="newFlora">
+                <button class="open-button" onClick="openForm()">New Flora</button>
+                <div class="form-popup" id="NewFlora">
+                    <form class="form-container">
+                        <h1>New Flora</h1>
+                        <lable for = "name">Name:</lable>
+                        <input type="text" placheolder="name" name="name" required> 
+                        <br />
+                        <lable for="type">Type:</lable>
+                        <input type="text" placeholder="Monster, tree, flower, herb, etc." name ="type">
+                        <br />
+                        <lable for="descripton">Description:</lable>
+                        <textarea id="description" placheolder="Describe your Flora" name="description" required> </textarea>
+                        <br />
+                        <lable for="abilities">Abilities:</lable>
+                        <textarea id="abilities" placheolder="what abilities does it have? is it poisonous? Carnivorous?  Is it used? How is it used?" name="abilities" > </textarea>
+                        <br />
+                        <lable for="origin">Origin/habitat:</lable>
+                        <input type="text" placeholder="Where is your Flora from? what habitat" name ="origin">
+                        <br />
+                        <lable for="world">World:</lable>
+                        <input type="text" placeholder="What world(s) do your flora/plant-life appear in?" name ="world">
+                        <br />
+                        
+                        <button type="submit">Create</button> 
+                        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+                        
+                    </form>
+                </div>
+            </div>
+            <div class = "filterAndSort">
+                <aside>Filter</aside>
+                <form action="" method="get">
+                    <lable for="type">Type: </lable>
+                    <select id = "type" name="varType">
+                        <option selected>All</option>
+                        <option>Magic Tree</option>
+                    </select>
+                    <lable for="world">world: </lable>
+                    <select id = "world" name="varWorld">
+                        <option selected>All</option>
+                        <option>The Void</option>
+                    </select>
+                    <lable for="author">Author: </lable>
+                    <select id = "author" name="varAuthor">
+                        <option selected>All</option>
+                        <option>Spencer Zaugg</option>
+                    </select>
+                    <lable for="sort">Sort: </lable>
+                    <select id = "sort" name="varSort">
+                        <option selected>Popular</option>
+                        <option>New to Old</option>
+                        <option>Old to New</option>
+                        <option>A-Z Name</option>
+                        <option>Z-A Name</option>
+                        <option>A-Z Author</option>
+                        <option>Z-A Author</option>
+                        <option>A-Z World</option>
+                        <option>Z-A World</option>
+                    </select>
+                </form>
+            </div>
+            <div>
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Author</th>
+                        <th>World</th>
+                        <th>Type</th>
+                    </tr>
+                    <tr>
+                        <td>World Tree</td>
+                        <td>Spencer Zaugg</td>
+                        <td>The Void</td>
+                        <td><a href="templates/thevoid.html">The Void</a></td>
+                    </tr>
+                </table>
+            </div>
+        </main>
+
         <footer>
             <hr />
             <span class="text-restet">Author Name:</span>

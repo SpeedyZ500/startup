@@ -46,10 +46,114 @@
             <p>
                 This is where you put your worlds, what races are their, which ones are native, 
                 which ones are worlds that had mass migration from another world due to <i>unfortunate</i> and <i>unforseen</i> circumstances.
-                Feel free to add biome info as well, and you don't need to fill it all out at the begining, you will be able to make edits later.
+                Feel free to add biome info as well, and you don't need to fill it all out at the begining, you will be able to make edits later. 
+                You will also be able to add additional information within the world's page, including defining the biomes you make up,
+                 and createing/adding wildlife, races, flora, organizations and countries which will automatically be added to the relevant tabs.
+                 Bioms however will be a subtab of your world, because the inhabitans wildlife, and flora of your biomes will be unique to your world.
             </p>
             <hr />
         </header>
+        <main>
+            <div class="newWorld">
+                <button class="open-button" onClick="openForm()">New World</button>
+                <div class="form-popup" id="newWorld">
+                    <form class="form-container">
+                        <h1>New World</h1>
+                        <lable for = "name">Name:</lable>
+                        <input type="text" placheolder="name/title" name="name" required> 
+                        <br />
+                        <lable for = "world">World:</lable>
+                        <input type="text" placheolder="world" name="world" required> 
+                        <br />
+                        <br />
+                        <lable for = "country">Countries:</lable>
+                        <input type="text" placheolder="Countries" name="country"> 
+                        <br />
+                        <lable for = "contenent">Contenent(s):</lable>
+                        <input type="text" placheolder="Contenent(s)" name="contenent"> 
+                        <lable for = "descripton">Description:</lable>
+                        <input type="text" placheolder="description" name="description" > 
+                        <br />
+                        <br />
+                        <lable for="descripton">Description:</lable>
+                        <textarea id="description" placheolder="Describe your Country" name="description" required> </textarea>
+                        <br />
+                        <lable for="history">History:</lable>
+                        <textarea id="history" placheolder="History" name="history"> </textarea>
+                        <br />
+                        <lable for="culture">Culture:</lable>
+                        <textarea id="culture" placheolder="What is your countries Culture" name="culture" > </textarea>
+                        <br />
+                        <lable for = "race">Race(s):</lable>
+                        <input type="text" placheolder="race" name="race"> 
+                        <br />
+                        <lable for = "religion">Religion(s):</lable>
+                        <input type="text" placheolder="religion" name="religion"> 
+                        <br />
+                        <lable for = "organization">Organization(s):</lable>
+                        <input type="text" placheolder="Organization" name="organization"> 
+                        <br />
+                        <lable for = "flora">Flora:</lable>
+                        <input type="text" placheolder="flora" name="flora"> 
+                        <br />
+                        <lable for = "wildlife">Wildlife:</lable>
+                        <input type="text" placheolder="wildlife" name="wildlife">
+                        <br /> 
+                        <lable for = "biome">Biome(s):</lable>
+                        <input type="text" placheolder="biome" name="biome">
+                        <br /> 
+                        
+                        
+
+                        <button type="submit">Create</button> 
+                        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+                        
+                    </form>
+                    <hr />
+                    
+
+                </div>
+            </div>
+            <div class = "filterAndSort">
+                <aside>Filter</aside>
+                <form action="" method="get">
+                    <select id = "race" name = "varRace">
+                        <option selected>All</option>
+                    </select>
+                    <lable for="author">Author: </lable>
+                    <select id = "author" name="varAuthor">
+                        <option selected>All</option>
+                        <option>Spencer Zaugg</option>
+                    </select>
+                    <lable for="sort">Sort: </lable>
+                    <select id = "sort" name="varSort">
+                        <option selected>Popular</option>
+                        <option>New to Old</option>
+                        <option>Old to New</option>
+                        <option>A-Z Title</option>
+                        <option>Z-A Title</option>
+                        <option>A-Z Author</option>
+                        <option>Z-A Author</option>
+                    </select>
+                </form>
+            </div>
+            <hr />
+
+            
+            <div>
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Author</th>
+                    </tr>
+                    <tr>
+                        <td><a href = templates/thevoid.html>The Void</a> </td>
+                        <td>Spencer Zaugg</td>
+                    </tr>
+                </table>
+            </div>
+
+        </main>
 
         <footer>
             <hr />

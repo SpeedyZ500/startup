@@ -49,6 +49,27 @@
             <hr />
         </header>
         <main>
+            <div class = "filterAndSort">
+                <aside>Filter</aside>
+                <form action="" method="get">
+                    <lable for="author">Author: </lable>
+                    <select id = "author" name="varAuthor">
+                        <option selected>All</option>
+                        <option>Spencer Zaugg</option>
+                    </select>
+                    <lable for="sort">Sort: </lable>
+                    <select id = "sort" name="varSort">
+                        <option selected>Popular</option>
+                        <option>New to Old</option>
+                        <option>Old to New</option>
+                        <option>A-Z Title</option>
+                        <option>Z-A Title</option>
+                        <option>A-Z Author</option>
+                        <option>Z-A Author</option>
+                    </select>
+                </form>
+            </div>
+            <hr />
             <!-- A button to open the form to submitt a new writing prompt -->
             <div class="newPrompt">
                 <button class="open-button" onClick="openForm()">New Prompt</button>

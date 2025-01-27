@@ -109,14 +109,14 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
 - [x] **HTML pages** - Create pages for the main page, worldbuilding, stories, characters, login, etc.
-- [ ] **Proper HTML element usage** - Using divs headder etc. appropriatly to format pages, and to store text.
+- [x] **Proper HTML element usage** - Using divs headder etc. appropriatly to format pages, and to store text.
 - [x] **Links** - Link between pages and page groups, make use of sub-pages under the main set such as under worldbuilding put magic systsems
 - [x] **Text** - About page, sections and other examples and descripter sections
 - [x] **3rd party API placeholder** - Put a placeholder toggle for profanity filter under settings
 - [x] **Images** - add logo image, and create webpage main image
 - [x] **Login placeholder** - On the login page put a placeholder for the login stuff, as well as a placeholder for the create account.
-- [ ] **DB data placeholder** - Example pages and data for the database, as well as a way to put the text into a form to post. input and submission box for the various post types, each in a class on the pages they are supposed to be on, will be a popup later, also may have more fields
-- [ ] **WebSocket placeholder** - New stories section on home page, reacently updated section as well.
+- [x] **DB data placeholder** - Example pages and data for the database, as well as a way to put the text into a form to post. input and submission box for the various post types, each in a class on the pages they are supposed to be on, will be a popup later, also may have more fields
+- [x] **WebSocket placeholder** - New stories section on home page, reacently updated section as well.
 
 ## 🚀 CSS deliverable
 

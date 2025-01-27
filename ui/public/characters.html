@@ -69,8 +69,14 @@
                         <lable for="descripton">Description:</lable>
                         <textarea id="description" placheolder="Describe your Character" name="description" required> </textarea>
                         <br />
-                        <lable for = "genre">Race:</lable>
+                        <lable for = "race">Race:</lable>
                         <input type="text" placheolder="race" name="race"> 
+                        <br />
+                        <lable for = "gender">Gender:</lable>
+                        <input type="text" placheolder="gender" name="race"> 
+                        <br />
+                        <lable for = "pronouns">Pronouns:</lable>
+                        <input type="text" placheolder="he/him, they/them, she/her, they/them (colective), etc." name="pronouns"> 
                         <br />
                         <lable for = "abilities">Abilities:</lable>
                         <input type="text" placheolder="abilities" name="abilities"> 
@@ -94,50 +100,58 @@
                 </div>
             </div>
             <hr />
-            <h4>World Hoppers</h4>
-            <hr />
-            <li>The Curator</li>
-            <li>The Moonlit Alchemist</li>
-
-            <hr />
-            <h4>New Characters</h4>
-            <hr /> 
-            <li>The Curator</li>
-            <li>The Moonlit Alchemist</li>
-            <hr />
-            <h4>Popular</h4>
-            <hr /> 
-            <li>The Curator</li>
-            <aside>No we cannot move The Curator from popular Characters, thier power is beyond our ability to do so.</aside>
-            <hr />
-            <h4>Protaganists</h4>
-            <hr /> 
-            <li>The Curator</li>
-            <aside>No we cannot move The Curator from protaganists, thier power is beyond our ability to do so. This is after all a window into thier relm.</aside>
-            <hr /> 
-            <h4>Heroes</h4>
-            <hr /> 
-            <li>The Curator</li>
-            <aside>No we cannot move The Curator from Heroes, thier power is beyond our ability to do so. They see themself as a hero.</aside>
-            <hr />
-            <h4>Anti-Heros</h4>
-            <hr /> 
-            <hr />
-            <h4>Vilalans</h4>
-            <hr /> 
-            <hr />
-            <h4>Anti-Vilalans</h4>
-            <hr /> 
-            <hr />
-            <h4>Anti-Vilalans</h4>
-            <hr /> 
-            <h4>Side Characters</h4>
-            <hr />
-            <li>The Moonlit Alchemist</li>
-            <aside>Yes we know he has his own story, but his view of himself as a side character is so powerful we can't make him a protaganist.
-                He wants to be a hero but doesn't see himself as one.
-            </aside>
-            <hr /> 
+            <div class = "filterAndSort">
+                <aside>Filter</aside>
+                <form action="" method="get">
+                    <lable for="type">Genre: </lable>
+                    <select id = "Type" name="varType">
+                        <option selected>All</option>
+                        <option>Heroes</option>
+                        <option>Villanes</option>
+                        <option>Anti-Heroes</option>
+                        <option>Anti-Villanes</option>
+                        <option>Side-Characters</option>
+                        <option>Wolrd Hoppers</option>
+                    </select>
+                    <lable for="author">Author: </lable>
+                    <select id = "author" name="varAuthor">
+                        <option selected>All</option>
+                        <option>Spencer Zaugg</option>
+                    </select>
+                    <lable for="sort">Sort: </lable>
+                    <select id = "sort" name="varSort">
+                        <option selected>Popular</option>
+                        <option>New to Old</option>
+                        <option>Old to New</option>
+                        <option>A-Z Name</option>
+                        <option>Z-A Name</option>
+                        <option>A-Z Author</option>
+                        <option>Z-A Author</option>
+                        <option>A-Z World</option>
+                        <option>Z-A World</option>
+                    </select>
+                </form>
+            </div>
+            <div>
+                
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>World</th>
+                        <th>Author</th>
+                    </tr>
+                    <tr>
+                        <td><a href="templates/thecurator.html">The Curator</a></td>
+                        <td><a href="worldbuilding/templates/thevoid.html">The Void</a></td>
+                        <td>Spencer Zaugg</td>
+                    </tr>
+                    <tr>
+                        <td><a href="templates/alastormoonblaze.html">Alastor Moonblaze</a></td>
+                        <td><a href="worldbuilding/templates/thevoid.html">The Void</a></td>
+                        <td>Spencer Zaugg</td>
+                    </tr>
+                </table>
+            </div>
         
 
         </main>

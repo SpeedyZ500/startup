@@ -47,9 +47,128 @@
                 Here is where you will put the organizations you create. Why isn't it under worlds or countries? 
                 World Hopping is possible, even between branches of the same story, or even to another universe entirely. 
                 So your organizations doesn't have to remain on one world or one branch of the World Tree. Religions would be included in Organizations.
+                If your organization is multiversal, use The origin world as the world, and put the classification as multiversal.
             </p>
             <hr />
         </header>
+        <main>
+            <div class="newOrganization">
+                <button class="open-button" onClick="openForm()">New Organization</button>
+                <div class="form-popup" id="newOrganization">
+                    <form class="form-container">
+                        <h1>New Organization</h1>
+                        <lable for = "name">Name:</lable>
+                        <input type="text" placheolder="name" name="name" required> 
+                        <br />
+                        <lable for = "world">World:</lable>
+                        <input type="text" placheolder="world" name="world" required> 
+                        <br />
+                        <lable for = "type">Type:</lable>
+                        <input type="text" placheolder="Religion, Guild, Gang, institution, etc." name="type" required> 
+                        <br />
+                        <lable for = "classification">Classification:</lable>
+                        <select id = "classification" name="varClassification">
+                            <option selected>uni-world</option>
+                            <option>Multiversal</option>
+                        </select>
+                        <br />
+                        <lable for = "leader">Leader(s):</lable>
+                        <input type="text" placheolder="Leader(s)" name="leader"> 
+                        <br />
+                        <lable for = "descripton">Description:</lable>
+                        <input type="text" placheolder="description" name="description" > 
+                        <br />
+                        <br />
+                        <lable for="descripton">Description:</lable>
+                        <textarea id="description" placheolder="Describe your Organizastion" name="description" required> </textarea>
+                        <br />
+                        <lable for="history">History:</lable>
+                        <textarea id="history" placheolder="History" name="history"> </textarea>
+                        <br />
+                        <lable for="goals">Goals:</lable>
+                        <textarea id="goals" placheolder="What are the goals of the orginization?" name="goals" > </textarea>
+                        <br />
+                        <lable for = "race">Race(s):</lable>
+                        <input type="text" placheolder="race" name="race"> 
+                        <br />
+                        
+                        <lable for = "allies">allies:</lable>
+                        <input type="text" placheolder="Ally" name="allies"> 
+                        <br />
+                        <lable for = "enemies">Enemies:</lable>
+                        <input type="text" placheolder="Enemy" name="enemies"> 
+                        <br />
+
+                        <button type="submit">Create</button> 
+                        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+
+                    </form>
+
+                </div>
+            </div>
+            <hr/>
+            <div class = "filterAndSort">
+                <aside>Filter</aside>
+                <form action="" method="get">
+                    <lable for="type">Type: </lable>
+                    <select id = "type" name="varType">
+                        <option selected>All</option>
+                        <option>Religion</option>
+                        <option>Guild</option>
+                        <option>Institution</option>
+                    </select>
+                    <lable for = "classification">Classification:</lable>
+                    <select id = "classification" name="varClassification">
+                        <option selected>All</option>
+                        <option>uni-world</option>
+                        <option>Multiversal</option>
+                    </select>
+                    <lable for="world">world: </lable>
+                    <select id = "world" name="varWorld">
+                        <option selected>All</option>
+                        <option>The Void</option>
+                    </select>
+                    <lable for="author">Author: </lable>
+                    <select id = "author" name="varAuthor">
+                        <option selected>All</option>
+                        <option>Spencer Zaugg</option>
+                    </select>
+                    <lable for="sort">Sort: </lable>
+                    <select id = "sort" name="varSort">
+                        <option selected>Popular</option>
+                        <option>New to Old</option>
+                        <option>Old to New</option>
+                        <option>A-Z Name</option>
+                        <option>Z-A Name</option>
+                        <option>A-Z Leader</option>
+                        <option>Z-A Leader</option>
+                        <option>A-Z Author</option>
+                        <option>Z-A Author</option>
+                        <option>A-Z World</option>
+                        <option>Z-A World</option>
+                    </select>
+                </form>
+            </div>
+            <hr />
+
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Classification</th>
+                    <th>World</th>
+                    <th>Author</th>
+                </tr>
+                <tr>
+                    <td><a href="templates/projectyggdrasil.html">Project Yggdrasil</a></td>
+                    <td>Institution</td>
+                    <td>Multiversal</td>
+                    <td><a href="templates/thevoid.html">The Void</a></td>
+                    <td>Spencer Zaugg</td>
+                </tr>
+            </table>
+
+        </main>
 
         <footer>
             <hr />
