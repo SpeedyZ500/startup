@@ -16,6 +16,7 @@
         <header>
             <nav>
                 <menue>
+                    
                     <li><a href = "../../index.html"><img alt = "Project Yggdrasil" src = "../../ProjectYggdrasil.png" width = 200/></a></li>
                     <li><a href = "../../stories.html">Stories</a></li>
                     <li><a href = "../../writingprompts.html">Writing Prompts</a></li>
@@ -31,14 +32,15 @@
                         <li><a href = "../organizations.html">Organizations</a></li>
 
                     </ul>
-                    <li><a href = "../writingadvice.html">Writing Advice</a></li>
-                    <li><a href = "../about.html">About</a></li>
+                    <li><a href = "../../writingadvice.html">Writing Advice</a></li>
+                    <li><a href = "../../about.html">About</a></li>
                     <li>
                         <lable for = "search" >Search:</lable>
                         <input type = "search" name = "varSearch" />
                     </li>
-                    <li><a href = "../settings.html">settings</a></li>
-                    <li><a href = "../login.html"> log-in/sign-up</a></li>
+                    <li><a href = "../../settings.html">settings</a></li>
+                    <li><a href = "../../login.html"> log-in/sign-up</a></li>
+                    
                 </menue>
             </nav>
             <hr />
@@ -52,12 +54,131 @@
             <hr />
         </header>
         <main>
+            <div class="world">
+                <h2>Wlord:</h2>
+                <ul>
+                    <li><a href="thevoid.html">The Void</a></li>
+                </ul>
+            </div>
+            <div class="type">
+                <h2>Type:</h2>
+                <ul>
+                    <li>Institution</li>
+                </ul>
+            </div>
+            <div class="leaders">
+                <h2>Leader(s)</h2>
+                <ul>
+                    <li>Spencer Zaugg</li>
+                    <li><a href="../../templates/alastormoonblaze.html">Alastor Moonblaze?</a></li>
+                </ul>
+            </div>
+
+            <div class="classification">
+                <h2>Classification:</h2>
+                <ul>
+                    <li>Multiversal</li>
+                </ul>
+            </div>
+            <div class="history">
+                <h2>History:</h2>
+                <aside>
+                    Founded by Spencer Zaugg while he was creating a website for his CS 260 class at BYU.
+                    Somhow it began to be able to view and access information from another world and facilitate communication between worlds.
+
+                </aside>
+            </div>
+
+            <div class="goals">
+                <h2>Goals:</h2>
+                <dl>
+                    <dt>Inspire Writers</dt>
+                    <dd>
+                        Writers help to stabelize realities.
+                        When a writer doesn't write a story idea they come up with, it causes multiversal collapse.
+                        Killing trillions of lives in the process, which can affect stories protected by the branches of Yggdrasil.
+                        Causing additional  multiversal collapse events, however the more stories Yggdrasil contains the more stable it is.
+                        Some stories never written are  apart of Yggdrasil, and protected by its branches, but can still be affected 
+                        by multiversal collapse, unless The World Tree is strong enough to resist it.
+                    </dd>
+                    <dt>Chronicle the stories Within</dt>
+                    <dd>There are stories untold contained within Yggdrasil, these stories unwrritten are apart of Yggdrasil, when the writer gives up on them, they collapse.
+                        Chronicling them however strengthens Yggdrasil, and prevents them from experiensing collapse.
+                    </dd>
+                    <dt>Protect the inhabitants of Yggdrasil</dt>
+                    <dd>
+                        The people within the worlds within Yggdrasil may seem imaginary to us, however who are we to define who is real and who is not.
+                    </dd>
+                </dl>
+            </div>
+            <div class="races">
+                <div class="newRace">
+                    <button class="open-button" onClick="openForm()">New Race</button>
+                    <div class="form-popup" id="newRace">
+                        <form class="form-container">
+                            <h1>New Race</h1>
+                            <lable for = "name">Name:</lable>
+                            <input type="text" placheolder="name" name="name" required> 
+                            <br />
+                            <lable for="type">Type:</lable>
+                            <input type="text" placeholder="Humanoid, insectoid, Avian, etc." name ="type">
+                            <br />
+                            <lable for="descripton">Description:</lable>
+                            <textarea id="description" placheolder="Describe your Race" name="description" required> </textarea>
+                            <br />
+                            <lable for="abilities">Abilities:</lable>
+                            <input type="text" placeholder="Magic Systems Accessable" name ="abilities">
+                            <br />
+                            <textarea id="abilities" placheolder="what abilities does the race have?" name="abilities" required> </textarea>
+                            <br />
+                            <lable for="origin">Origin:</lable>
+                            <input type="text" placeholder="Where is your Race From originally?" name ="origin">
+                            <br />
+                            <lable for="world">World:</lable>
+                            <input type="text" placeholder="What world(s) do your Race appear in?" name ="world">
+                            <br />
+                            
+                            <button type="submit">Create</button> 
+                            <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+                            
+                        </form>
+                    </div>
+                </div>
+                <ul>
+                    <li><a href="remgulus.html">Remgulus</a></li>
+                    <li>Humans</li>
+                </ul>
+            </div>
+            <div class="members">
+                <h2>Members</h2>
+                <ul>
+                    <li><a href="../../templates/alastormoonblaze.html">Alastor Moonblaze</a></li>
+                    <li>Spencer Zaugg</li>
+                    <!-- a dynamic list of all the authors, as well as other people in world-->
+                </ul>
+            </div>
+
+            <div class="allies">
+                <h2>Allies:</h2>
+                <li>Spencer Zaugg</li>
+                <li><a href="../worldbuilding/templates/projectyggdrasil.html">Project Yggdrasil (organization)</a></li>
+                
+
+            </div>
+            <div class="enemies">
+                <h2>Enemies</h2>
+                <li><a href="thecurator.html">The Curator</a></li>
+            </div>
+            <div class = "Author">
+                <h2>Author</h2>
+                <ul><li>Spencer Zaugg</il></ul>
+            </div>
 
         </main>
         <footer>
             <hr />
             <span class="text-restet">Author Name:</span>
-            <td>Spencer Zaugg</td>
+            <dt>Spencer Zaugg</dt>
             <br />
             <a href = "https://github.com/SpeedyZ500/startup.git"> GitHub</a>
         </footer>

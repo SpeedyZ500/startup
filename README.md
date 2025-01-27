@@ -115,7 +115,7 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 - [x] **3rd party API placeholder** - Put a placeholder toggle for profanity filter under settings
 - [x] **Images** - add logo image, and create webpage main image
 - [x] **Login placeholder** - On the login page put a placeholder for the login stuff, as well as a placeholder for the create account.
-- [x] **DB data placeholder** - Example pages and data for the database, as well as a way to put the text into a form to post. input and submission box for the various post types, each in a class on the pages they are supposed to be on, will be a popup later, also may have more fields
+- [x] **DB data placeholder** - Example pages and data for the database, as well as a way to put the text into a form to post. input and submission box for the various post types, each in a class on the pages they are supposed to be on, will be a popup later, also may have more fields, temporary text, need more time to prepare lore and stories
 - [x] **WebSocket placeholder** - New stories section on home page, reacently updated section as well.
 
 ## 🚀 CSS deliverable

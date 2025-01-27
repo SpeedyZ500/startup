@@ -31,14 +31,15 @@
                         <li><a href = "../organizations.html">Organizations</a></li>
 
                     </ul>
-                    <li><a href = "../writingadvice.html">Writing Advice</a></li>
-                    <li><a href = "../about.html">About</a></li>
+                    <li><a href = "../../writingadvice.html">Writing Advice</a></li>
+                    <li><a href = "../../about.html">About</a></li>
                     <li>
                         <lable for = "search" >Search:</lable>
                         <input type = "search" name = "varSearch" />
                     </li>
-                    <li><a href = "../settings.html">settings</a></li>
-                    <li><a href = "../login.html"> log-in/sign-up</a></li>
+                    <li><a href = "../../settings.html">settings</a></li>
+                    <li><a href = "../../login.html"> log-in/sign-up</a></li>
+                
                 </menue>
             </nav>
             <hr />
@@ -51,24 +52,13 @@
         <main>
             <div class = "contenents">
                 <h2>Contenents</h2>
-                <li>Yiggdrasil</li>
-                <aside>There is only one known contenent in the void, Yiggdrasil</aside>
-            </div>
-            <div class = "countries">
-                <h2>Countries</h2>
-                <div class="newCountry">
+                <div class ="newContenent">
                     <button class="open-button" onClick="openForm()">New Country</button>
-                    <div class="form-popup" id="newCountry">
+                    <div class="form-popup" id="newContentent">
                         <form class="form-container">
-                            <h1>New Country</h1>
+                            <h1>New Contenent</h1>
                             <lable for = "name">Name:</lable>
                             <input type="text" placheolder="name" name="name" required> 
-                            <br />
-                            <lable for = "world">World:</lable>
-                            <input type="text" placheolder="world" name="world" required> 
-                            <br />
-                            <lable for = "leader">Leader(s):</lable>
-                            <input type="text" placheolder="Leader(s)" name="leader"> 
                             <br />
                             <lable for = "descripton">Description:</lable>
                             <input type="text" placheolder="description" name="description" > 
@@ -77,20 +67,11 @@
                             <lable for="descripton">Description:</lable>
                             <textarea id="description" placheolder="Describe your Country" name="description" required> </textarea>
                             <br />
-                            <lable for="history">History:</lable>
-                            <textarea id="history" placheolder="History" name="history"> </textarea>
-                            <br />
-                            <lable for="culture">Culture:</lable>
-                            <textarea id="culture" placheolder="What is your countries Culture" name="culture" > </textarea>
+                            <lable for="geography">Geography:</lable>
+                            <textarea id="history" placheolder="geography" name="geography"> </textarea>
                             <br />
                             <lable for = "race">Race(s):</lable>
                             <input type="text" placheolder="race" name="race"> 
-                            <br />
-                            <lable for = "religion">Religion(s):</lable>
-                            <input type="text" placheolder="religion" name="religion"> 
-                            <br />
-                            <lable for = "organization">Organization(s):</lable>
-                            <input type="text" placheolder="Organization" name="organization"> 
                             <br />
                             <lable for = "flora">Flora:</lable>
                             <input type="text" placheolder="flora" name="flora"> 
@@ -101,6 +82,240 @@
                             <lable for = "biome">Biome(s):</lable>
                             <input type="text" placheolder="biome" name="biome">
                             <br /> 
+                            <button type="submit">Create</button> 
+                            <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+    
+                        </form>
+    
+                    </div>
+
+                </div>
+                <dl>
+                    <dt>Yggdrasil</dt>
+                    <dd>
+                        There is only one known contenent in the void, Yggdrasil the World Tree
+                        <div class = "geography">
+                            <h4>Geography</h4>
+                            <ul>
+                                <li>Tree</li>
+                            </ul>
+                        </div>
+                        <div class = "countries">
+                            <h4>Countries</h4>
+                            <div class="newCountry">
+                                <button class="open-button" onClick="openForm()">New Country</button>
+                                <div class="form-popup" id="newCountry">
+                                    <form class="form-container">
+                                        <h1>New Country</h1>
+                                        <lable for = "name">Name:</lable>
+                                        <input type="text" placheolder="name" name="name" required> 
+                                        <br />
+                                        <lable for = "world">World:</lable>
+                                        <input type="text" placheolder="world" name="world" required> 
+                                        <br />
+                                        <lable for = "leader">Leader(s):</lable>
+                                        <input type="text" placheolder="Leader(s)" name="leader"> 
+                                        <br />
+                                        <lable for = "descripton">Description:</lable>
+                                        <input type="text" placheolder="description" name="description" > 
+                                        <br />
+                                        <br />
+                                        <lable for="descripton">Description:</lable>
+                                        <textarea id="description" placheolder="Describe your Country" name="description" required> </textarea>
+                                        <br />
+                                        <lable for="history">History:</lable>
+                                        <textarea id="history" placheolder="History" name="history"> </textarea>
+                                        <br />
+                                        <lable for="culture">Culture:</lable>
+                                        <textarea id="culture" placheolder="What is your countries Culture" name="culture" > </textarea>
+                                        <br />
+                                        <lable for = "race">Race(s):</lable>
+                                        <input type="text" placheolder="race" name="race"> 
+                                        <br />
+                                        <lable for = "religion">Religion(s):</lable>
+                                        <input type="text" placheolder="religion" name="religion"> 
+                                        <br />
+                                        <lable for = "organization">Organization(s):</lable>
+                                        <input type="text" placheolder="Organization" name="organization"> 
+                                        <br />
+                                        <lable for = "flora">Flora:</lable>
+                                        <input type="text" placheolder="flora" name="flora"> 
+                                        <br />
+                                        <lable for = "wildlife">Wildlife:</lable>
+                                        <input type="text" placheolder="wildlife" name="wildlife">
+                                        <br /> 
+                                        <lable for = "biome">Biome(s):</lable>
+                                        <input type="text" placheolder="biome" name="biome">
+                                        <br /> 
+                                        <lable for = "allies">allies:</lable>
+                                        <input type="text" placheolder="Ally" name="allies"> 
+                                        <br />
+                                        <lable for = "enemies">Enemies:</lable>
+                                        <input type="text" placheolder="Enemy" name="enemies"> 
+                                        <br />
+                
+                                        <button type="submit">Create</button> 
+                                        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+                
+                                    </form>
+                
+                                </div>
+                            </div>
+                            <hr />
+                            <ul>
+                                <li><a href="yggdrasil.html">Yggdrasil</a></li>
+                            </ul>
+                        </div>
+                        <div class="race">
+                            <h4>Race(s)
+
+                            </h4>
+                            <ul>
+                                <li><a href="remgulus.html">Remgulus</a></li>
+                                <li>The Curator</li>
+                            </ul>
+                        </div>
+                        <div class = "flora">
+                            <h4>Flora</h4>
+                            <ul>
+                                <li><a href="worldtree.html">World Tree</a></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="wildlife">
+                            <h4>Wildlife</h4>
+                            <ul>
+                                <li><a href="voidreacher.html">Void Reacher</a></li>
+                            </ul>
+                        </div>
+                        <div class="biomeC">
+                            <button class="open-button" onClick="openForm()">New Biome</button>
+                            <div class="form-popup" id="newBiome">
+                                <form class="form-container">
+                                    <h1>New Biome</h1>
+                                    <lable for="name">Name</lable>
+                                    <input type="text" placheolder="name/title" name="name" required> 
+                                    <br />
+                                    <lable for="descripton">Description:</lable>
+                                    <textarea id="description" placheolder="Describe your Boime" name="description" required> </textarea>
+                                    <br />
+                                    <lable for = "flora">Flora:</lable>
+                                     <input type="text" placheolder="flora" name="flora"> 
+                                    <br />
+                                    <lable for = "wildlife">Wildlife:</lable>
+                                    <input type="text" placheolder="wildlife" name="wildlife">
+                                    
+                                    <br />
+                                    <button type="submit">Create</button> 
+                                    <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+                        
+                                </form>
+                            </div>
+                            <h4>Biome(s)</h4>
+                            <dl>
+                                <dt>World Tree</dt>
+                                <dd>
+                                    The world tree biome is the only known biome to be able to sustane life.
+                                    reduced amount of void entities
+                                    <div class = "flora">
+                                        <h4>Flora</h4>
+                                        <ul>
+                                            <li><a href="worldtree.html">World Tree</a></li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="wildlife">
+                                        <h4>Wildlife</h4>
+                                        <ul>
+                                            <li><a href="voidreacher.html">Void Reacher</a></li>
+                                        </ul>
+                                    </div>
+
+                                </dd>
+                                <dt>The Deep Void</dt>
+                            </dl>
+                        </div>
+                    </dd>
+                </dl>
+
+                
+            </div>
+            <div class="races">
+                <div class="newRace">
+                    <button class="open-button" onClick="openForm()">New Race</button>
+                    <div class="form-popup" id="newRace">
+                        <form class="form-container">
+                            <h1>New Race</h1>
+                            <lable for = "name">Name:</lable>
+                            <input type="text" placheolder="name" name="name" required> 
+                            <br />
+                            <lable for="type">Type:</lable>
+                            <input type="text" placeholder="Humanoid, insectoid, Avian, etc." name ="type">
+                            <br />
+                            <lable for="descripton">Description:</lable>
+                            <textarea id="description" placheolder="Describe your Race" name="description" required> </textarea>
+                            <br />
+                            <lable for="abilities">Abilities:</lable>
+                            <input type="text" placeholder="Magic Systems Accessable" name ="abilities">
+                            <br />
+                            <textarea id="abilities" placheolder="what abilities does the race have?" name="abilities" required> </textarea>
+                            <br />
+                            <lable for="origin">Origin:</lable>
+                            <input type="text" placeholder="Where is your Race From originally?" name ="origin">
+                            <br />
+                            <lable for="world">World:</lable>
+                            <input type="text" placeholder="What world(s) do your Race appear in?" name ="world">
+                            <br />
+                            
+                            <button type="submit">Create</button> 
+                            <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+                            
+                        </form>
+                    </div>
+                </div>
+                <ul>
+                    <li><a href="remgulus.html">Remgulus</a></li>
+                </ul>
+            </div>
+            <div class="religions">
+                <h2>Religions</h2>
+                <div class="newRelegion">
+                    <button class="open-button" onClick="openForm()">New Relegion</button>
+                    <div class="form-popup" id="newRelegion">
+                        <form class="form-container">
+                            <h1>New Religion</h1>
+                            <lable for = "name">Name:</lable>
+                            <input type="text" placheolder="name" name="name" required> 
+                            <br />
+                            <lable for = "world">World:</lable>
+                            <input type="text" placheolder="world" name="world" required> 
+                            <br />
+                            <lable for = "classification">Classification:</lable>
+                            <select id = "classification" name="varClassification">
+                                <option selected>uni-world</option>
+                                <option>Multiversal</option>
+                            </select>
+                            <br />
+                            <lable for = "leader">Leader(s):</lable>
+                            <input type="text" placheolder="Leader(s)" name="leader"> 
+                            <br />
+                            <lable for = "descripton">Description:</lable>
+                            <input type="text" placheolder="description" name="description" > 
+                            <br />
+                            <br />
+                            <lable for="descripton">Description:</lable>
+                            <textarea id="description" placheolder="Describe your Organizastion" name="description" required> </textarea>
+                            <br />
+                            <lable for="history">History:</lable>
+                            <textarea id="history" placheolder="History" name="history"> </textarea>
+                            <br />
+                            <lable for="goals">Goals:</lable>
+                            <textarea id="goals" placheolder="What are the goals of the orginization?" name="goals" > </textarea>
+                            <br />
+                            <lable for = "race">Race(s):</lable>
+                            <input type="text" placheolder="race" name="race"> 
+                            <br />
+                            
                             <lable for = "allies">allies:</lable>
                             <input type="text" placheolder="Ally" name="allies"> 
                             <br />
@@ -115,11 +330,73 @@
     
                     </div>
                 </div>
-                <hr />
                 <ul>
-                    <li><a href="yggdrasil.html">Yggdrasil</a></li>
+                    <li>Wait for data</li>
+                </ul>
+
+            </div>
+
+            <div class="organizations">
+                <h2>Organizations</h2>
+                <div class="newRelegion">
+                    <button class="open-button" onClick="openForm()">New Organization</button>
+                    <div class="form-popup" id="newOrganization">
+                        <form class="form-container">
+                            <h1>New Organization</h1>
+                            <lable for = "name">Name:</lable>
+                            <input type="text" placheolder="name" name="name" required> 
+                            <br />
+                            <lable for = "world">World:</lable>
+                            <input type="text" placheolder="world" name="world" required> 
+                            <br />
+                            <lable for = "type">Type:</lable>
+                            <input type="text" placheolder="Guild, Gang, institution, etc." name="type" required> 
+                            <br />
+                            <lable for = "classification">Classification:</lable>
+                            <select id = "classification" name="varClassification">
+                                <option selected>uni-world</option>
+                                <option>Multiversal</option>
+                            </select>
+                            <br />
+                            <lable for = "leader">Leader(s):</lable>
+                            <input type="text" placheolder="Leader(s)" name="leader"> 
+                            <br />
+                            <lable for = "descripton">Description:</lable>
+                            <input type="text" placheolder="description" name="description" > 
+                            <br />
+                            <br />
+                            <lable for="descripton">Description:</lable>
+                            <textarea id="description" placheolder="Describe your Organizastion" name="description" required> </textarea>
+                            <br />
+                            <lable for="history">History:</lable>
+                            <textarea id="history" placheolder="History" name="history"> </textarea>
+                            <br />
+                            <lable for="goals">Goals:</lable>
+                            <textarea id="goals" placheolder="What are the goals of the orginization?" name="goals" > </textarea>
+                            <br />
+                            <lable for = "race">Race(s):</lable>
+                            <input type="text" placheolder="race" name="race"> 
+                            <br />
+                            
+                            <lable for = "allies">allies:</lable>
+                            <input type="text" placheolder="Ally" name="allies"> 
+                            <br />
+                            <lable for = "enemies">Enemies:</lable>
+                            <input type="text" placheolder="Enemy" name="enemies"> 
+                            <br />
+    
+                            <button type="submit">Create</button> 
+                            <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+    
+                        </form>
+    
+                    </div>
+                </div>
+                <ul>
+                    <li><a href="projectyggdrasil.html">Project Yggdrasil</a></li>
                 </ul>
             </div>
+            
             <div class="wildlife">
                 <h2>Wildlife</h2>
                 <div class="newWildlife">
@@ -142,9 +419,6 @@
                             <lable for="origin">Origin/habitat:</lable>
                             <input type="text" placeholder="Where is your creature from? what habitat" name ="origin">
                             <br />
-                            <lable for="world">World:</lable>
-                            <input type="text" placeholder="What world(s) do your creature appear in?" name ="world">
-                            <br />
                             
                             <button type="submit">Create</button> 
                             <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
@@ -158,16 +432,158 @@
                 </ul>
             </div>
 
+            <div class = "flora">
+                <h2>Flora</h2>
+                <div class="newFlora">
+                    <button class="open-button" onClick="openForm()">New Flora</button>
+                    <div class="form-popup" id="NewFlora">
+                        <form class="form-container">
+                            <h1>New Flora</h1>
+                            <lable for = "name">Name:</lable>
+                            <input type="text" placheolder="name" name="name" required> 
+                            <br />
+                            <lable for="type">Type:</lable>
+                            <input type="text" placeholder="Monster, tree, flower, herb, etc." name ="type">
+                            <br />
+                            <lable for="descripton">Description:</lable>
+                            <textarea id="description" placheolder="Describe your Flora" name="description" required> </textarea>
+                            <br />
+                            <lable for="abilities">Abilities:</lable>
+                            <textarea id="abilities" placheolder="what abilities does it have? is it poisonous? Carnivorous?  Is it used? How is it used?" name="abilities" > </textarea>
+                            <br />
+                            <lable for="origin">Origin/habitat:</lable>
+                            <input type="text" placeholder="Where is your Flora from? what habitat" name ="origin">
+                            <br />
+                            
+                            <button type="submit">Create</button> 
+                            <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+                            
+                        </form>
+                    </div>
+                </div>
+                <ul>
+                    <li><a href="worldtree.html">World Tree</a></li>
+                </ul>
+            </div>
+            <div class = "biome">
+                <h2>biomes</h2>
+                <button class="open-button" onClick="openForm()">New Biome</button>
+                <div class="form-popup" id="newBiome">
+                    <form class="form-container">
+                        <h1>New Biome</h1>
+                        <lable for="name">Name</lable>
+                        <input type="text" placheolder="name/title" name="name" required> 
+                        <br />
+                        <lable for="descripton">Description:</lable>
+                        <textarea id="description" placheolder="Describe your Boime" name="description" required> </textarea>
+                        <br />
+                        <lable for="contenent">Contenent(s)</lable>
+                        <input type="text" placheolder="contenent(s)" name="contenent"> 
+
+                        <lable for = "flora">Flora:</lable>
+                        <input type="text" placheolder="flora" name="flora"> 
+                        <br />
+                        <lable for = "wildlife">Wildlife:</lable>
+                        <input type="text" placheolder="wildlife" name="wildlife">
+                        
+                        <br />
+                        <button type="submit">Create</button> 
+                        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+            
+                    </form>
+                </div>
+                <dl>
+                    <dt>World Tree</dt>
+                    <dd>
+                        The world tree biome is the only known biome to be able to sustane life.
+                        reduced amount of void entities such as the Void Reacher
+                        <div class="contenentB">
+                            <h4>Contenent(s)</h4>
+                            <ul>
+                                <li>Yggdrasil</li>
+                            </ul>
+                        </div>
+                        <div class = "flora">
+                            <h4>Flora</h4>
+                            <ul>
+                                <li><a href="worldtree.html">World Tree</a></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="wildlife">
+                            <h4>Wildlife</h4>
+                            <ul>
+                                <li><a href="voidreacher.html">Void Reacher</a></li>
+                            </ul>
+                        </div>
+
+                    </dd>
+                    <dt>The Deep Void</dt>
+                    <dd>
+                        The Deep Void, origin of all Void entities, the region of the void beyount Yggdrasil, the World Tree.
+                        <div class="contenentB">
+                            <h4>Contenent(s)</h4>
+                            <ul>
+                                <li>None</li>
+                            </ul>
+                        </div>
+                        <div class = "flora">
+                            <h4>Flora</h4>
+                            <ul>
+                                <li>none</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="wildlife">
+                            <h4>Wildlife</h4>
+                            <ul>
+                                <li><a href="voidreacher.html">Void Reacher</a></li>
+                            </ul>
+                        </div>
+                    </dd>
+                </dl>
+                
+
+            </div>
+            <div class="magicsystems">
+                <h2>Magic Systems</h2>
+                <div class="newMagicSystem">
+                    <button class="open-button" onClick="openForm()">New Magic System</button>
+                    <div class="form-popup" id="newMagicSystem">
+                        <form class="form-container">
+                            <h1>New Magic System</h1>
+                            <lable for = "name">Name:</lable>
+                            <input type="text" placheolder="name" name="name" required> 
+                            <br />
+                            <lable for="type">Type:</lable>
+                            <input type="text" placeholder="Dimensional, Technological, Alchemical, Transformation." name ="type">
+                            <br />
+                            <lable for="descripton">Description:</lable>
+                            <textarea id="description" placheolder="Describe your Magic System, requirements, what can it do?" name="description" required> </textarea>
+                            <br />
+    
+                            
+                            <button type="submit">Create</button> 
+                            <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+                            
+                        </form>
+                    </div>
+                </div>
+                <ul>
+                    <li><a href="voidwalking.html">Void Walking</a></li>
+                </ul>
+            </div>
+
             
             <div class = "Author">
                 <h2>Author</h2>
-                <ul>Spencer Zaugg</ul>
+                <ul><li>Spencer Zaugg</il></ul>
             </div>
         </main>
         <footer>
             <hr />
             <span class="text-restet">Author Name:</span>
-            <td>Spencer Zaugg</td>
+            <dt>Spencer Zaugg</dt>
             <br />
             <a href = "https://github.com/SpeedyZ500/startup.git"> GitHub</a>
         </footer>
