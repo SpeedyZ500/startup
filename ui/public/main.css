@@ -14,8 +14,10 @@
         border-bottom: solid white thin;
         a:link{color:white;};
         a:visited{color:white;};
+        background-color: black;
         
     }
+    
     .dropdown-menu{
 
      background-color: black !important;
@@ -53,17 +55,21 @@ header {
 header .theme{
     border-bottom: solid black thin;
 }
+img .navbar-brand{
+    vertical-align: top;
+}
 
 footer a{
     float: right;
 }
 .theme-h{
+    justify-content: flex-start;
+    background-color: white;
     border-bottom: solid black thin;
+    align-items:first baseline;
 }
 
-nav{
-    background-color: white;
-}
+
 
 
 menu {
@@ -141,9 +147,6 @@ nav div button {
         display: none;
     };
     header h1{display: none;};
-    nav{
-        background-color: black;
-    }
     main {
         flex: 1 100vh;
       }

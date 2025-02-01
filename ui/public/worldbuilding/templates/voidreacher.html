@@ -7,52 +7,175 @@
         <link rel="icon" href="../../favicon.ico" />
         <link rel="stylesheet" href="../../main.css">
 
-        <style>
-            .worldbuilding{
-                display: block
-            }
-        </style>
+        <link rel="stylesheet" href="../../worldbuilding.css">
+        
+        <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi"
+        crossorigin="anonymous"
+        /> 
+        <script 
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" 
+        integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" 
+        crossorigin="anonymous"></script>
     </head>
     <body class="theme adaptive">
         
         <header>
-            <nav>
-                <menue>
-
-                    <li><a href="../../index.html"><img alt="Project Yggdrasil" src="../../ProjectYggdrasil.png" width=200/></a></li>
-                    <li><a href="../../stories.html">Stories</a></li>
-                    <li><a href="../../writingprompts.html">Writing Prompts</a></li>
-                    <li><a href="../../characters.html">Characters</a></li>
-                    <li><a href="../../worldbuilding.html">World Building</a></li>
-                    <ul class="worldbuilding">
-                        <li><a href="../magicsystems.html">Magic Systems</a></li>
-                        <li><a href="../races.html">Races</a></li>
-                        <li><a href="../countries.html">Countries</a></li>
-                        <li><a href="../wildlife.html">Wildlife</a></li>
-                        <li><a href="../flora.html">Flora</a></li>
-                        <li><a href="../worlds.html">Worlds</a></li>
-                        <li><a href="../organizations.html">Organizations</a></li>
-
-                    </ul>
-                    <li><a href="../../writingadvice.html">Writing Advice</a></li>
-                    <li><a href="../../about.html">About</a></li>
-                    <li>
-                        <lable for="search" >Search:</lable>
-                        <input type="search" name="varSearch" />
-                    </li>
-                    <li><a href="../../settings.html">settings</a></li>
-                    <li><a href="../../login.html"> log-in</a></li>
-                </menue>
-            </nav>
-            <hr />
-            <h1>Void Reacher</h1>
-            <p>
-                DATA WAITING APPROVAL
-            </p>
+            <div class="container-fluid position-relative"  >
+                <nav class="navbar top theme-h adaptive" aria-label="primary">
+                    <div class="navbar-header">
+                        <a class="navbar-brand"href="../../index.html">
+                            <picture alt="Project Yggdrasil (home)" width="200">
+                                <source srcset="../../transparentProjectYggdrasil.png" media="(prefers-color-scheme: light)" />
+                                <source srcset="../../transparentProjectYggdrasilDark.png" media="(prefers-color-scheme: dark)" />
+                                <img  alt="Project Yggdrasil (home)" src="../../transparentProjectYggdrasil.png" width=200/>
+                            </picture>
+                        </a>
+                    </div>
+                    <div id="mobile">
+                        <button class="navbar-toggler float-right" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+                            <div class="offcanvas-header">
+                                <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Project Yggdrasil</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                            </div>
+                            <div class="offcanvas-body">
+                                <menu class="navbar-nav justify-content-end">
+                        
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="../../stories.html">Stories</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="../../writingprompts.html">Writing Prompts</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="../../characters.html">Characters</a>
+                                    </li>
+                                    <li class="dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            World Building
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="../../worldbuilding.html">Overview</a></li>
+                                            <li>
+                                                <hr class="dropdown-divider">
+                                            </li>
+                                            <li class="dropdown-item"><a class="dropdown-item" href="../magicsystems.html">Magic Systems</a></li>
+                                            <li class="dropdown-item"><a class="dropdown-item" href="../races.html">Races</a></li>
+                                            <li class="dropdown-item"><a class="dropdown-item" href="../countries.html">Countries</a></li>
+                                            <li class="dropdown-item"><a class="dropdown-item" href="../wildlife.html">Wildlife</a></li>
+                                            <li class="dropdown-item"><a class="dropdown-item" href="../flora.html">Flora</a></li>
+                                            <li class="dropdown-item"><a class="dropdown-item" href="../worlds.html">Worlds</a></li>
+                                            <li class="dropdown-item"><a class="dropdown-item" href="../organizations.html">Organizations</a></li>
+                                        </ul>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="../../writingadvice.html">Writing Advice</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="../../about.html">About</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <form class="d-flex" role="search">
+                                            <input class="form-control" type="search" placeholder="Search" aria-label="Search">
+                                            <button class="btn btn-outline-success" type="submit">Search</button>
+                                        </form>
+                                    </li>
+                                    <li class="nav-item" id="settings">
+                                        <a class="nav-link" href="../../settings.html">
+                                            settings 
+                                        </a>
+                                    </li>
+                                    <li class="nav-item" id="log-in">
+                                        <a class="nav-link" href="../../login.html">log-in</a>
+                                    </li>
+                                </menu>
+                            </div>
+                        </div>
+                    </div>
+                    <menu class="navbar-nav" id="navbar-desktop">
+                        <li class="nav-item">
+                            <a class="nav-link" href="../../stories.html">Stories</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../../writingprompts.html">Writing Prompts</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../../characters.html">Characters</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                World Building
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../../writingadvice.html">Writing Advice</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../../about.html">About</a>
+                        </li>
+                        <ul class="navbar-nav navbar-right">
+                            <li class="nav-item">
+                                <form class="d-flex" role="search">
+                                    <input class="form-control" type="search" placeholder="Search" aria-label="Search">
+                                    <button class="btn btn-outline-success" type="submit">Search</button>
+                                </form>
+                            </li>
+                            <li class="nav-item" id="settings">
+                                <a class="nav-link" href="../../settings.html">
+                                    settings   
+                                </a>
+                            </li>
+                            <li class="nav-item" id="log-in">
+                                <a class="nav-link" href="../../login.html">log-in</a>
+                            </li>
+                        </ul>
+                    </menu>
+                </nav>
+            </div>
+            <div class="theme-h adaptive container-fluid" >
+                <nav class="navbar" aria-label="Secondary" id="worldbuilding">
+                    <menu class="navbar-nav" >
+                        <li class="nav-item">
+                            <a class="nav-link" href="../../worldbuilding.html">Overview</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../magicsystems.html">Magic Systems</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../races.html">Races</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../countries.html">Countries</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="../wildlife.html">Wildlife</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../flora.html">Flora</a>
+                        </li class="nav-item">
+                        <li class="nav-item">
+                            <a class="nav-link" href="../worlds.html">Worlds</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../organizations.html">Organizations</a>
+                        </li>
+                    </menu>
+                </nav>
+            </div>
         </header>
 
         <main>
-    
+            <div class="theme-h adaptive">
+                <h1>Void Reacher</h1>
+                <p>
+                    DATA WAITING APPROVAL
+                </p>
+            </div>
             <div class="Type">
                 <hr />
 
