@@ -5,50 +5,164 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>About</title>
         <link rel="icon" href="favicon.ico" />
+        <link rel="stylesheet" href="main.css">
+
         <style>
             .worldbuilding{
                 display: none
             }
         </style>
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi"
+            crossorigin="anonymous"
+        /> 
+        
+        <script 
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" 
+        integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" 
+        crossorigin="anonymous"></script>
     </head>
 
-    <body>
+    <body class="theme adaptive">
         
         <header>
-            <nav>
-                <menue>
-                    <li><a href="index.html"><img alt="Project Yggdrasil" src="ProjectYggdrasil.png" width=200/></a></li>
-                    <li><a href="stories.html">Stories</a></li>
-                    <li><a href="writingprompts.html">Writing Prompts</a></li>
-                    <li><a href="characters.html">Characters</a></li>
-                    <li><a href="worldbuilding.html">World Building</a></li>
-                    <ul class="worldbuilding">
-                        <li><a href="worldbuilding/magicsystems.html">Magic Systems</a></li>
-                        <li><a href="worldbuilding/races.html">Races</a></li>
-                        <li><a href="worldbuilding/countries.html">Countries</a></li>
-                        <li><a href="worldbuilding/wildlife.html">Wildlife</a></li>
-                        <li><a href="worldbuilding/flora.html">Flora</a></li>
-                        <li><a href="worldbuilding/worlds.html">Worlds</a></li>
-                        <li><a href="worldbuilding/organizations.html">Organizations</a></li>
-
-                    </ul>
-                    <li><a href="writingadvice.html">Writing Advice</a></li>
-                    <li><a href="about.html">About</a></li>
-                    <li>
-                        <lable for="search" >Search:</lable>
-                        <input type="search" name="varSearch" />
-                    </li>
-                    <li><a href="settings.html">settings</a></li>
-                    <li><a href="login.html"> log-in/sign-up</a></li>
-                </menue>
-                
-                
-            </nav>
-            <hr />
-            <h1>About</h1>
-            <p>
-                <h4>stuff from Spencer</h4>
-                Welcome to Project Yggdrasil.
+            <div class="container-fluid"  >
+                <nav class="navbar fixed-top theme-h adaptive">
+                    <div class="navbar-header">
+                        <a class="navbar-brand"href="index.html">
+                            <picture alt="Project Yggdrasil (home)" width="200">
+                                <source srcset="transparentProjectYggdrasil.png" media="(prefers-color-scheme: light)" />
+                                <source srcset="transparentProjectYggdrasilDark.png" media="(prefers-color-scheme: dark)" />
+                                <img  alt="Project Yggdrasil (home)" src="transparentProjectYggdrasil.png" width=200/>
+                            </picture>
+                        </a>
+                    </div>
+                    <div id="mobile">
+                        <button class="navbar-toggler float-right" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+                            <div class="offcanvas-header">
+                                <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Project Yggdrasil</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                            </div>
+                            <div class="offcanvas-body">
+                                <menu class="navbar-nav justify-content-end">
+                        
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="stories.html">Stories</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="writingprompts.html">Writing Prompts</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="characters.html">Characters</a>
+                                    </li>
+                                    <li class="dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            World Building
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            <li ><a class="dropdown-item" href="worldbuilding.html">Overview</a></li>
+                                            <li>
+                                                <hr class="dropdown-divider">
+                                            </li>
+                                            <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/magicsystems.html">Magic Systems</a></li>
+                                            <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/races.html">Races</a></li>
+                                            <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/countries.html">Countries</a></li>
+                                            <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/wildlife.html">Wildlife</a></li>
+                                            <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/flora.html">Flora</a></li>
+                                            <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/worlds.html">Worlds</a></li>
+                                            <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/organizations.html">Organizations</a></li>
+                                        </ul>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="writingadvice.html">Writing Advice</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="about.html">About</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <form class="d-flex" role="search">
+                                            <input class="form-control" type="search" placeholder="Search" aria-label="Search">
+                                            <button class="btn btn-outline-success" type="submit">Search</button>
+                                        </form>
+                                    </li>
+                                    <li class="nav-item" id="settings">
+                                        <a class="nav-link" href="settings.html">
+                                            settings 
+                                        </a>
+                                    </li>
+                                    <li class="nav-item" id="log-in">
+                                        <a class="nav-link" href="login.html">log-in</a>
+                                    </li>
+                                </menu>
+                            </div>
+                        </div>
+                    </div>
+                    <menu class="navbar-nav" id="navbar-desktop">
+                        <li class="nav-item">
+                            <a class="nav-link" href="stories.html">Stories</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="writingprompts.html">Writing Prompts</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="characters.html">Characters</a>
+                        </li>
+                        <li class="dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                World Building
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li ><a class="dropdown-item" href="worldbuilding.html">Overview</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/magicsystems.html">Magic Systems</a></li>
+                                <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/races.html">Races</a></li>
+                                <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/countries.html">Countries</a></li>
+                                <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/wildlife.html">Wildlife</a></li>
+                                <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/flora.html">Flora</a></li>
+                                <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/worlds.html">Worlds</a></li>
+                                <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/organizations.html">Organizations</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="writingadvice.html">Writing Advice</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="about.html">About</a>
+                        </li>
+                        <ul class="navbar-nav navbar-right">
+                            <li class="nav-item">
+                                <form class="d-flex" role="search">
+                                    <input class="form-control" type="search" placeholder="Search" aria-label="Search">
+                                    <button class="btn btn-outline-success" type="submit">Search</button>
+                                </form>
+                            </li>
+                            <li class="nav-item" id="settings">
+                                <a class="nav-link" href="settings.html">
+                                    settings   
+                                </a>
+                            </li>
+                            <li class="nav-item" id="log-in">
+                                <a class="nav-link" href="login.html">log-in</a>
+                            </li>
+                        </ul>
+                    </menu>
+                </nav>
+            </div>
+        </header>
+        <main>
+            <div>
+                <h1 class="theme-h adaptive">About</h1>
+                <h4 class="theme-h adaptive">stuff from Spencer</h4>
+                <p>
+               
+                <aside class="theme-h adaptive">Welcome to Project Yggdrasil.
                 <br />
                 <br />
                 Project Yggdrasil is a group authoring site where you can make branching timelines of the stories you like, 
@@ -58,43 +172,50 @@
                 wildlife (monsters, magical creatures, etc.), cities, and countries (and their relevant stories).
                 <br />
                 <br />
+                
                 Please be respectful and refrain from hate speach in the coments. I'm not sure about the stories, please be respectful,
                 however there is something to be said about those atributes being useful when making villans. 
                 Please tag your stories with the apropriate content warnings and genre(s). 
                 <br />
                 <br />
                  I have tried to ensure that AI won't be able to scrape this site, but I don't know if they will scrape it anyways.
+                </aside>
                 <br />
                 <br />
-                <h4>Stuff from the Project Yggdrasil Team across The Void</h4>
+                <h4 class="theme-h adaptive">Stuff from the Project Yggdrasil Team across The Void</h4>
                 <br />
-                Thanks for explaining how this site works, though I would have prefered that you not refer to "lore," or "worldbuilding," 
-                or "stories going in the wrong direction," as that makes it sound like we are not real. And that our stories aren't real, 
-                just because it's your imaginations that influence what parts of our stories you can see, and what timelines you can view.
-                <br />
-                <br />
-                <h5>Mysterious Content Warnings</h5>
-                <br />
-                You may encounter a content warning tag labeled "Fallen Universe," or "Lost Branch," these tags refer to
-                events on a scale that lead to multiversal collapse. "Lost Branches," are only on the scale of the timeline.
-                "Fallen Universes" are lost enterly from the trunck of the World Tree, to the void, and as far as The Curator
-                can tell, are lost forever, and who are we to question the word of a Realmatic Arborist.
+                <aside class="theme-h adaptive">
+                    Thanks for explaining how this site works, though I would have prefered that you not refer to "lore," or "worldbuilding," 
+                    or "stories going in the wrong direction," as that makes it sound like we are not real. And that our stories aren't real, 
+                    just because it's your imaginations that influence what parts of our stories you can see, and what timelines you can view.
+                </aside> 
                 <br />
                 <br />
-                <h5>Who is The Curator?</h5>
+                <h5 class="theme-h adaptive">Mysterious Content Warnings</h5>
                 <br />
-                That is an exellent question, sadly we at Project Yggdrasil can't realy answer that. The Curator is not Spencer, the creator of this site,
-                he is from your reality, which is some-how compleatly disconnected from Yggdrasil, and across The Void from our realities. That realy doesn't answer
-                the question of who "The Curator" is, all the known information on this elusive entity can be found in the Characters tab. Now that I think about it 
-                Spencer looked almost scared when asked about whether or not he was The Curator when we first met him through the window that connects realities.
-                We don't know why Spencer was scared, The Curator has no power to harm him because The Curator cannot travel to your reality. 
-                And the Curator should have no reason to harm him in the first place, after all he seems to be a nice enough fellow.
-
+                <aside class="theme-h adaptive">
+                    You may encounter a content warning tag labeled "Fallen Universe," or "Lost Branch," these tags refer to
+                    events on a scale that lead to multiversal collapse. "Lost Branches," are only on the scale of the timeline.
+                    "Fallen Universes" are lost enterly from the trunck of the World Tree, to the void, and as far as The Curator
+                    can tell, are lost forever, and who are we to question the word of a Realmatic Arborist.
+                </aside>
+                
+                <br />
+                <br />
+                <h5 class="theme-h adaptive">Who is The Curator?</h5>
+                <br />
+                <aside>
+                     That is an exellent question, sadly we at Project Yggdrasil can't realy answer that. The Curator is not Spencer, the creator of this site,
+                    he is from your reality, which is some-how compleatly disconnected from Yggdrasil, and across The Void from our realities. That realy doesn't answer
+                    the question of who "The Curator" is, all the known information on this elusive entity can be found in the Characters tab. Now that I think about it 
+                    Spencer looked almost scared when asked about whether or not he was The Curator when we first met him through the window that connects realities.
+                    We don't know why Spencer was scared, The Curator has no power to harm him because The Curator cannot travel to your reality. 
+                    And the Curator should have no reason to harm him in the first place, after all he seems to be a nice enough fellow.
+                </aside>
+               
                 
             </p>
-        </header>
-        <main>
-            
+            </div>
         </main>
 
         <footer>
