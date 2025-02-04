@@ -125,7 +125,7 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 - [x] **Header, footer, and main content body** - implement dark and light mode, and stuff, make everything in flex boxes. using a common css `main.css`. use other css files for specifics such as `login.css` and `worldbuilding.css`
 - [x] **Navigation elements** - redo Nav bar using bootstrap navbar
 - [x] **Responsive to window resizing** - use bootstrap, `display:flex` to make cards and stuff to ensure that elements are properly sized, and adapt to display, make navbar become a menue button that expans a navbar for smaller screens
-- [ ] **Application elements** - use bootstrap to make cards, and buttons for my forms. use `display: flex` to arange suff, also move the create stuff forms into offcanvas popups. Remove the In page creation buttons, you will add your contentents discription through edditing the continent data on the world Page, when I get around to that sometime during either reactivity or DB Note that the actual pages for the database are unfinished, and won't be until the DB portion.
+- [x] **Application elements** - use bootstrap to make cards, and buttons for my forms. use `display: flex` to arange suff, also move the create stuff forms into offcanvas popups. Remove the In page creation buttons, you will add your contentents discription through edditing the continent data on the world Page, when I get around to that sometime during either reactivity or DB Note that the actual pages for the database are unfinished, and won't be until the DB portion.
 - [x] **Application text content** - change the font to something nice
 - [x] **Application images** - make images respond to the preferences
 
