@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Flora</title>
+        <title>Biome</title>
         <link rel="icon" href="../favicon.ico" />
         <link rel="stylesheet" href="../main.css">
 
@@ -21,7 +21,6 @@
         crossorigin="anonymous"></script>
     </head>
     <body class="theme adaptive">
-        
         <header>
             <div class="container-fluid position-relative"  >
                 <nav class="navbar top theme-h adaptive" aria-label="primary">
@@ -158,7 +157,7 @@
                             <a class="nav-link" href="wildlife.html">Wildlife</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" href="flora.html">Flora</a>
+                            <a class="nav-link" href="flora.html">Flora</a>
                         </li class="nav-item">
                         <li class="nav-item">
                             <a class="nav-link" href="worlds.html">Worlds</a>
@@ -167,70 +166,67 @@
                             <a class="nav-link" href="organizations.html">Organizations</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="biomes.html">Biomes</a>
+                            <a class="nav-link active" href="biomes.html">Biomes</a>
                         </li>
                     </menu>
                 </nav>
             </div>
         </header>
-
         <main>
             <div class="theme-h adaptive textbody">
-                <h1>Flora</h1>
+                <h1>Biome</h1>
                 <p>
-                    The plant-life you create, a description of what they look like, uses or effects, is it poisonous? Is it carnivorous?
-                    Plant type monsters should be in this tab, because they aren't wildlife, they are plants, and therefor should be among thier kind
-                    note that you should feel free to make a Plant monster of some of your useful plants, because that would be something that could happen
-                    if monster plants existed, because mimicry, whether it was the useful plant that mimics the monster plan, or the monster that mimics the useful
-                    either would be accurate.
+                   The Biomes you create, and they have the worlds and contenents that this type of biome appears in.
                 </p>
             </div>
-            <button class="btn btn-primary button-align" onClick="openForm()" data-bs-toggle="offcanvas" data-bs-target="#offcanvasFlora" aria-controls="offcanvasFlora">New Flora</button>
-            <div class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasFlora" aria-labelledby="offcanvasFloraLabel">
+            <button class="btn btn-primary button-align" onClick="openForm()" data-bs-toggle="offcanvas" data-bs-target="#offcanvasBiome" aria-controls="offcanvasBiome">New Biome</button>
+            <div class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasBiome" aria-labelledby="offcanvasBiomeLabel">
                 
                 <div class="offcanvas-header">
-                    <h4 class="offcanvas-title" id="offcanvasFloratLabel">New Flora</h4>
+                    <h4 class="offcanvas-title" id="offcanvasBiometLabel">New Biome</h4>
                     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
-                <div class="newFlora">
-                    <div class="form-popup" id="newFlora">
+                <div class="newBiome">
+                    <div class="form-popup" id="newBiome">
                         <form class="form-container">
                             <div class="input-group">
                                 <lable class="input-group-text" for="name">Name:</lable>
                                 <input class="form-control" type="text" placheolder="name" name="name" required> 
                             </div>
                             <div class="input-group">
-                                <lable class="input-group-text" for="world">Origin World:</lable>
+                                <!--Will make it multi select at some point-->
+                                <lable class="input-group-text" for="world">World:</lable>
                                 <select class="form-select" placheolder="world" name="type"> 
                                     <option selected>Choose a world</option>
                                     <option>The Void</option>
                                 </select>
                             </div>
                             <div class="input-group">
-                                <lable class="input-group-text" for="type">Type:</lable>
-                                <input class="form-control" type="text" placheolder="Monster, tree, flower, herb, etc." name="type" required> 
+                                <lable class="input-group-text" for="descripton">Description:</lable>
+                                <textarea class="form-control" id="description" placheolder="Describe your Country" name="description" required> </textarea>
+
+                            </div>
+                           
+                            
+                            <div class="input-group">
+                                <lable class="input-group-text" for="wildlife">Wildlife:</lable>
+                                <!--Will make this multi Select at some point-->
+                                <input class="form-control" type="text" placheolder="wildlife, what creatures" name="wildlife"> 
+                            </div>
+                            <div class="input-group">
+                                <lable class="input-group-text" for="flora">Flora:</lable>
+                                <input class="form-control" type="text" placheolder="Flora, what plants" name="flora"> 
                             </div>
                             
                             <div class="input-group">
-                                <lable class="input-group-text" for="descripton">Description:</lable>
-                                <textarea class="form-control" id="description" placheolder="Describe your Flora" name="description" required> </textarea>
+                                <lable class="input-group-text" for="continent">Continent:</lable>
+                                <input class="form-control" type="text" placheolder="what continent(s) is/are your biome in?" name="continent"> 
+                            </div>    
+                            
+                            
+                            
 
-                            </div>
-                            <div class="input-group">
-                                <lable class="input-group-text" for="abilities">Abilities:</lable>
-                                <input class="form-control" type="text" placheolder="abilities" name="abilities"> 
-                            </div>
-
-                          
-                            <div class="input-group">
-                                <lable class="input-group-text" for="worlds">Worlds:</lable>
-                                <input class="form-control" type="text" placheolder="What worlds does your flora appear in" name="worlds"> 
-                            </div>
-                            <div class="input-group">
-                                <lable class="input-group-text" for="biomes">Biome(s):</lable>
-                                <input class="form-control" type="text" placheolder="What boimes does your flora grow in?" name="biomes"> 
-                            </div>
-                        
+                            
                             <div class="btn-group">
                                 <button class="btn btn-primary" type="submit">Create</button>
                                 <button type="button" class="btn btn-secondary cansel" data-bs-dismiss="offcanvas" aria-label="Close">Cancel</button>
@@ -241,7 +237,7 @@
 
                 </div>
             </div>
-
+            
             <div class="theme-h adaptive expanded">
                 
                 <form class="filterAndSort" action="" method="get">
@@ -251,16 +247,6 @@
                         <select class="form-select" id="world" name="varWorld">
                             <option selected>All</option>
                             <option>The Void</option>
-                        </select>
-                    </div>
-                    <div class="input-group mb-3">
-                        <lable class="input-group-text"for="type">Type </lable>
-                        <select class="form-select" id="type" name="varType">
-                            <option selected>All</option>
-                            <option>Magic Tree</option>
-                            <option>Monster</option>
-                            
-
                         </select>
                     </div>
                     
@@ -277,51 +263,53 @@
                             <option selected>Popular</option>
                             <option>New to Old</option>
                             <option>Old to New</option>
+
                             <option>A-Z Name</option>
                             <option>Z-A Name</option>
                             <option>A-Z Author</option>
                             <option>Z-A Author</option>
-                            <option>A-Z World</option>
-                            <option>Z-A World</option>
                         </select>
                     </div>
                    
                     
                 </form>
             </div>
-            <div class="card-columns d-flex" id="wildlife">
+            <div class="card-columns d-flex" id="biomes">
                 <div class="card" style="width: 18rem">
                     <div class="card-header theme-c adaptive">
-                        <h4><a class="card-link" href="templates/worldtree.html">World Tree</a></h4>
+                        <h4><a class="card-link" href="templates/worldtreebiome.html">The World Tree (Biome)</a></h4>
                     </div>
                     <div class="card-body theme adaptive">
                         <h5 class="card-title"><a class="card-link" href=templates/thevoid.html>The Void</a></h5>
                         <h6 class="card-subtitle">by: Spencer Zaugg</h6>
                         <p>
-                            Type: Magic Tree
+                            The world tree biome is the only known biome to be able to sustane life.
+                            reduced amount of void entities such as the Void Reacher
+                                
+                        </p>
+
+                    </div>
+                    
+                </div>    
+                <div class="card" style="width: 18rem">
+                    <div class="card-header theme-c adaptive">
+                        <h4><a class="card-link" href="templates/thedeepvoid.html">The Deep Void</a></h4>
+                    </div>
+                    <div class="card-body theme adaptive">
+                        <h5 class="card-title"><a class="card-link" href=templates/thevoid.html>The Void</a></h5>
+                        <h6 class="card-subtitle">by: Spencer Zaugg</h6>
+                        <p>
+                            The origin of the Void Entities, the Space Between Earth and Yggdrasil
                         </p>
 
                     </div>
                     
                 </div>              
             </div>
-            <div>
-                <table>
-                    <tr>
-                        <th>Name</th>
-                        <th>Author</th>
-                        <th>World</th>
-                        <th>Type</th>
-                    </tr>
-                    <tr>
-                        <td><a href="templates/worldtree.html">World Tree</a></td>
-                        <td>Spencer Zaugg</td>
-                        <td>The Void</td>
-                        <td><a href="templates/thevoid.html">The Void</a></td>
-                    </tr>
-                </table>
-            </div>
+            
+           
         </main>
+        
 
         <footer>
             <hr />

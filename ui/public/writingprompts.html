@@ -70,6 +70,8 @@
                                             <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/flora.html">Flora</a></li>
                                             <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/worlds.html">Worlds</a></li>
                                             <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/organizations.html">Organizations</a></li>
+                                            <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/biomes.html">Bimoes</a></li>
+
                                         </ul>
                                     </li>
                                     <li class="nav-item">
@@ -122,6 +124,8 @@
                                 <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/flora.html">Flora</a></li>
                                 <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/worlds.html">Worlds</a></li>
                                 <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/organizations.html">Organizations</a></li>
+                                <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/biomes.html">Bimoes</a></li>
+
                             </ul>
                         </li>
                         <li class="nav-item">
@@ -152,47 +156,66 @@
         </header>
             
         <main>
-            <div class="theme-h adaptive">
+            <div class="theme-h adaptive textbody">
                 <h1>Writing Prompts</h1>
                 <br />
                 <asside>Need ideas for a story? here are some ideas</asside>
             </div>
-            <div class="filterAndSort">
-                <aside>Filter</aside>
-                <form action="" method="get">
-                    <lable for="author">Author: </lable>
-                    <select id="author" name="varAuthor">
-                        <option selected>All</option>
-                        <option>Spencer Zaugg</option>
-                    </select>
-                    <lable for="sort">Sort: </lable>
-                    <select id="sort" name="varSort">
-                        <option selected>Popular</option>
-                        <option>New to Old</option>
-                        <option>Old to New</option>
-                        <option>A-Z Title</option>
-                        <option>Z-A Title</option>
-                        <option>A-Z Author</option>
-                        <option>Z-A Author</option>
-                    </select>
-                </form>
-            </div>
-            <hr />
-            <!-- A button to open the form to submitt a new writing prompt -->
-            <div class="newPrompt">
-                <button class="open-button" onClick="openForm()">New Prompt</button>
-                <div class="form-popup" id="newPrompt">
-                    <form class="form-container">
-                        <h1>New Writing Prompt</h1>
-                        <lable for="prompt">writing prompt:</lable>
-                        <input type="text" placheolder="Your prompt" name="prompt" required> 
-                        <button type="submit">Create</button> 
-                        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
 
-                    </form>
+            <button class="btn btn-primary button-align" onClick="openForm()" data-bs-toggle="offcanvas" data-bs-target="#offcanvasPrompt" aria-controls="offcanvasPrompt">New Prompt</button>
+            <div class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasPrompt" aria-labelledby="offcanvasPromptLabel">
+                
+                <div class="offcanvas-header">
+                    <h4 class="offcanvas-title" id="offcanvasPromptLabel">New Prompt</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="newPrompt">
+                    <div class="form-popup" id="newPrompt">
+                        <form class="form-container">
+                            <div class="input-group mb-3">
+                                <lable class="input-group-text"for="prompt">writing prompt:</lable>
+                                <input class="form-control" type="text" placheolder="Your prompt" name="prompt" required> 
+                            </div>
+                            
+                            <div class="btn-group">
+                                <button class="btn btn-primary" type="submit">Create</button>
+                                <button type="button" class="btn btn-secondary cansel" data-bs-dismiss="offcanvas" aria-label="Close">Cancel</button>
+                            </div>
+                            
+                        </form>
 
+                    </div>
                 </div>
             </div>
+            
+            <div class="theme-h adaptive expanded">
+                            
+                <form class="filterAndSort" action="" method="get">
+                    <h4>Filter:</h4>    
+                    <div class="input-group mb-3">
+                         <lable class="input-group-text" for="author">Author: </lable>
+                        <select class="form-select" id="author" name="varAuthor">
+                            <option selected>All</option>
+                            <option>Spencer Zaugg</option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <lable class="input-group-text" for="sort">Sort: </lable>
+                        <select class="form-select" id="sort" name="varSort">
+                            <option selected>Popular</option>
+                            <option>New to Old</option>
+                            <option>Old to New</option>
+                            <option>A-Z Title</option>
+                            <option>Z-A Title</option>
+                            <option>A-Z Author</option>
+                            <option>Z-A Author</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- A button to open the form to submitt a new writing prompt -->
+            
             <div class="prompts">
                 <ul>
                     <li>What if werewoves were real, but they aren't around today because they colonized the moon?</li>
@@ -202,10 +225,12 @@
 
         <footer>
             <hr />
-            <span class="text-restet">Author Name:</span>
-            <td>Spencer Zaugg</td>
-            <br />
-            <a href="https://github.com/SpeedyZ500/startup.git"> GitHub</a>
+            <div class="container-fluid">
+                <span class="text-reset">Author Name:</span>
+                <td>Spencer Zaugg</td>
+                <a href="https://github.com/SpeedyZ500/startup.git"> GitHub</a>
+            </div>
+            
         </footer>
     </body>
     

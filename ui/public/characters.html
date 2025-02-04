@@ -69,6 +69,8 @@
                                             <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/flora.html">Flora</a></li>
                                             <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/worlds.html">Worlds</a></li>
                                             <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/organizations.html">Organizations</a></li>
+                                            <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/biomes.html">Bimoes</a></li>
+
                                         </ul>
                                     </li>
                                     <li class="nav-item">
@@ -121,6 +123,8 @@
                                 <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/flora.html">Flora</a></li>
                                 <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/worlds.html">Worlds</a></li>
                                 <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/organizations.html">Organizations</a></li>
+                                <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/biomes.html">Bimoes</a></li>
+
                             </ul>
                         </li>
                         <li class="nav-item">
@@ -150,123 +154,189 @@
             </div>
         </header>
         <main>
-            <div class="theme-h adaptive">
+            <div class="theme-h adaptive textbody">
                 <h1>Characters</h1>
                 <aside>All the Characters that are currently on the site.</aside>
             </div>
-            <div class="newCharacter">
-                <button class="open-button" onClick="openForm()">New Character</button>
-                <div class="form-popup" id="newCharacter">
-                    <form class="form-container">
-                        <h1>New Character</h1>
-                        <lable for="name">Name/Title:</lable>
-                        <input type="text" placheolder="name/title" name="name" required> 
-                        <br />
-                        <lable for="type">Type:</lable>
-                        <input type="text" placheolder="type" name="type" required> 
-                        <br />
-                        <lable for="titles">title(s):</lable>
-                        <input type="text" placheolder="title(s)" name="titles"> 
-                        <br />
-                        <lable for="descripton">Description:</lable>
-                        <input type="text" placheolder="description" name="description" > 
-                        <br />
-                        <br />
-                        <lable for="descripton">Description:</lable>
-                        <textarea id="description" placheolder="Describe your Character" name="description" required> </textarea>
-                        <br />
-                        <lable for="race">Race:</lable>
-                        <input type="text" placheolder="race" name="race"> 
-                        <br />
-                        <lable for="gender">Gender:</lable>
-                        <input type="text" placheolder="gender" name="race"> 
-                        <br />
-                        <lable for="pronouns">Pronouns:</lable>
-                        <input type="text" placheolder="he/him, they/them, she/her, they/them (colective), etc." name="pronouns"> 
-                        <br />
-                        <lable for="abilities">Abilities:</lable>
-                        <input type="text" placheolder="abilities" name="abilities"> 
-                        <br />
-                        <lable for="allies">allies:</lable>
-                        <input type="text" placheolder="Ally" name="allies"> 
-                        <br />
-                        <lable for="enemies">Enemies:</lable>
-                        <input type="text" placheolder="Enemy" name="enemies"> 
-                        <br />
-                        <lable for="relation">Related to:</lable>
-                        <input type="text" placheolder="Related to" name="relation"> 
+            <button class="btn btn-primary button-align" onClick="openForm()" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCharacter" aria-controls="offcanvasCharacter">New Character</button>
+            <div class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasCharacter" aria-labelledby="offcanvasCharacterLabel">
+                
+                <div class="offcanvas-header">
+                    <h4 class="offcanvas-title" id="offcanvasCharactertLabel">New Character</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="newCharacter">
+                    <div class="form-popup" id="newCharacter">
+                        <form class="form-container">
+                            <div class="input-group">
+                                <lable class="input-group-text" for="name">Name:</lable>
+                                <input class="form-control" type="text" placheolder="name" name="name" required> 
+                            </div>
+                            <div class="input-group">
+                                <lable class="input-group-text" for="world">world:</lable>
+                                <select class="form-select" placheolder="world" name="type"> 
+                                    <option selected>Choose a world</option>
+                                    <option>The Void</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <lable class="input-group-text" for="type">Type:</lable>
+                                <input class="form-control" type="text" placheolder="type" name="type" required> 
+                            </div>
+                            <div class="input-group">
+                                <lable class="input-group-text" for="titles">title(s):</lable>
+                                <input class="form-control" type="text" placheolder="title(s)" name="titles"> 
+                            </div>
+                            <div class="input-group">
+                                <lable class="input-group-text" for="descripton">Description:</lable>
+                                <textarea class="form-control" id="description" placheolder="Describe your Character" name="description" required> </textarea>
 
-                        <br />
+                            </div>
+                            <div class="input-group">
+                                <lable class="input-group-text" for="race">Race:</lable>
+                                <input class="form-control" type="text" placheolder="race" name="race"> 
 
-                        <button type="submit">Create</button> 
-                        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+                            </div>
+                            <div class="input-group">
+                                <lable class="input-group-text" for="gender">Gender:</lable>
+                                <input class="form-control" type="text" placheolder="gender" name="gender">
+                            </div>                             
+                            <div class="input-group">
+                                <lable class="input-group-text" for="pronouns">Pronouns:</lable>
+                                <input class="form-control" type="text" placheolder="he/him, they/them, she/her, they/them (colective), etc." name="pronouns"> 
+                            </div>
+                            <div class="input-group">
+                                <lable class="input-group-text" for="abilities">Abilities:</lable>
+                                <input class="form-control" type="text" placheolder="abilities" name="abilities"> 
+                            </div>
+                            <div class="input-group">
+                                <lable class="input-group-text" for="allies">allies:</lable>
+                                <input class="form-control" type="text" placheolder="Ally" name="allies"> 
+                            </div>
+                            <div class="input-group">
+                                <lable class="input-group-text" for="enemies">Enemies:</lable>
+                                <input class="form-control" type="text" placheolder="Enemy" name="enemies"> 
+                            </div>
 
-                    </form>
+                            <div class="input-group">
+                                <lable class="input-group-text" for="relation">Related to:</lable>
+                                <input class="form-control" type="text" placheolder="Related to" name="relation"> 
+                            </div>    
+                            <div class="btn-group">
+                                <button class="btn btn-primary" type="submit">Create</button>
+                                <button type="button" class="btn btn-secondary cansel" data-bs-dismiss="offcanvas" aria-label="Close">Cancel</button>
+                            </div>
+                        </form>
+    
+                    </div>
 
                 </div>
             </div>
-            <hr />
-            <div class="filterAndSort">
-                <aside>Filter</aside>
-                <form action="" method="get">
-                    <lable for="type">Genre: </lable>
-                    <select id="Type" name="varType">
-                        <option selected>All</option>
-                        <option>Heroes</option>
-                        <option>Villanes</option>
-                        <option>Anti-Heroes</option>
-                        <option>Anti-Villanes</option>
-                        <option>Side-Characters</option>
-                        <option>Wolrd Hoppers</option>
-                    </select>
-                    <lable for="author">Author: </lable>
-                    <select id="author" name="varAuthor">
-                        <option selected>All</option>
-                        <option>Spencer Zaugg</option>
-                    </select>
-                    <lable for="sort">Sort: </lable>
-                    <select id="sort" name="varSort">
-                        <option selected>Popular</option>
-                        <option>New to Old</option>
-                        <option>Old to New</option>
-                        <option>A-Z Name</option>
-                        <option>Z-A Name</option>
-                        <option>A-Z Author</option>
-                        <option>Z-A Author</option>
-                        <option>A-Z World</option>
-                        <option>Z-A World</option>
-                    </select>
-                </form>
-            </div>
-            <div>
+            
+            <div class="theme-h adaptive expanded">
                 
-                <table>
-                    <tr>
-                        <th>Name</th>
-                        <th>World</th>
-                        <th>Author</th>
-                    </tr>
-                    <tr>
-                        <td><a href="templates/thecurator.html">The Curator</a></td>
-                        <td><a href="worldbuilding/templates/thevoid.html">The Void</a></td>
-                        <td>Spencer Zaugg</td>
-                    </tr>
-                    <tr>
-                        <td><a href="templates/alastormoonblaze.html">Alastor Moonblaze</a></td>
-                        <td><a href="worldbuilding/templates/thevoid.html">The Void</a></td>
-                        <td>Spencer Zaugg</td>
-                    </tr>
-                </table>
+                <form class="filterAndSort theme-h adaptive" action="" method="get">
+                    <h4>Filter:</h4>
+                    <div class="input-group mb-3">
+                        <lable class="input-group-text"for="world">World </lable>
+                        <select class="form-select" id="world" name="varWorld">
+                            <option selected>All</option>
+                            <option>The Void</option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <lable class="input-group-text"for="type">Type </lable>
+                        <select class="form-select" id="type" name="varType">
+                            <option selected>All</option>
+                            <option>Heroes</option>
+                            <option>Villanes</option>
+                            <option>Anti-Heroes</option>
+                            <option>Anti-Villanes</option>
+                            <option>Side-Characters</option>
+                            <option>Wolrd Hoppers</option>
+
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <lable class="input-group-text"for="race">Race </lable>
+                        <select class="form-select" id="race" name="varRace">
+                            <option selected>All</option>
+                            <option>???</option>
+                            <option>Remgulus</option>
+                            <option>Human</option>
+
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                         <lable class="input-group-text" for="author">Author </lable>
+                        <select class="form-select" id="author" name="varAuthor">
+                            <option selected>All</option>
+                            <option>Spencer Zaugg</option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <lable class="input-group-text" for="sort">Sort </lable>
+                        <select class="form-select" id="sort" name="varSort">
+                            <option selected>Popular</option>
+                            <option>New to Old</option>
+                            <option>Old to New</option>
+                            <option>A-Z Name</option>
+                            <option>Z-A Name</option>
+                            <option>A-Z Author</option>
+                            <option>Z-A Author</option>
+                        </select>
+                    </div>
+                   
+                    
+                </form>
+
+               
             </div>
+            <div class="card-columns d-flex" id="characters">
+                    
+                <div class="card" style="width:18rem">
+                    <div class="card-header theme-c adaptive">
+                        <h4><a class="card-link" href="templates/thecurator.html"> The Curator</a></h4>
+
+                        </div>
+                    <div class="card-body theme adaptive">
+                        <h5 class="card-title">World: <a class="card-link" href="worldbuilding/templates/thevoid.html">The Void</a></h5>
+                        <h6 class="card-subtitle">by: Spencer Zaugg</h6>
+                        <p>
+                            A mysterious individual who claims to rule over Yggdrasil, the World Tree. Not much is known about them.
+                        </p>
+                        
+                    </div>
+                    
+                </div>              
+                <div class="card" style="width:18rem">
+                    <div class="card-header theme-c adaptive">
+                        <h4><a class="card-link" href="templates/alastormoonblaze.html"> Alastor Moonblaze</a></h4>
+
+                        </div>
+                    <div class="card-body theme adaptive">
+                        <h5 class="card-title">World: <a class="card-link" href="worldbuilding/templates/thevoid.html">The Void</a></h5>
+                        <h6 class="card-subtitle">by: Spencer Zaugg</h6>
+                        <p>
+                            A mysterious Alchemist who seeks to restore his world
+                        </p>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+           
         
 
         </main>
         <footer>
             <hr />
-            <span class="text-restet">Author Name:</span>
-            <td>Spencer Zaugg</td>
-            <br />
-            <a href="https://github.com/SpeedyZ500/startup.git"> GitHub</a>
+            <div class="container-fluid">
+                <span class="text-reset">Author Name:</span>
+                <td>Spencer Zaugg</td>
+                <a href="https://github.com/SpeedyZ500/startup.git"> GitHub</a>
+            </div>
+            
         </footer>
     </body>
 </html>

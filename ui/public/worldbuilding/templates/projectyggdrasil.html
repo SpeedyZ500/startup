@@ -8,6 +8,8 @@
         <link rel="stylesheet" href="../../main.css">
 
         <link rel="stylesheet" href="../../worldbuilding.css">
+        <link rel="stylesheet" href="../../biopage.css">
+
         
         <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"
@@ -71,6 +73,8 @@
                                             <li class="dropdown-item"><a class="dropdown-item" href="../flora.html">Flora</a></li>
                                             <li class="dropdown-item"><a class="dropdown-item" href="../worlds.html">Worlds</a></li>
                                             <li class="dropdown-item"><a class="dropdown-item" href="../organizations.html">Organizations</a></li>
+                                            <li class="dropdown-item"><a class="dropdown-item" href="../biomes.html">Bimoes</a></li>
+
                                         </ul>
                                     </li>
                                     <li class="nav-item">
@@ -164,12 +168,32 @@
                         <li class="nav-item">
                             <a class="nav-link active" href="../organizations.html">Organizations</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../biomes.html">Biomes</a>
+                        </li>
                     </menu>
                 </nav>
             </div>
         </header>
         <main>
-            <div class="theme-h adaptive">
+            <div class="card nav">
+                <div class="card-body internal-nav">
+                    <nav class="navbar">
+                        <menu class="navbar-nav">
+                            <li class="nav-item"><a class="nav-link" href="#discription">Discription</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#world">World</a> </li>
+                            <li class="nav-item"><a class="nav-link" href="#type">Type</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#leaders">Leader(s)</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#classification">Classification</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#history">history</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#goals">Goals</a></li>
+        
+                        </menu>
+                    </nav>
+                </div>
+                
+            </div>
+            <div class="theme-h adaptive textbody" id="discription">
                 <h1>Project Yggdrasil (Organnization)</h1>
                 <p>
                     This site is a part of Project Yggdrasil, it acts as "an access point into a location within the void, between realities." 
@@ -178,15 +202,15 @@
                     world of Imagination.
                 </p>
             </div>
-            <div class="world">
-                <h2>Wlord:</h2>
+            <div  class="textbody" id="world">
+                <h2>World:</h2>
                 <ul>
                     <li><a href="thevoid.html">The Void</a></li>
                 </ul>
             </div>
             <hr />
 
-            <div class="type">
+            <div class="textbody" id="type">
                 <h2>Type:</h2>
                 <ul>
                     <li>Institution</li>
@@ -194,7 +218,7 @@
             </div>
             <hr />
 
-            <div class="leaders">
+            <div class="textbody" id="leaders">
                 <h2>Leader(s)</h2>
                 <ul>
                     <li>Spencer Zaugg</li>
@@ -203,7 +227,7 @@
             </div>
             <hr />
 
-            <div class="classification">
+            <div class="textbody" id="classification">
                 <h2>Classification:</h2>
                 <ul>
                     <li>Multiversal</li>
@@ -211,7 +235,7 @@
             </div>
             <hr />
 
-            <div class="history">
+            <div class="textbody" id="history">
                 <h2>History:</h2>
                 <aside>
                     Founded by Spencer Zaugg while he was creating a website for his CS 260 class at BYU.
@@ -221,7 +245,7 @@
             </div>
             <hr />
 
-            <div class="goals">
+            <div class="textbody" id="goals">
                 <h2>Goals:</h2>
                 <dl>
                     <dt>Inspire Writers</dt>
@@ -245,39 +269,9 @@
             </div>
             <hr />
 
-            <div class="races">
-                <div class="newRace">
-                    <button class="open-button" onClick="openForm()">New Race</button>
-                    <div class="form-popup" id="newRace">
-                        <form class="form-container">
-                            <h1>New Race</h1>
-                            <lable for="name">Name:</lable>
-                            <input type="text" placheolder="name" name="name" required> 
-                            <br />
-                            <lable for="type">Type:</lable>
-                            <input type="text" placeholder="Humanoid, insectoid, Avian, etc." name ="type">
-                            <br />
-                            <lable for="descripton">Description:</lable>
-                            <textarea id="description" placheolder="Describe your Race" name="description" required> </textarea>
-                            <br />
-                            <lable for="abilities">Abilities:</lable>
-                            <input type="text" placeholder="Magic Systems Accessable" name ="abilities">
-                            <br />
-                            <textarea id="abilities" placheolder="what abilities does the race have?" name="abilities" required> </textarea>
-                            <br />
-                            <lable for="origin">Origin:</lable>
-                            <input type="text" placeholder="Where is your Race From originally?" name ="origin">
-                            <br />
-                            <lable for="world">World:</lable>
-                            <input type="text" placeholder="What world(s) do your Race appear in?" name ="world">
-                            <br />
-                            
-                            <button type="submit">Create</button> 
-                            <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
-                            
-                        </form>
-                    </div>
-                </div>
+            <div class="textbody" id="races">
+                <h2>Races:</h2>
+            
                 <ul>
                     <hr />
 
@@ -287,7 +281,7 @@
             </div>
             <hr />
 
-            <div class="members">
+            <div class="textbody" id="members">
                 <h2>Members</h2>
 
                 <ul>
@@ -299,7 +293,7 @@
 
             </div>
 
-            <div class="allies">
+            <div class="textbody" id="allies">
                 <h2>Allies:</h2>
                 <li>Spencer Zaugg</li>
                 <li><a href="../worldbuilding/templates/projectyggdrasil.html">Project Yggdrasil (organization)</a></li>
@@ -307,13 +301,13 @@
 
 
             </div>
-            <div class="enemies">
+            <div class="textbody" id="enemies">
                 <h2>Enemies</h2>
                 <li><a href="thecurator.html">The Curator</a></li>
             </div>
             <hr />
 
-            <div class="Author">
+            <div class="textbody" id="Author">
                 <h2>Author</h2>
                 <ul><li>Spencer Zaugg</il></ul>
             </div>
@@ -321,10 +315,12 @@
         </main>
         <footer>
             <hr />
-            <span class="text-restet">Author Name:</span>
-            <dt>Spencer Zaugg</dt>
-            <br />
-            <a href="https://github.com/SpeedyZ500/startup.git"> GitHub</a>
+            <div class="container-fluid">
+                <span class="text-reset">Author Name:</span>
+                <td>Spencer Zaugg</td>
+                <a href="https://github.com/SpeedyZ500/startup.git"> GitHub</a>
+            </div>
+            
         </footer>
     </body>
 </html>

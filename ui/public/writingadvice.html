@@ -71,6 +71,8 @@
                                             <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/flora.html">Flora</a></li>
                                             <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/worlds.html">Worlds</a></li>
                                             <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/organizations.html">Organizations</a></li>
+                                            <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/biomes.html">Bimoes</a></li>
+
                                         </ul>
                                     </li>
                                     <li class="nav-item">
@@ -123,6 +125,8 @@
                                 <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/flora.html">Flora</a></li>
                                 <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/worlds.html">Worlds</a></li>
                                 <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/organizations.html">Organizations</a></li>
+                                <li class="dropdown-item"><a class="dropdown-item" href="worldbuilding/biomes.html">Bimoes</a></li>
+
                             </ul>
                         </li>
                         <li class="nav-item">
@@ -153,44 +157,62 @@
         </header>
             
         <main>
-            <div class="theme-h adaptive">
+            <div class="theme-h adaptive textbody expanded">
                 <h1>Writing Advice</h1>
             </div>
             <!-- A button to open the form to submit advice -->
-            <div class="advice">
-                <button class="open-button" onClick="openForm()">Give Advice</button>
-                <div class="form-popup" id="giveAdvice">
-                    <form class="form-container">
-                        <h1>New Writing Advice</h1>
-                        <lable for="advice">Advice:</lable>
-                        <textarea id="advice" placheolder="Your advice" name="advice" required> </textarea>
-                        <button type="submit">Create</button> 
-                        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
-                    </form>
+            <button class="btn btn-primary button-align" onClick="openForm()" data-bs-toggle="offcanvas" data-bs-target="#offcanvasAdvice" aria-controls="offcanvasAdvice">New Advice</button>
+            <div class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasAdvice" aria-labelledby="offcanvasAdviceLabel">
+                
+                <div class="offcanvas-header">
+                    <h4 class="offcanvas-title" id="offcanvasAdvaiceLabel">New Advice</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="newAdvice">
+                    <div class="form-popup" id="newAdvice">
+                        <form class="form-container">
+                            <div class="input-group mb-3">
+                                <lable class="input-group-text"for="prompt">Advice:</lable>
+                                <textarea class="form-control" type="advice" placheolder="Your advice" name="advice" required> </textarea>
+                            </div>
+                            
+                            <div class="btn-group">
+                                <button class="btn btn-primary" type="submit">Create</button>
+                                <button type="button" class="btn btn-secondary cansel" data-bs-dismiss="offcanvas" aria-label="Close">Cancel</button>
+                            </div>
+                            
+                        </form>
+
+                    </div>
                 </div>
             </div>
-            <hr />
-            <div class="filterAndSort">
-                <aside>Filter</aside>
-                <form action="" method="get">
-                    <lable for="author">Author: </lable>
-                    <select id="author" name="varAuthor">
-                        <option selected>All</option>
-                        <option>Spencer Zaugg</option>
-                    </select>
-                    <lable for="sort">Sort: </lable>
-                    <select id="sort" name="varSort">
-                        <option selected>Popular</option>
-                        <option>New to Old</option>
-                        <option>Old to New</option>
-                        <option>A-Z Title</option>
-                        <option>Z-A Title</option>
-                        <option>A-Z Author</option>
-                        <option>Z-A Author</option>
-                    </select>
+           
+            <div class="theme-h adaptive expanded">
+                <form class="filterAndSort" action="" method="get">
+                    <h4>Filter:</h4>    
+                    <div class="input-group mb-3">
+                         <lable class="input-group-text" for="author">Author: </lable>
+                        <select class="form-select" id="author" name="varAuthor">
+                            <option selected>All</option>
+                            <option>Spencer Zaugg</option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <lable class="input-group-text" for="sort">Sort: </lable>
+                        <select class="form-select" id="sort" name="varSort">
+                            <option selected>Popular</option>
+                            <option>New to Old</option>
+                            <option>Old to New</option>
+                            <option>A-Z Title</option>
+                            <option>Z-A Title</option>
+                            <option>A-Z Author</option>
+                            <option>Z-A Author</option>
+                        </select>
+                    </div>
+                   
+                    
                 </form>
             </div>
-            <hr />
             <div class="advice">
                 <ul>
                     <li>It doesn't matter what it is you write, just start writing, getting ideas on a page is more impoartant than if it looks good.</li>
@@ -200,10 +222,12 @@
 
         <footer>
             <hr />
-            <span class="text-restet">Author Name:</span>
-            <td>Spencer Zaugg</td>
-            <br />
-            <a href="https://github.com/SpeedyZ500/startup.git"> GitHub</a>
+            <div class="container-fluid">
+                <span class="text-reset">Author Name:</span>
+                <td>Spencer Zaugg</td>
+                <a href="https://github.com/SpeedyZ500/startup.git"> GitHub</a>
+            </div>
+            
         </footer>
     </body>
     

@@ -71,6 +71,8 @@
                                             <li class="dropdown-item"><a class="dropdown-item" href="flora.html">Flora</a></li>
                                             <li class="dropdown-item"><a class="dropdown-item" href="worlds.html">Worlds</a></li>
                                             <li class="dropdown-item"><a class="dropdown-item" href="organizations.html">Organizations</a></li>
+                                            <li class="dropdown-item"><a class="dropdown-item" href="biomes.html">Bimoes</a></li>
+
                                         </ul>
                                     </li>
                                     <li class="nav-item">
@@ -164,13 +166,16 @@
                         <li class="nav-item">
                             <a class="nav-link" href="organizations.html">Organizations</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="biomes.html">Biomes</a>
+                        </li>
                     </menu>
                 </nav>
             </div>
         </header>
         <main>
 
-            <div class="theme-h adaptive">
+            <div class="theme-h adaptive textbody">
                 <h1>Worlds</h1>
                 <aside>
                     This is where you put your worlds, what races are their, which ones are native, 
@@ -178,105 +183,147 @@
                     Feel free to add biome info as well, and you don't need to fill it all out at the begining, you will be able to make edits later. 
                     You will also be able to add additional information within the world's page, including defining the biomes you make up,
                     and createing/adding wildlife, races, flora, organizations and countries which will automatically be added to the relevant tabs.
-                    Bioms however will be a subtab of your world, because the inhabitans wildlife, and flora of your biomes will be unique to your world.
                 </aside>
             </div>
-            <div class="newWorld">
-                <button class="open-button" onClick="openForm()">New World</button>
-                <div class="form-popup" id="newWorld">
-                    <form class="form-container">
-                        <h1>New World</h1>
-                        <lable for="name">Name:</lable>
-                        <input type="text" placheolder="name/title" name="name" required> 
-                        <br />
-                        <lable for="world">World:</lable>
-                        <input type="text" placheolder="world" name="world" required> 
-                        <br />
-                        <br />
-                        <br />
-                        <lable for="descripton">Description:</lable>
-                        <textarea id="description" placheolder="Describe your Country" name="description" required> </textarea>
-                        <br />
-                        <lable for="history">History:</lable>
-                        <textarea id="history" placheolder="History" name="history"> </textarea>
-                        <br />
-                        <lable for="race">Race(s):</lable>
-                        <input type="text" placheolder="race" name="race"> 
-                        <br />
-                        <lable for="religion">Religion(s):</lable>
-                        <input type="text" placheolder="religion" name="religion"> 
-                        <br />
-                        <lable for="organization">Organization(s):</lable>
-                        <input type="text" placheolder="Organization" name="organization"> 
-                        <br />
-                        <lable for="flora">Flora:</lable>
-                        <input type="text" placheolder="flora" name="flora"> 
-                        <br />
-                        <lable for="wildlife">Wildlife:</lable>
-                        <input type="text" placheolder="wildlife" name="wildlife">
-                        <br /> 
-                        <lable for="biome">Biome(s):</lable>
-                        <input type="text" placheolder="biome" name="biome">
-                        <br /> 
-                        
-                        
+            
 
-                        <button type="submit">Create</button> 
-                        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
-                        
-                    </form>
-                    <hr />
-                    
+            <button class="btn btn-primary button-align" onClick="openForm()" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWorld" aria-controls="offcanvasWorld">New World</button>
+            <div class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasWorld" aria-labelledby="offcanvasWorldLabel">
+                
+                <div class="offcanvas-header">
+                    <h4 class="offcanvas-title" id="offcanvasCountrytLabel">New World</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="newWorld">
+                    <div class="form-popup" id="newWorld">
+                        <form class="form-container">
+                            <div class="input-group">
+                                <lable class="input-group-text" for="name">Name:</lable>
+                                <input class="form-control" type="text" placheolder="name" name="name" required> 
+                            </div>
+                           
+                            
+                            <div class="input-group">
+                                <lable class="input-group-text" for="descripton">Description:</lable>
+                                <textarea class="form-control" id="description" placheolder="Describe your World" name="description" required> </textarea>
+
+                            </div>
+                            <div class="input-group">
+                                <lable class="input-group-text" for="history">History:</lable>
+                                <textarea class="form-control" id="history" placheolder="tell us about the history" name="history"> </textarea>
+
+                            </div>
+                            <div class="input-group">
+                                <lable class="input-group-text" for="culture">Culture:</lable>
+                                <textarea class="form-control" id="culture" placheolder="What is/are your world's Culture(s)" name="culture" > </textarea>
+
+                            </div>
+                            <div class="input-group">
+                                <lable class="input-group-text" for="race">Race(s):</lable>
+                                <input class="form-control" type="text" placheolder="race" name="race"> 
+
+                            </div>
+                            <div class="input-group">
+                                <lable class="input-group-text" for="wildlife">Wildlife:</lable>
+                                <input class="form-control" type="text" placheolder="wildlife, what creatures" name="wildlife"> 
+                            </div>
+                            <div class="input-group">
+                                <lable class="input-group-text" for="flora">Flora:</lable>
+                                <input class="form-control" type="text" placheolder="Flora, what plants" name="flora"> 
+                            </div>
+                            <div class="input-group">
+                                <lable class="input-group-text" for="religions">Relegion:</lable>
+                                <input class="form-control" type="text" placheolder="a list of religions" name="religions">
+                            </div>                             
+                            <div class="input-group">
+                                <lable class="input-group-text" for="organizations">Organizations:</lable>
+                                <input class="form-control" type="text" placheolder="A list of organizations" name="organizations"> 
+                            </div>
+                            <div class="input-group">
+                                <lable class="input-group-text" for="continent">Continents:</lable>
+                                <input class="form-control" type="text" placheolder="what continents are there ?" name="continent"> 
+                            </div>    
+                            <div class="input-group">
+                                <lable class="input-group-text" for="biomes">Biome(s):</lable>
+                                <input class="form-control" type="text" placheolder="What boimes does your country have?" name="biomes"> 
+                            </div>
+                            
+
+                            
+                            <div class="btn-group">
+                                <button class="btn btn-primary" type="submit">Create</button>
+                                <button type="button" class="btn btn-secondary cansel" data-bs-dismiss="offcanvas" aria-label="Close">Cancel</button>
+                            </div>
+                        </form>
+    
+                    </div>
 
                 </div>
             </div>
-            <div class="filterAndSort">
-                <aside>Filter</aside>
-                <form action="" method="get">
-                    <select id="race" name="varRace">
-                        <option selected>All</option>
-                    </select>
-                    <lable for="author">Author: </lable>
-                    <select id="author" name="varAuthor">
-                        <option selected>All</option>
-                        <option>Spencer Zaugg</option>
-                    </select>
-                    <lable for="sort">Sort: </lable>
-                    <select id="sort" name="varSort">
-                        <option selected>Popular</option>
-                        <option>New to Old</option>
-                        <option>Old to New</option>
-                        <option>A-Z Title</option>
-                        <option>Z-A Title</option>
-                        <option>A-Z Author</option>
-                        <option>Z-A Author</option>
-                    </select>
+            
+            <div class="theme-h adaptive expanded">
+                
+                <form class="filterAndSort" action="" method="get">
+                    <h4>Filter:</h4>
+                    
+                    <div class="input-group mb-3">
+                        <lable class="input-group-text"for="race">Race </lable>
+                        <select class="form-select" id="race" name="varRace">
+                            <option selected>All</option>
+                            <option>???</option>
+                            <option>Remgulus</option>
+                            <option>Human</option>
+
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                         <lable class="input-group-text" for="author">Author </lable>
+                        <select class="form-select" id="author" name="varAuthor">
+                            <option selected>All</option>
+                            <option>Spencer Zaugg</option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <lable class="input-group-text" for="sort">Sort </lable>
+                        <select class="form-select" id="sort" name="varSort">
+                            <option selected>Popular</option>
+                            <option>New to Old</option>
+                            <option>Old to New</option>
+                            <option>A-Z Name</option>
+                            <option>Z-A Name</option>
+                            <option>A-Z Author</option>
+                            <option>Z-A Author</option>
+                        </select>
+                    </div>
+                   
+                    
                 </form>
             </div>
-            <hr />
 
-            
-            <div>
-                <table>
-                    <tr>
-                        <th>Name</th>
-                        <th>Author</th>
-                    </tr>
-                    <tr>
-                        <td><a href=templates/thevoid.html>The Void</a> </td>
-                        <td>Spencer Zaugg</td>
-                    </tr>
-                </table>
+            <div class="card-columns d-flex" id="worlds">
+                <div class="card" style="width: 18rem">
+                    <div class="card-body theme adaptive">
+                        <h5 class="card-title"><a class="card-link" href=templates/thevoid.html>The Void</a></h5>
+                        <h6 class="card-subtitle">by: Spencer Zaugg</h6>
+                        <p>
+                            The World Between Worlds
+                        </p>
+                    </div>
+                    
+                </div>              
+                
             </div>
 
         </main>
 
         <footer>
             <hr />
-            <span class="text-restet">Author Name:</span>
-            <td>Spencer Zaugg</td>
-            <br />
-            <a href="https://github.com/SpeedyZ500/startup.git"> GitHub</a>
+            <div class="container-fluid">
+                <span class="text-reset">Author Name:</span>
+                <td>Spencer Zaugg</td>
+                <a href="https://github.com/SpeedyZ500/startup.git"> GitHub</a>
+            </div>
+            
         </footer>
     </body>
     

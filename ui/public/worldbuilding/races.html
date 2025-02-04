@@ -71,6 +71,8 @@
                                             <li class="dropdown-item"><a class="dropdown-item" href="flora.html">Flora</a></li>
                                             <li class="dropdown-item"><a class="dropdown-item" href="worlds.html">Worlds</a></li>
                                             <li class="dropdown-item"><a class="dropdown-item" href="organizations.html">Organizations</a></li>
+                                            <li class="dropdown-item"><a class="dropdown-item" href="biomes.html">Bimoes</a></li>
+
                                         </ul>
                                     </li>
                                     <li class="nav-item">
@@ -164,111 +166,156 @@
                         <li class="nav-item">
                             <a class="nav-link" href="organizations.html">Organizations</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="biomes.html">Biomes</a>
+                        </li>
                     </menu>
                 </nav>
             </div>
         </header>
         <main>
-            <div class="theme-h adaptive">
+            <div class="theme-h adaptive textbody">
                 <h1>Races</h1>
                 <aside>This doesn't refer to skin color, it refers to Humans, Elves, Dwarvs, Orks and other fantasy races.
                     Here is where you will put all your custom races, their cultures, histories, and abilities, as well as other stuff like that.
                 </aside>
             </div>
-            <div class="newRace">
-                <button class="open-button" onClick="openForm()">New Race</button>
-                <div class="form-popup" id="newRace">
-                    <form class="form-container">
-                        <h1>New Race</h1>
-                        <lable for="name">Name:</lable>
-                        <input type="text" placheolder="name" name="name" required> 
-                        <br />
-                        <lable for="type">Type:</lable>
-                        <input type="text" placeholder="Humanoid, insectoid, Avian, etc." name ="type">
-                        <br />
-                        <lable for="descripton">Description:</lable>
-                        <textarea id="description" placheolder="Describe your Race" name="description" required> </textarea>
-                        <br />
-                        <lable for="abilities">Abilities:</lable>
-                        <input type="text" placeholder="Magic Systems Accessable" name ="abilities">
-                        <br />
-                        <textarea id="abilities" placheolder="what abilities does the race have?" name="abilities" required> </textarea>
-                        <br />
-                        <lable for="origin">Origin:</lable>
-                        <input type="text" placeholder="Where is your Race From originally?" name ="origin">
-                        <br />
-                        <lable for="world">World:</lable>
-                        <input type="text" placeholder="What world(s) do your Race appear in?" name ="world">
-                        <br />
+
+            <button class="btn btn-primary button-align" onClick="openForm()" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRace" aria-controls="offcanvasRace">New Race</button>
+            <div class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasRace" aria-labelledby="offcanvasRaceLabel">
+                
+                <div class="offcanvas-header">
+                    <h4 class="offcanvas-title" id="offcanvasRacetLabel">New Race</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="newRace">
+                    <div class="form-popup" id="newRace">
+                        <form class="form-container">
+                            <div class="input-group">
+                                <lable class="input-group-text" for="name">Name:</lable>
+                                <input class="form-control" type="text" placheolder="name" name="name" required> 
+                            </div>
+                            <div class="input-group">
+                                <lable class="input-group-text" for="world">Origin World:</lable>
+                                <select class="form-select" placheolder="world" name="type"> 
+                                    <option selected>Choose a world</option>
+                                    <option>The Void</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <lable class="input-group-text" for="type">Type:</lable>
+                                <input class="form-control" type="text" placheolder="Humanoid, insectoid, Avian, etc" name="type" required> 
+                            </div>
+                            
+                            <div class="input-group">
+                                <lable class="input-group-text" for="descripton">Description:</lable>
+                                <textarea class="form-control" id="description" placheolder="Describe your Race" name="description" required> </textarea>
+
+                            </div>
+                            <div class="input-group">
+                                <lable class="input-group-text" for="abilities">Abilities:</lable>
+                                <input class="form-control" type="text" placheolder="abilities" name="abilities"> 
+                            </div>
+                            <div class="input-group">
+                                <lable class="input-group-text" for="magicsystems">Magic Systems:</lable>
+                                <select class="form-select" placheolder="world" name="type"> 
+                                    <option selected>None</option>
+                                    <option>Void Walking</option>
+                                </select>
+                            </div>
+
+                          
+                            <div class="input-group">
+                                <lable class="input-group-text" for="worlds">Worlds:</lable>
+                                <input class="form-control" type="text" placheolder="What worlds does your race appear in" name="worlds"> 
+                            </div>
+
                         
-                        <button type="submit">Create</button> 
-                        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
-                        
-                    </form>
+                            <div class="btn-group">
+                                <button class="btn btn-primary" type="submit">Create</button>
+                                <button type="button" class="btn btn-secondary cansel" data-bs-dismiss="offcanvas" aria-label="Close">Cancel</button>
+                            </div>
+                        </form>
+    
+                    </div>
+
                 </div>
             </div>
-            <div class="filterAndSort">
-                <aside>Filter</aside>
-                <form action="" method="get">
-                    <lable for="type">Type: </lable>
-                    <select id="type" name="varType">
-                        <option selected>All</option>
-                        <option>Humanoid</option>
-                        <option>Shape Shifter</option>
-                    </select>
-                    <lable for="world">world: </lable>
-                    <select id="world" name="varWorld">
-                        <option selected>All</option>
-                        <option>The Void</option>
-                    </select>
-                    <select id="race" name="varRace">
-                        <option selected>All</option>
-                    </select>
-                    <lable for="author">Author: </lable>
-                    <select id="author" name="varAuthor">
-                        <option selected>All</option>
-                        <option>Spencer Zaugg</option>
-                    </select>
-                    <lable for="sort">Sort: </lable>
-                    <select id="sort" name="varSort">
-                        <option selected>Popular</option>
-                        <option>New to Old</option>
-                        <option>Old to New</option>
-                        <option>A-Z Name</option>
-                        <option>Z-A Name</option>
-                        <option>A-Z Author</option>
-                        <option>Z-A Author</option>
-                        <option>A-Z World</option>
-                        <option>Z-A World</option>
-                    </select>
+
+
+
+            <div class="theme-h adaptive expanded">
+                
+                <form class="filterAndSort" action="" method="get">
+                    <h4>Filter:</h4>
+                    <div class="input-group mb-3">
+                        <lable class="input-group-text"for="world">World </lable>
+                        <select class="form-select" id="world" name="varWorld">
+                            <option selected>All</option>
+                            <option>The Void</option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <lable class="input-group-text"for="type">Type: </lable>
+                        <select class="form-select" id="type" name="varType">
+                            <option selected>All</option>
+                            <option>Humanoid</option>
+                            <option>Shape Shifter</option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                         <lable class="input-group-text" for="author">Author </lable>
+                        <select class="form-select" id="author" name="varAuthor">
+                            <option selected>All</option>
+                            <option>Spencer Zaugg</option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <lable class="input-group-text" for="sort">Sort </lable>
+                        <select class="form-select" id="sort" name="varSort">
+                            <option selected>Popular</option>
+                            <option>New to Old</option>
+                            <option>Old to New</option>
+                            <option>A-Z Name</option>
+                            <option>Z-A Name</option>
+                            <option>A-Z Author</option>
+                            <option>Z-A Author</option>
+                        </select>
+                    </div>
+                   
+                    
                 </form>
             </div>
-            <hr />
-            <div>
-                <table>
-                    <tr>
-                        <th>Race</th>
-                        <th>Type</th>
-                        <th>World</th>
-                        <th>Author</th>
-                    </tr>
-                    <tr>
-                        <td><a href="templates/remgulus.html">Remgulus</a></td>
-                        <td>Shape Shifter</td>
-                        <td>The Void</td>
-                        <td>Spencer Zaugg</td>
-                    </tr>
-                </table>
-            </div>
 
+            <div class="card-columns d-flex" id="wildlife">
+                <div class="card" style="width: 18rem">
+                    <div class="card-header theme-c adaptive">
+                        <h4><a class="card-link" href="templates/remgulus.html">Remgulus</a></h4>
+                    </div>
+                    <div class="card-body theme adaptive">
+                        <h5 class="card-title"><a class="card-link" href=templates/thevoid.html>The Void</a></h5>
+                        <h6 class="card-subtitle">by: Spencer Zaugg</h6>
+                        <p>
+                            Type: Shapeshifter
+                        </p>
+                        <a class="card-link" href="templates/voidwalking.html">Void Walking</a>
+
+                    </div>
+                    
+                </div>              
+            </div>
+            
+            
         </main>
 
         <footer>
             <hr />
-            <span class="text-restet">Author Name:</span>
-            <td>Spencer Zaugg</td>
-            <br />
-            <a href="https://github.com/SpeedyZ500/startup.git"> GitHub</a>
+            <div class="container-fluid">
+                <span class="text-reset">Author Name:</span>
+                <td>Spencer Zaugg</td>
+                <a href="https://github.com/SpeedyZ500/startup.git"> GitHub</a>
+            </div>
+            
         </footer>
     </body>
     

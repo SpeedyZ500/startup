@@ -69,6 +69,8 @@
                                             <li class="dropdown-item"><a class="dropdown-item" href="../worldbuilding/flora.html">Flora</a></li>
                                             <li class="dropdown-item"><a class="dropdown-item" href="../worldbuilding/worlds.html">Worlds</a></li>
                                             <li class="dropdown-item"><a class="dropdown-item" href="../worldbuilding/organizations.html">Organizations</a></li>
+                                            <li class="dropdown-item"><a class="dropdown-item" href="../worldbuilding/biomes.html">Bimoes</a></li>
+
                                         </ul>
                                     </li>
                                     <li class="nav-item">
@@ -121,6 +123,8 @@
                                 <li class="dropdown-item"><a class="dropdown-item" href="../worldbuilding/flora.html">Flora</a></li>
                                 <li class="dropdown-item"><a class="dropdown-item" href="../worldbuilding/worlds.html">Worlds</a></li>
                                 <li class="dropdown-item"><a class="dropdown-item" href="../worldbuilding/organizations.html">Organizations</a></li>
+                                <li class="dropdown-item"><a class="dropdown-item" href="../worldbuilding/biomes.html">Bimoes</a></li>
+
                             </ul>
                         </li>
                         <li class="nav-item">
@@ -150,86 +154,129 @@
             </div>
         </header>
         <main>
-            <div class="theme-h adaptive">
+            <div class="theme-h adaptive textbody">
                 <h1>The Moonlit Alchemists</h1>
                 <p>
                     The story of a mysterious Alchemist who's alchemy is enhanced by moonlight, displaced from his world by a catastrophe
-                    <hr />
-                    <br />
-                    (Story not yet finnished)
+                    
                     
                 </p>
             </div>
-            <div class="newBranch">
-                <button class="open-button" onClick="openForm()">New Story</button>
-                <div class="form-popup" id="newPrompt">
-                    <form class="form-container">
-                        <h1>New Story</h1>
-                        <lable for="title">Chapter Title:</lable>
-                        <input type="text" placheolder="title" name="title" required> 
-                        <br />
-                        <lable for="descripton">Description:</lable>
-                        <input type="text" placheolder="description" name="description" > 
-                        <br />
-                        <br />
-                        <lable for="story">Story Body</lable>
-                        <textarea id="story" placheolder="your story" name="story" required> </textarea>
-                        <br />
-                        <lable for="genre">Genre(s):</lable>
-                        <input type="text" placheolder="genre" name="genre"> 
-                        <br />
-                        <lable for="contentwarning">Content Warning(s):</lable>
-                        <input type="text" placheolder="content warning" name="contentwarning"> 
-                        <br />
-                        <button type="submit">Create</button> 
-                        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
-                    </form>
+
+            <button class="btn btn-primary button-align" onClick="openForm()" data-bs-toggle="offcanvas" data-bs-target="#offcanvasChapter" aria-controls="offcanvasChapter">New Chapter</button>
+            <div class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasChapter" aria-labelledby="offcanvasChapterLabel">
+                <div class="offcanvas-header">
+                    <h4 class="offcanvas-title" id="offcanvasChapterLabel">New Chapter</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+
+                </div>
+                <div class="offcanvas-body">
+                    <div class="form-popup" id="newStory">
+                    
+                        <form class="form-container">
+                            <div class="input-group mb-3">
+                                <lable class="input-group-text" for="previousChapter">Previous Chapter:</lable>
+                                <select class="form-select" id="previousChapter" name="previousChapter">
+                                    <option selected>none</option>
+                                    <option>Chapter 1: The end and the Begining, Spencer Zaugg</option>
+                                </select>
+                            </div>
+                            <div class="input-group mb-3">
+                                <lable class="input-group-text" for="chapterTitle">Chapter Title:</lable>
+                                <input class="form-control" type="text" placheolder="Chapter Title" name="chapterTitle"> 
+                            </div>
+                            <div class=" mb-3">
+                                <lable for="story" class="form-label">Chapter Body</lable>
+                                <textarea class="form-control" id="story" placheolder="your story" name="story"> </textarea>    
+                            </div>
+                            <div class="input-group mb-3">
+                                <lable class="input-group-text" for="genre">Genre(s):</lable>
+                                <input class="form-control" type="text" placheolder="genre" name="genre"> 
+                            </div>
+                            <div class="input-group mb-3">
+                                <lable class="input-group-text" for="contentwarning">Content Warning(s):</lable>
+                                <input class="form-control" type="text" placheolder="content warning" name="contentwarning"> 
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn btn-primary" type="submit">Create</button>
+                                <button type="button" class="btn btn-secondary cancel" data-bs-dismiss="offcanvas" aria-label="Close">Cancel</button>
+                            </div>
+                        </form>   
+                    </div>             
                 </div>
             </div>
-            <div class="filterAndSort">
-                <aside>Filter</aside>
-                <form action="" method="get">
-                    <lable for="genre">Genre: </lable>
-                    <select id="genre" name="varGenre">
-                        <option selected>All</option>
-                        <option>Example</option>
-                    </select>
-                    <lable for="author">Author: </lable>
-                    <select id="author" name="varAuthor">
-                        <option selected>All</option>
-                        <option>Spencer Zaugg</option>
-                    </select>
-                    <lable for="sort">Sort: </lable>
-                    <select id="sort" name="varSort">
-                        <option selected>Popular</option>
-                        <option>New to Old</option>
-                        <option>Old to New</option>
-                        <option>A-Z Title</option>
-                        <option>Z-A Title</option>
-                        <option>A-Z Author</option>
-                        <option>Z-A Author</option>
-                    </select>
+            <div class="theme-h adaptive expanded" style="margin-bottom:20px">
+                <h4>Filter</h4>
+                <form class="filterAndSort" action="" method="get">
+                    <div class="input-group mb-3">
+                        <lable class="input-group-text"for="genre">Genre: </lable>
+                        <select class="form-select" id="genre" name="varGenre">
+                            <option selected>All</option>
+                            <option>Example</option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <lable class="input-group-text"for="chapter">Chapter: </lable>
+                        <select class="form-select" id="chapter" name="varChapter">
+                            <option selected>All</option>
+                            <option>Chapter 1</option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                         <lable class="input-group-text" for="author">Author: </lable>
+                        <select class="form-select" id="author" name="varAuthor">
+                            <option selected>All</option>
+                            <option>Spencer Zaugg</option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <lable class="input-group-text" for="sort">Sort: </lable>
+                        <select class="form-select" id="sort" name="varSort">
+                            <option>New to Old</option>
+                            <option>Old to New</option>
+                            <option>A-Z Title</option>
+                            <option>Z-A Title</option>
+                            <option>A-Z Author</option>
+                            <option>Z-A Author</option>
+
+                        </select>
+                    </div>
+                   
+                    
                 </form>
             </div>
             <hr />
-            <div class="branches">
-                <table>
-                    <tr>
-                        <th>Chapter</th>
-                        <th>discription</th>
-                        <th>Genre</th>
-                        <th>Content Warning</th>
-                        <th>Author</th>
-                    </tr>
-                </table>
+            <div class="card-columns d-flex" id="chapters">
+                <div class="card-columns d-flex" id="stories">
+                    <div class="card" style="width: 18rem">
+                        <div class="card-header">
+                            <h4>Chapter 1</h4>
+                        </div>
+                        <div class="card-body theme adaptive">
+                            <h5 class="card-title">The End and a Beginning</h5>
+                            <h6 class="card-subtitle">by: Spencer Zaugg</h6>
+
+                            
+                        </div>
+                        <div class="card-footer theme-c adaptive">
+                            <!--Note Popers won't work until I add the nessisary Java Script stuff, I will deal with that later-->
+                            <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="popover" data-bs-title="Genres" data-bs-content="Example">Genre</button>
+                            <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="popover"  data-bs-title="Content Warnings" data-bs-content="Fallen Universe">Content Warnings</button>
+    
+                        </div>
+                    </div>              
+                </div>
+                
             </div>
         </main>
         <footer>
             <hr />
-            <span class="text-restet">Author Name:</span>
-            <ul><li>Spencer Zaugg</il></ul>
-            <br />
-            <a href="https://github.com/SpeedyZ500/startup.git"> GitHub</a>
+            <div class="container-fluid">
+                <span class="text-reset">Author Name:</span>
+                <td>Spencer Zaugg</td>
+                <a href="https://github.com/SpeedyZ500/startup.git"> GitHub</a>
+            </div>
+            
         </footer>
     </body>
 </html>

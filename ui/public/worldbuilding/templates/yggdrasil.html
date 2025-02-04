@@ -71,6 +71,8 @@
                                             <li class="dropdown-item"><a class="dropdown-item" href="../flora.html">Flora</a></li>
                                             <li class="dropdown-item"><a class="dropdown-item" href="../worlds.html">Worlds</a></li>
                                             <li class="dropdown-item"><a class="dropdown-item" href="../organizations.html">Organizations</a></li>
+                                            <li class="dropdown-item"><a class="dropdown-item" href="../biomes.html">Bimoes</a></li>
+
                                         </ul>
                                     </li>
                                     <li class="nav-item">
@@ -164,12 +166,15 @@
                         <li class="nav-item">
                             <a class="nav-link" href="../organizations.html">Organizations</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../biomes.html">Biomes</a>
+                        </li>
                     </menu>
                 </nav>
             </div>
         </header>
         <main>
-            <div class="theme-h adaptive">
+            <div class="theme-h adaptive textbody">
                  <h1>Yggdrasil</h1>
                 <p>
                     "The grandest of the World Trees in the known Void. Ruled by me, The Curator" -The Curator
@@ -179,7 +184,7 @@
             
                 </p>
             </div>
-            <div class="contenent">
+            <div class="textbody" id="contenent">
                 <hr />
 
                 <h2>Contenent</h2>
@@ -188,7 +193,7 @@
                 </ul>
             </div>
            
-            <div class="Leader(s)">
+            <div class="textbody" id="Leader(s)">
                 <hr />
 
                 <h2>Leader(s)</h2>
@@ -196,7 +201,7 @@
                     <li><a href="../../templates/thecurator.html">The Curator</a></li>
                 </ul>
             </div>
-            <div class="history">
+            <div class="textbody" id="history">
                 <hr />
 
                 <h2>History</h2>
@@ -205,300 +210,77 @@
                     and has been expanding ever sense. Ruled by its Eternal Emporor The Curator.
                 </aside>
             </div>
-            <div class="culture">
+            <div class="textbody" id="culture">
                 <hr />
 
                 <h2>Culture</h2>
                 <asside>Not yet added</asside>
 
             </div>
-            <div class="races">
+            <div class="textbody" id="races">
                 <hr />
 
                 <h2>Races</h2>
-                <div class="newRace">
-                    <button class="open-button" onClick="openForm()">New Race</button>
-                    <div class="form-popup" id="newRace">
-                        <form class="form-container">
-                            <h1>New Race</h1>
-                            <lable for="name">Name:</lable>
-                            <input type="text" placheolder="name" name="name" required> 
-                            <br />
-                            <lable for="type">Type:</lable>
-                            <input type="text" placeholder="Humanoid, insectoid, Avian, etc." name ="type">
-                            <br />
-                            <lable for="descripton">Description:</lable>
-                            <textarea id="description" placheolder="Describe your Race" name="description" required> </textarea>
-                            <br />
-                            <lable for="abilities">Abilities:</lable>
-                            <input type="text" placeholder="Magic Systems Accessable" name ="abilities">
-                            <br />
-                            <textarea id="abilities" placheolder="what abilities does the race have?" name="abilities" required> </textarea>
-                            <br />
-                            <lable for="origin">Origin:</lable>
-                            <input type="text" placeholder="Where is your Race From originally?" name ="origin">
-                            <br />
-                            <lable for="world">World:</lable>
-                            <input type="text" placeholder="What world(s) do your Race appear in?" name ="world">
-                            <br />
-                            
-                            <button type="submit">Create</button> 
-                            <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
-                            
-                        </form>
-                    </div>
-                </div>
+                
                 <ul>
                     <li><a href="remgulus.html">Remgulus</a></li>
                 </ul>
             </div>
-            <div class="religions">
+            <div class="textbody" id="religions">
                 <hr />
 
                 <h2>Religions</h2>
-                <div class="newRelegion">
-                    <button class="open-button" onClick="openForm()">New Relegion</button>
-                    <div class="form-popup" id="newRelegion">
-                        <form class="form-container">
-                            <h1>New Religion</h1>
-                            <lable for="name">Name:</lable>
-                            <input type="text" placheolder="name" name="name" required> 
-                            <br />
-                            <lable for="world">World:</lable>
-                            <input type="text" placheolder="world" name="world" required> 
-                            <br />
-                            <lable for="classification">Classification:</lable>
-                            <select id="classification" name="varClassification">
-                                <option selected>uni-world</option>
-                                <option>Multiversal</option>
-                            </select>
-                            <br />
-                            <lable for="leader">Leader(s):</lable>
-                            <input type="text" placheolder="Leader(s)" name="leader"> 
-                            <br />
-                            <lable for="descripton">Description:</lable>
-                            <input type="text" placheolder="description" name="description" > 
-                            <br />
-                            <br />
-                            <lable for="descripton">Description:</lable>
-                            <textarea id="description" placheolder="Describe your Organizastion" name="description" required> </textarea>
-                            <br />
-                            <lable for="history">History:</lable>
-                            <textarea id="history" placheolder="History" name="history"> </textarea>
-                            <br />
-                            <lable for="goals">Goals:</lable>
-                            <textarea id="goals" placheolder="What are the goals of the orginization?" name="goals" > </textarea>
-                            <br />
-                            <lable for="race">Race(s):</lable>
-                            <input type="text" placheolder="race" name="race"> 
-                            <br />
-                            
-                            <lable for="allies">allies:</lable>
-                            <input type="text" placheolder="Ally" name="allies"> 
-                            <br />
-                            <lable for="enemies">Enemies:</lable>
-                            <input type="text" placheolder="Enemy" name="enemies"> 
-                            <br />
-    
-                            <button type="submit">Create</button> 
-                            <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
-    
-                        </form>
-    
-                    </div>
-                </div>
                 <ul>
                     <li>Wait for data</li>
                 </ul>
 
             </div>
 
-            <div class="organizations">
+            <div class="textbody" id="organizations">
                 <hr />
 
                 <h2>Organizations</h2>
-                <div class="newRelegion">
-                    <button class="open-button" onClick="openForm()">New Organization</button>
-                    <div class="form-popup" id="newOrganization">
-                        <form class="form-container">
-                            <h1>New Organization</h1>
-                            <lable for="name">Name:</lable>
-                            <input type="text" placheolder="name" name="name" required> 
-                            <br />
-                            <lable for="world">World:</lable>
-                            <input type="text" placheolder="world" name="world" required> 
-                            <br />
-                            <lable for="type">Type:</lable>
-                            <input type="text" placheolder="Guild, Gang, institution, etc." name="type" required> 
-                            <br />
-                            <lable for="classification">Classification:</lable>
-                            <select id="classification" name="varClassification">
-                                <option selected>uni-world</option>
-                                <option>Multiversal</option>
-                            </select>
-                            <br />
-                            <lable for="leader">Leader(s):</lable>
-                            <input type="text" placheolder="Leader(s)" name="leader"> 
-                            <br />
-                            <lable for="descripton">Description:</lable>
-                            <input type="text" placheolder="description" name="description" > 
-                            <br />
-                            <br />
-                            <lable for="descripton">Description:</lable>
-                            <textarea id="description" placheolder="Describe your Organizastion" name="description" required> </textarea>
-                            <br />
-                            <lable for="history">History:</lable>
-                            <textarea id="history" placheolder="History" name="history"> </textarea>
-                            <br />
-                            <lable for="goals">Goals:</lable>
-                            <textarea id="goals" placheolder="What are the goals of the orginization?" name="goals" > </textarea>
-                            <br />
-                            <lable for="race">Race(s):</lable>
-                            <input type="text" placheolder="race" name="race"> 
-                            <br />
-                            
-                            <lable for="allies">allies:</lable>
-                            <input type="text" placheolder="Ally" name="allies"> 
-                            <br />
-                            <lable for="enemies">Enemies:</lable>
-                            <input type="text" placheolder="Enemy" name="enemies"> 
-                            <br />
-    
-                            <button type="submit">Create</button> 
-                            <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
-    
-                        </form>
-    
-                    </div>
-                </div>
+                
                 <ul>
                     <li><a href="projectyggdrasil.html">Project Yggdrasil</a></li>
                 </ul>
             </div>
             
-            <div class="wildlife">
+            <div class="textbody" id="wildlife">
                 <hr />
 
                 <h2>Wildlife</h2>
-                <div class="newWildlife">
-                    <button class="open-button" onClick="openForm()">New Creature</button>
-                    <div class="form-popup" id="newWildlife">
-                        <form class="form-container">
-                            <h1>New Creature</h1>
-                            <lable for="name">Name:</lable>
-                            <input type="text" placheolder="name" name="name" required> 
-                            <br />
-                            <lable for="type">Type:</lable>
-                            <input type="text" placeholder="Monster, Bird, rodent, etc." name ="type">
-                            <br />
-                            <lable for="descripton">Description:</lable>
-                            <textarea id="description" placheolder="Describe your Creature" name="description" required> </textarea>
-                            <br />
-                            <lable for="abilities">Abilities:</lable>
-                            <textarea id="description" placheolder="what abilities does it have? is it poisonous? Venomous?" name="description" required> </textarea>
-                            <br />
-                            <lable for="origin">Origin/habitat:</lable>
-                            <input type="text" placeholder="Where is your creature from? what habitat" name ="origin">
-                            <br />
-                            
-                            <button type="submit">Create</button> 
-                            <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
-                            
-                        </form>
-                    </div>
-                </div>
+                
                 <hr />
                 <ul>
                     <li><a href="voidreacher.html">Void Reacher</a>></a></li>
                 </ul>
             </div>
 
-            <div class="flora">
+            <div class="textbody" id="flora">
                 <hr />
 
                 <h2>Flora</h2>
-                <div class="newFlora">
-                    <button class="open-button" onClick="openForm()">New Flora</button>
-                    <div class="form-popup" id="NewFlora">
-                        <form class="form-container">
-                            <h1>New Flora</h1>
-                            <lable for="name">Name:</lable>
-                            <input type="text" placheolder="name" name="name" required> 
-                            <br />
-                            <lable for="type">Type:</lable>
-                            <input type="text" placeholder="Monster, tree, flower, herb, etc." name ="type">
-                            <br />
-                            <lable for="descripton">Description:</lable>
-                            <textarea id="description" placheolder="Describe your Flora" name="description" required> </textarea>
-                            <br />
-                            <lable for="abilities">Abilities:</lable>
-                            <textarea id="abilities" placheolder="what abilities does it have? is it poisonous? Carnivorous?  Is it used? How is it used?" name="abilities" > </textarea>
-                            <br />
-                            <lable for="origin">Origin/habitat:</lable>
-                            <input type="text" placeholder="Where is your Flora from? what habitat" name ="origin">
-                            <br />
-                            
-                            <button type="submit">Create</button> 
-                            <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
-                            
-                        </form>
-                    </div>
-                </div>
+                
                 <ul>
                     <li><a href="worldtree.html">World Tree</a></li>
                 </ul>
             </div>
 
-            <div class="biome">
+            <div class="textbody" id="biome">
                 <hr />
 
                 <h2>biomes</h2>
-                <button class="open-button" onClick="openForm()">New Biome</button>
-                <div class="form-popup" id="newBiome">
-                    <form class="form-container">
-                        <h1>New Biome</h1>
-                        <lable for="name">Name</lable>
-                        <input type="text" placheolder="name/title" name="name" required> 
-                        <br />
-                        <lable for="descripton">Description:</lable>
-                        <textarea id="description" placheolder="Describe your Boime" name="description" required> </textarea>
-                        <br />
-                        <lable for="flora">Flora:</lable>
-                        <input type="text" placheolder="flora" name="flora"> 
-                        <br />
-                        <lable for="wildlife">Wildlife:</lable>
-                        <input type="text" placheolder="wildlife" name="wildlife">
-                        
-                        <br />
-                        <button type="submit">Create</button> 
-                        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
-            
-                    </form>
-                </div>
-                <dl>
-                    <dt>World Tree</dt>
-                    <dd>
-                        The world tree biome is the only known biome to be able to sustane life.
-                        reduced amount of void entities such as the Void Reacher
-                        <div class="flora">
-                            <h4>Flora</h4>
-                            <ul>
-                                <li><a href="worldtree.html">World Tree</a></li>
-                            </ul>
-                        </div>
-                        
-                        <div class="wildlife">
-                            <h4>Wildlife</h4>
-                            <ul>
-                                <li><a href="voidreacher.html">Void Reacher</a></li>
-                            </ul>
-                        </div>
+                <ul>
+                    <li>
+                        <a href="worldtreebiome.html">World Tree (biome)</a>
+                    </li>
+                    
+                </ul>
+                
 
-                    </dd>
-
-                </dl>
             </div>
-            <div class="Author">
+            <div class="textbody" id="Author">
                 <hr />
 
                 <h2>Author</h2>
@@ -507,10 +289,12 @@
         </main>
         <footer>
             <hr />
-            <span class="text-restet">Author Name:</span>
-            <td>Spencer Zaugg</td>
-            <br />
-            <a href="https://github.com/SpeedyZ500/startup.git"> GitHub</a>
+            <div class="container-fluid">
+                <span class="text-reset">Author Name:</span>
+                <td>Spencer Zaugg</td>
+                <a href="https://github.com/SpeedyZ500/startup.git"> GitHub</a>
+            </div>
+            
         </footer>
     </body>
 </html>

@@ -71,6 +71,8 @@
                                             <li class="dropdown-item"><a class="dropdown-item" href="flora.html">Flora</a></li>
                                             <li class="dropdown-item"><a class="dropdown-item" href="worlds.html">Worlds</a></li>
                                             <li class="dropdown-item"><a class="dropdown-item" href="organizations.html">Organizations</a></li>
+                                            <li class="dropdown-item"><a class="dropdown-item" href="biomes.html">Bimoes</a></li>
+
                                         </ul>
                                     </li>
                                     <li class="nav-item">
@@ -164,110 +166,156 @@
                         <li class="nav-item">
                             <a class="nav-link" href="organizations.html">Organizations</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="biomes.html">Biomes</a>
+                        </li>
                     </menu>
                 </nav>
             </div>
         </header>
             
         <main>
-            <div class="theme-h adaptive">
+            <div class="theme-h adaptive textbody">
                 <h1>Wildlife</h1>
                 <aside>
                     This is all about the creatures, critters and monsters you create, thier abilities and natrual habitats.
                 </aside>
             </div>
-            <div class="newWildlife">
-                <button class="open-button" onClick="openForm()">New Creature</button>
-                <div class="form-popup" id="newWildlife">
-                    <form class="form-container">
-                        <h1>New Creature</h1>
-                        <lable for="name">Name:</lable>
-                        <input type="text" placheolder="name" name="name" required> 
-                        <br />
-                        <lable for="type">Type:</lable>
-                        <input type="text" placeholder="Monster, Bird, rodent, etc." name ="type">
-                        <br />
-                        <lable for="descripton">Description:</lable>
-                        <textarea id="description" placheolder="Describe your Creature" name="description" required> </textarea>
-                        <br />
-                        <lable for="abilities">Abilities:</lable>
-                        <textarea id="description" placheolder="what abilities does it have? is it poisonous? Venomous?" name="description" required> </textarea>
-                        <br />
-                        <lable for="origin">Origin/habitat:</lable>
-                        <input type="text" placeholder="Where is your creature from? what habitat" name ="origin">
-                        <br />
-                        <lable for="world">World:</lable>
-                        <input type="text" placeholder="What world(s) do your creature appear in?" name ="world">
-                        <br />
+            
+            <button class="btn btn-primary button-align" onClick="openForm()" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWildlife" aria-controls="offcanvasWildlife">New Wildlife</button>
+            <div class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasWildlife" aria-labelledby="offcanvasWildlifeLabel">
+                
+                <div class="offcanvas-header">
+                    <h4 class="offcanvas-title" id="offcanvasWildlifetLabel">New Wildlife</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="newWildlife">
+                    <div class="form-popup" id="newWildlife">
+                        <form class="form-container">
+                            <div class="input-group">
+                                <lable class="input-group-text" for="name">Name:</lable>
+                                <input class="form-control" type="text" placheolder="name" name="name" required> 
+                            </div>
+                            <div class="input-group">
+                                <lable class="input-group-text" for="world">Origin World:</lable>
+                                <select class="form-select" placheolder="world" name="type"> 
+                                    <option selected>Choose a world</option>
+                                    <option>The Void</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <lable class="input-group-text" for="type">Type:</lable>
+                                <input class="form-control" type="text" placheolder="Monster, Bird, rodent, etc." name="type" required> 
+                            </div>
+                            
+                            <div class="input-group">
+                                <lable class="input-group-text" for="descripton">Description:</lable>
+                                <textarea class="form-control" id="description" placheolder="Describe your Wildlife" name="description" required> </textarea>
+
+                            </div>
+                            <div class="input-group">
+                                <lable class="input-group-text" for="abilities">Abilities:</lable>
+                                <input class="form-control" type="text" placheolder="what abilities does it have? is it poisonous? Venomous?" name="abilities"> 
+                            </div>
+
+                          
+                            <div class="input-group">
+                                <lable class="input-group-text" for="worlds">Worlds:</lable>
+                                <input class="form-control" type="text" placheolder="What worlds does your wildlife appear in" name="worlds"> 
+                            </div>
+                            <div class="input-group">s
+                                <lable class="input-group-text" for="biomes">Biome(s):</lable>
+                                <input class="form-control" type="text" placheolder="What boimes does your wildlife like?" name="biomes"> 
+                            </div>
                         
-                        <button type="submit">Create</button> 
-                        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
-                        
-                    </form>
+                            <div class="btn-group">
+                                <button class="btn btn-primary" type="submit">Create</button>
+                                <button type="button" class="btn btn-secondary cansel" data-bs-dismiss="offcanvas" aria-label="Close">Cancel</button>
+                            </div>
+                        </form>
+    
+                    </div>
+
                 </div>
             </div>
-            <hr />
-            <div class="filterAndSort">
-                <aside>Filter</aside>
-                <form action="" method="get">
-                    <lable for="type">Type: </lable>
-                    <select id="type" name="varType">
-                        <option selected>All</option>
-                        <option>Monster</option>
-                    </select>
-                    <lable for="world">world: </lable>
-                    <select id="world" name="varWorld">
-                        <option selected>All</option>
-                        <option>The Void</option>
-                    </select>
-                    <lable for="author">Author: </lable>
-                    <select id="author" name="varAuthor">
-                        <option selected>All</option>
-                        <option>Spencer Zaugg</option>
-                    </select>
-                    <lable for="sort">Sort: </lable>
-                    <select id="sort" name="varSort">
-                        <option selected>Popular</option>
-                        <option>New to Old</option>
-                        <option>Old to New</option>
-                        <option>A-Z Name</option>
-                        <option>Z-A Name</option>
-                        <option>A-Z Author</option>
-                        <option>Z-A Author</option>
-                        <option>A-Z World</option>
-                        <option>Z-A World</option>
-                    </select>
+
+            <div class="theme-h adaptive expanded">
+                
+                <form class="filterAndSort" action="" method="get">
+                    <h4>Filter:</h4>
+                    <div class="input-group mb-3">
+                        <lable class="input-group-text"for="world">World </lable>
+                        <select class="form-select" id="world" name="varWorld">
+                            <option selected>All</option>
+                            <option>The Void</option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <lable class="input-group-text"for="type">Type </lable>
+                        <select class="form-select" id="type" name="varType">
+                            <option selected>All</option>
+                            <option>Monster</option>
+                            
+
+                        </select>
+                    </div>
+                    
+                    <div class="input-group mb-3">
+                         <lable class="input-group-text" for="author">Author </lable>
+                        <select class="form-select" id="author" name="varAuthor">
+                            <option selected>All</option>
+                            <option>Spencer Zaugg</option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <lable class="input-group-text" for="sort">Sort </lable>
+                        <select class="form-select" id="sort" name="varSort">
+                            <option selected>Popular</option>
+                            <option>New to Old</option>
+                            <option>Old to New</option>
+                            <option>A-Z Name</option>
+                            <option>Z-A Name</option>
+                            <option>A-Z Author</option>
+                            <option>Z-A Author</option>
+                            <option>A-Z World</option>
+                            <option>Z-A World</option>
+                        </select>
+                    </div>
+                   
+                    
                 </form>
             </div>
-            <hr />
+            <div class="card-columns d-flex" id="wildlife">
+                <div class="card" style="width: 18rem">
+                    <div class="card-header theme-c adaptive">
+                        <h4><a class="card-link" href="templates/voidreacher.html">Void Reacher</a></h4>
+                    </div>
+                    <div class="card-body theme adaptive">
+                        <h5 class="card-title"><a class="card-link" href=templates/thevoid.html>The Void</a></h5>
+                        <h6 class="card-subtitle">by: Spencer Zaugg</h6>
+                        <p>
+                            Type: Monster <br>
+                            DATA WAITING APPROVAL
+                        </p>
+                    </div>
+                    
+                </div>              
+            </div>
 
             
 
 
-            <div>
-                <table>
-                    <tr>
-                        <th>Name</th>
-                        <th>Type</th>
-                        <th>World</th>
-                        <th>Author</th>
-                    </tr>
-                    <tr>
-                        <td><a href="templates/voidreacher.html">Void Reacher</a></td>
-                        <td>Monster</td>
-                        <td><a href="templates/thevoid.html">The Void</a></td>
-                        <td>Spencer Zaugg</td>
-                    </tr>
-                </table>
-            </div>
+            
         </main>
 
         <footer>
             <hr />
-            <span class="text-restet">Author Name:</span>
-            <td>Spencer Zaugg</td>
-            <br />
-            <a href="https://github.com/SpeedyZ500/startup.git"> GitHub</a>
+            <div class="container-fluid">
+                <span class="text-reset">Author Name:</span>
+                <td>Spencer Zaugg</td>
+                <a href="https://github.com/SpeedyZ500/startup.git"> GitHub</a>
+            </div>
+            
         </footer>
     </body>
     

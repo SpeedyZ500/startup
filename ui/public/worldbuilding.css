@@ -2,7 +2,7 @@
     padding: 0 0 !important;
 }
 
-@media screen and (min-width: 0px) and (max-width: 600px){
+@media screen and (min-width: 0px) and (max-width: 1140px){
     #worldbuilding{
         display: none;
     }

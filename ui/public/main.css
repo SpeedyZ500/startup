@@ -2,6 +2,9 @@
     background:white;
     color: black;
 }
+*{
+    font-family: Arial, Helvetica, sans-serif;
+}
 
 @media (prefers-color-scheme: dark){
     .theme.adaptive{
@@ -17,7 +20,9 @@
         background-color: black;
         
     }
-    
+    .theme-c.adaptive{
+        background-color:darkgrey;
+    }
     .dropdown-menu{
 
      background-color: black !important;
@@ -43,7 +48,11 @@
     }
     
 }
-
+.filterAndSort{
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+}
 body{
     display: flex;
     flex-direction: column;
@@ -58,17 +67,22 @@ header .theme{
 img .navbar-brand{
     vertical-align: top;
 }
+.expanded{
+    width: 97%;
+}
 
 footer a{
     float: right;
 }
 .theme-h{
-    justify-content: flex-start;
     background-color: white;
     border-bottom: solid black thin;
-    align-items:first baseline;
+    margin-bottom: 20px;
 }
-
+.button-align{
+    align-self: flex-start;
+    margin-left: 2em;
+}
 
 
 
@@ -106,7 +120,7 @@ menu .right{
 }
 
 main {
-    flex: 1 calc(100vh - 110px);
+    flex: 1 calc(30vh - 25px);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -130,16 +144,24 @@ nav div button {
     justify-content: end !important;
 }
 .navbar-header{
-    padding-bottom: 20px;
+    padding-top: 10px;
+}
+.textbody{
+    margin-left: 2em;
+    margin-right: 2em;
+    width: 97%;
+    align-self: start;
 }
 
 
 
-@media screen and (min-width: 601px){
+@media screen and (min-width: 1141px){
     #mobile{display: none;};
 }
 
-@media screen and (min-width: 0px) and (max-width: 600px){
+
+
+@media screen and (min-width: 0px) and (max-width: 1140px){
     .page-title  {
         display: none;
     }
