@@ -29,7 +29,7 @@ I also learned what Sudo does it makes you the super user
 Learned you need to use href = "" to insert hyperlinks
 need to specify width and height
 make sure you are copying the image address not a link to the image location
-use width and height to specify image size or you can use fit and you don't nessisaraly need to specify height
+use width and height to specify image size or you can use fit and you don't nessisarily need to specify height
 I also learned how all the inputs work, will be very useful for my site
 Use <search> var type for search bar
 Multiple ways to embed audio
@@ -37,7 +37,7 @@ Must have warn when connecting to http: to go live for whatever reason
 Should be able to store the html in a sub-folder hopefully
 
 ## CSS Notes
-@media querries is for max sizes and flex and stuff and you can make it so that you can do light and dark mode, as well as enabling moving nav into a hamberger if it request a screen size to small to display
+@media queries is for max sizes and flex and stuff and you can make it so that you can do light and dark mode, as well as enabling moving nav into a Hamburger if it request a screen size to small to display
 
 bootstrap stuff 
 https://cdn.jsdeliver.net/npm/boot-strap
@@ -59,3 +59,27 @@ is what you use for the bootstrap Java Script Elements
 Bootstrap documentation: https://getbootstrap.com/docs/5.2/getting-started/introduction/
 
 Cards are something you can do
+
+## JavaScript/React Notes
+props are what you use for the components declared in the function portion of the JavaScript
+jsx is a language,
+
+You can do anything with React and Vite and stuff
+full power of html and CSS and Java Script
+Setting states styles and stuff
+I suspect that this will be very useful for my thing, setting the states of names and other stuff to the values of description names and stuff
+as well as a list value
+and states of what links to link to within the code
+This is how I am going to be able to have a wiki like database for characters, magic systems and stuff
+only pretends to change pages, states stay
+runs like an application on your desktop
+Routers are cool
+React is a library
+dom router
+react-router-dom
+use CSS as normal
+npm  run dev to launch the react
+Need to port everything to react
+Pretty much mostly dealating 
+Wish I only did a couple of example files
+You can fetch json data!!! I will create .jsx files that put data from .JSON files and pull the requisite info into the files!

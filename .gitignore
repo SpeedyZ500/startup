@@ -1,2 +1,4 @@
 ### Mac OS system/directory files ###
 .DS_Store
+
+node_modules/

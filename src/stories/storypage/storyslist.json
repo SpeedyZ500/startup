@@ -1,0 +1,18 @@
+[
+    {
+        "title":"The Moonlit Alchemist",
+        "id":1,
+        "author":"Spencer Zaugg",
+        "description":"The story of a mysterious Alchemist who's alchemy is enhanced by moonlight, displaced from his world",
+        "genre":[
+            "Example",
+            "Fantasy"
+        ],
+        "contentwarnings":[
+            "Fallen Universe"
+        ],
+        "expanded":1739222421,
+        "chapterslocation":"/chapter/chapters/themoonlitalchemist/list.json"
+
+    }
+]

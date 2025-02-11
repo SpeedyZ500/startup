@@ -1,0 +1,219 @@
+.theme{
+    background:white;
+    color: black;
+}
+*{
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+@media (prefers-color-scheme: dark){
+    .theme.adaptive{
+        background: black;
+        color: white;
+        main:a:link{color:#87a9f9;};
+        main:a:visited{color: #c9a0f4};
+    }
+    .theme-h.adaptive{
+        border-bottom: solid white thin;
+        a:link{color:white;};
+        a:visited{color:white;};
+        background-color: black;
+        
+    }
+    .theme-c.adaptive{
+        background-color:darkgrey;
+    }
+    .dropdown-menu{
+
+     background-color: black !important;
+    }
+    .dropdown-item{
+        background-color: black !important;
+    }
+    .dropdown-divider{
+        border-color:white !important;
+       color:white !important;
+    }
+    .offcanvas-body{
+        background-color: black !important;
+    }
+    .offcanvas-header{
+        background-color: black !important;
+    }
+    .btn-close{
+       filter:invert(100%);
+    }
+    .navbar-toggler-icon{
+        filter:invert(100%);
+    }
+    
+}
+.filterAndSort{
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+}
+.body{
+    display: flex;
+    flex-direction: column;
+    min-width:375px;
+    max-height: 100%;
+
+}
+.scrollable{
+   padding-top: 20px;
+
+}
+header {
+    flex: 0 80px;
+}
+header .theme{
+    border-bottom: solid black thin;
+}
+img .navbar-brand{
+    vertical-align: top;
+}
+.expanded{
+    width: 92%;
+}
+
+footer a{
+    float: right;
+}
+.theme-h{
+    background-color: white;
+    border-bottom: solid black thin;
+    margin-bottom: 20px;
+}
+.button-align{
+    align-self: flex-start;
+    margin-left: 4em;
+}
+
+
+menu div{
+    flex: 1;
+    display: flex;
+    flex-direction: row !important;
+}
+menu {
+    flex: 1;
+    display: flex;
+    
+    /*  overwrite Bootstrap so the menu does not wrap */
+    flex-direction: row !important;
+    list-style: none;
+    
+}
+
+.navbar-brand {
+    padding-left: 0.3em;
+    
+    border-bottom: solid rgb(182, 182, 182) thin;
+
+}
+.offcanvas-body menu{
+    flex-direction: column !important;
+    justify-content: end;
+
+}
+
+
+
+menu .navbar-nav{
+    padding-top: 0 !important;
+}
+
+menu .nav-item{
+    padding: 0 .3em;
+}
+
+menu .right{
+    justify-content: end;
+}
+
+
+main {
+    flex: 1 calc(30vh - 25px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+  }
+
+menu ul {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+}
+#myOffcanvasNavbar{
+    flex: 1;
+    display: flex;
+    flex-direction: column !important;
+    justify-content: end !important;
+    
+}
+nav div button {
+    justify-content: end !important;
+}
+.navbar-header{
+    padding-top: 10px;
+}
+.textbody{
+    margin-left: 4em;
+    margin-right: 4em;
+    width: 92%;
+    align-self: start;
+}
+.navbar-nav{
+    .nav-item{
+        border-left: solid black thin;
+
+    }
+}
+.navbar-right{
+    float: right;
+}
+#mobile{
+    .nav-item{
+        border-left: none;
+
+    }
+}
+#navbar-desktop{
+    padding-left: 0;
+    margin-left : 0;
+    
+}
+nav{
+    flex: 0;
+
+}
+.navbar-nav .dropdown-menu{
+
+  position:absolute;
+}
+@media screen and (min-width: 1141px){
+    #mobile{display: none;};
+}
+
+
+
+@media screen and (min-width: 0px) and (max-width: 1140px){
+    .page-title  {
+        display: none;
+    }
+    #navbar-desktop {
+        display: none;
+    };
+    header h1{display: none;};
+    main {
+        flex: 1 100vh;
+      }
+    footer {
+        display: none;
+      }
+     
+}
+

@@ -1,0 +1,17 @@
+#worldbuilding{
+    padding: 0 0 !important;
+}
+.secondary{
+    padding: 0 0 !important;
+}
+main{
+    padding-top: 30px;
+}
+
+
+@media screen and (min-width: 0px) and (max-width: 1140px){
+    #worldbuilding{
+        display: none;
+    }
+     
+}

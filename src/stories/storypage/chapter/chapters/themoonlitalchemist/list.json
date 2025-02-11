@@ -1,0 +1,50 @@
+[
+    {
+        "chapterId":1,
+        "chapterNumber":1,
+        "title":"The End and a Beginning",
+        "contentwarnings":[
+            "Fallen Universe"
+        ],
+        "genre":[
+            "Example",
+            "Fantasy"
+        ],
+        "author":"Author Name",
+        "previous":null,
+        "branches": [2,3],
+        "path":"/1_1_the_end_and_a_beginning_author_name.json"
+    },
+    {
+        "chapterId":2,
+        "chapterNumber":2,
+        "title":"Seeking a New Home",
+        "contentwarnings":[
+            "Fallen Universe"
+        ],
+        "genre":[
+            "Example",
+            "Fantasy"
+        ],
+        "author":"Author Name",
+        "previous":1,
+        "branches": [],
+        "path":"/2_2_seeking_a_new_home_author_name.json"
+    },
+    {
+        "chapterId":3,
+        "chapterNumber":2,
+        "title":"A new Friend",
+        "contentwarnings":[
+            "Fallen Universe"
+        ],
+        "genre":[
+            "Example",
+            "Fantasy"
+        ],
+        "author":"Author Name",
+        "previous":1,
+        "branches": [],
+        "path":"/3_2_a_new_friend_author_name.json"
+    }
+]
