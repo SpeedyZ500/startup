@@ -3,11 +3,25 @@
 }
 .secondary{
     padding: 0 0 !important;
+    
 }
 main{
     padding-top: 30px;
 }
+.theme-h .secondary{
+    padding: 0 0 !important;
+    margin: 0 0;
 
+}
+.navbar.secondary{
+    padding-top: 0 !important;
+    margin-top: 0;
+
+}
+.navbar{
+    padding-bottom: 0;
+    margin-bottom: 0;;
+}
 
 @media screen and (min-width: 0px) and (max-width: 1140px){
     #worldbuilding{

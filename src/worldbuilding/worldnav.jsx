@@ -5,7 +5,8 @@ import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
 
 export function SubNav(){
     return(
-                <menu className="navbar-nav secondary" id="worldbuilding" >
+        <nav className="navbar secondary theme-h adaptive">
+                <menu className="navbar-nav" id="worldbuilding" >
                     <li className="nav-item">
                         <NavLink className="nav-link" to="/worldbuilding">Overview</NavLink>
                     </li>
@@ -34,6 +35,7 @@ export function SubNav(){
                         <NavLink className="nav-link" to="/worldbuilding/biomes">Biomes</NavLink>
                     </li>
                 </menu>
+            </nav>
 );
 }
 

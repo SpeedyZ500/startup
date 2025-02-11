@@ -80,6 +80,16 @@ img .navbar-brand{
 footer a{
     float: right;
 }
+#mainNav{
+    flex-direction:row;
+    flex-wrap:nowrap!important;
+    flex: 0 0;
+    display:flex;
+    justify-content: start !important;
+    width: 99% ;
+
+}
+
 .theme-h{
     background-color: white;
     border-bottom: solid black thin;
@@ -90,7 +100,9 @@ footer a{
     margin-left: 4em;
 }
 
-
+menu .dropdown{
+    flex: 0;
+}
 menu div{
     flex: 1;
     display: flex;
@@ -126,6 +138,7 @@ menu .navbar-nav{
 
 menu .nav-item{
     padding: 0 .3em;
+    text-wrap: nowrap;
 }
 
 menu .right{
@@ -191,7 +204,6 @@ nav{
 
 }
 .navbar-nav .dropdown-menu{
-
   position:absolute;
 }
 @media screen and (min-width: 1141px){
