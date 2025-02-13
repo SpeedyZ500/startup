@@ -5,6 +5,8 @@ import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { OffcanvasBody, OffcanvasHeader } from 'react-bootstrap';
+import { NavLink } from 'react-router-dom';
+
 export function MagicSystems() {
         const [visible, setVisibility] = useState(false);
             
@@ -14,7 +16,7 @@ export function MagicSystems() {
                 const handleOpen = () => setVisibility(true);
     
     return (
-    <main>
+    <main className="worldbuilding">
         <div className="theme-h adaptive textbody">
                 <h1>Magic Systems</h1>
                 <aside> How do people intereact with magic and stuff, this is also where SiFi technology should be found.
@@ -46,10 +48,6 @@ export function MagicSystems() {
                             <div className="input-group">
                                 <label className="input-group-text" htmlFor="type">Type:</label>
                                 <input className="form-control" type="text" placheolder="Dimensional, Technological, Alchemical, Transformation, ect." name="type" required/> 
-                            </div>
-                            <div className="input-group">
-                                <label className="input-group-text" htmlFor="titles">title(s):</label>
-                                <input className="form-control" type="text" placheolder="title(s)" name="titles"/> 
                             </div>
                             <div className="input-group">
                                 <label className="input-group-text" htmlFor="descripton">Description:</label>
@@ -122,10 +120,10 @@ export function MagicSystems() {
             <div className="card-columns d-flex" id="wildlife">
                 <div className="card" style={{width: '18rem'}}>
                     <div className="card-header theme-c adaptive">
-                        <h4><a className="card-link" href="templates/voidwalking.html">Void Walking</a></h4>
+                        <h4><NavLink className="card-link" to="voidwalking">Void Walking</NavLink></h4>
                     </div>
                     <div className="card-body theme adaptive">
-                        <h5 className="card-title"><a className="card-link" href="templates/thevoid.html">The Void</a></h5>
+                        <h5 className="card-title"><NavLink className="card-link" to="/worldbuilding/worlds/thevoid">The Void</NavLink></h5>
                         <h6 className="card-subtitle">by: Spencer Zaugg</h6>
                         <p>
                             Type: Dimensional
@@ -135,21 +133,6 @@ export function MagicSystems() {
                     
                 </div>              
             </div>
-            <div>
-                <table>
-                    <tr>
-                        <th>Name</th>
-                        <th>World</th>
-                        <th>Type</th>
-                        <th>Author</th>
-                    </tr>
-                    <tr>
-                        <td><a href="templates/voidwalking.html">Void Walking</a></td>
-                        <td><a href="templates/thevoid.html">The Void</a></td>
-                        <td>Dimensional</td>
-                        <td>Spencer Zaugg</td>
-                    </tr>
-                </table>
-            </div>
+            
     </main>);
 }

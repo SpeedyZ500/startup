@@ -18,7 +18,7 @@ export function WritingPrompts() {
         <div className="theme-h adaptive textbody">
                 <h1>Writing Prompts</h1>
                 <br />
-                <asside>Need ideas for a story? here are some ideas</asside>
+                <aside>Need ideas for a story? here are some ideas</aside>
             </div>
 
             <button className="btn btn-primary button-align" onClick={handleOpen} data-bs-toggle="offcanvas" data-bs-target="#offcanvasPrompt" aria-controls="offcanvasPrompt">New Prompt</button>
@@ -73,7 +73,7 @@ export function WritingPrompts() {
                 </form>
             </div>
             
-            // A button to open the form to submitt a new writing prompt
+             {/*A button to open the form to submitt a new writing prompt*/}
             
             <div className="prompts">
                 <ul>

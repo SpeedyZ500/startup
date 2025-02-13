@@ -133,10 +133,9 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] **Bundled using Vite** - Install bundal and add the node moduels to  gitignor. and other things
-- [ ] **Components** - Componenttize everything, 2 variants of the navbar thing, one for WorldBuilding, the other for the rest, make the wiki like pages look better, and make them individual files, use .json files for the data of each Wiki-Like Page! Find a way to dynamicaly add additional cards hopefully, if not do that in Reactivity. Make writing prompts and Writing Advice also pull from a .Json file that is just an JSON array which stores tuples of author and advice, or Author and Prompt, if I don't get to this deal with it during Reactivity.
-Or another option is to componentize it now and put the data back into it when I do DB
-- [ ] **Router** - Routing between login and other components
+- [X] **Bundled using Vite** - Install bundal and add the node moduels to  gitignor. and other things
+- [X] **Components** - Componenttize everything, 2 variants of the navbar thing, one for WorldBuilding, the other for the rest, make the wiki like pages look better, and make them individual files, use .json files for the data of each Wiki-Like Page! Find a way to dynamicaly add additional cards hopefully, if not do that in Reactivity. Prepare for the Jsonification next time. by creating pages that look right but may not have all the proper info or nav elements, in the case of dynamic nav elements. Probably could have made only one example page, and use pure dynamic content for formatting and stuff, might explore doing that next time, just need some examples
+- [X] **Router** - Routing between login and other components
 
 ## 🚀 React part 2: Reactivity
 

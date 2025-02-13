@@ -4,6 +4,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
+import { NavLink } from 'react-router-dom';
+
 import { OffcanvasBody, OffcanvasHeader } from 'react-bootstrap';
 
 
@@ -101,7 +103,7 @@ export function Stories() {
             <div className="card-columns d-flex" id="stories">
                 <div className="card" style={{width:"18rem"}}>
                     <div className="card-header theme-c adaptive">
-                        <h4><a className="card-link" href="templates/themoonlitealchemist.html"> The Moonlit Alchemist</a></h4>
+                        <h4><NavLink className="card-link" to="/stories/themoonlitealchemist"> The Moonlit Alchemist</NavLink></h4>
 
                      </div>
                     <div className="card-body theme adaptive">
@@ -112,7 +114,7 @@ export function Stories() {
                         
                     </div>
                     <div className="card-footer theme-c adaptive">
-                        // Note Popers won't work until I add the nessisary Java Script stuff, I will deal with that later
+                        {/* Note Popers won't work until I add the nessisary Java Script stuff, I will deal with that later */}
                         <button type="button" className="btn btn-sm btn-secondary" data-bs-toggle="popover" data-bs-title="Genres" data-bs-content="Example">Genre</button>
                         <button type="button" className="btn btn-sm btn-secondary" data-bs-toggle="popover"  data-bs-title="Content Warnings" data-bs-content="Fallen Universe">Content Warnings</button>
 

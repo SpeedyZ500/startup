@@ -1,0 +1,28 @@
+.buttons{
+    width: 90%;
+    justify-content:space-between;
+    align-items: fill;
+    display: flex;
+    flex-direction: row !important;
+    align-self: center;
+}
+.border-bottom{
+    border-bottom: black thin solid;
+}
+.border-top{
+    border-top: black thin solid;
+}
+.chapter{
+    display:flex;
+    flex-direction: column;
+}
+
+@media (prefers-color-scheme: dark){
+    .border-bottom{
+        border-color: white;
+    }
+    .border-top{
+        border-color: white;
+    }
+
+}

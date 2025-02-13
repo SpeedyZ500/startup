@@ -4,6 +4,8 @@ import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { OffcanvasBody, OffcanvasHeader } from 'react-bootstrap';
+import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
+
 
 export function Characters() {
     const [visible, setVisibility] = useState(false);
@@ -156,12 +158,12 @@ export function Characters() {
                     
                 <div className="card" style={{width:"18rem"}}>
                     <div className="card-header theme-c adaptive">
-                        <h4><a className="card-link" href="templates/thecurator.html"> The Curator</a></h4>
+                        <h4><NavLink className="card-link" to="/characters/thecurator"> The Curator</NavLink></h4>
 
                         </div>
                     <div className="card-body theme adaptive">
-                        <h5 className="card-title">World: <a className="card-link" href="worldbuilding/templates/thevoid.html">The Void</a></h5>
-                        <h6 className="card-subtitle">by: Spencer Zaugg</h6>
+                    <h5 className="card-title">World: <NavLink className="card-link" to="/worldbuilding/worlds/thevoid">The Void</NavLink></h5>
+                    <h6 className="card-subtitle">by: Spencer Zaugg</h6>
                         <p>
                             A mysterious individual who claims to rule over Yggdrasil, the World Tree. Not much is known about them.
                         </p>
@@ -171,11 +173,11 @@ export function Characters() {
                 </div>              
                 <div className="card" style={{width:"18rem"}}>
                     <div className="card-header theme-c adaptive">
-                        <h4><a className="card-link" href="templates/alastormoonblaze.html"> Alastor Moonblaze</a></h4>
+                        <h4><NavLink className="card-link" to="/characters/alastormoonblaze"> Alastor Moonblaze</NavLink></h4>
 
                         </div>
                     <div className="card-body theme adaptive">
-                        <h5 className="card-title">World: <a className="card-link" href="worldbuilding/templates/thevoid.html">The Void</a></h5>
+                        <h5 className="card-title">World: <NavLink className="card-link" to="/worldbuilding/worlds/thevoid">The Void</NavLink></h5>
                         <h6 className="card-subtitle">by: Spencer Zaugg</h6>
                         <p>
                             A mysterious Alchemist who seeks to restore his world

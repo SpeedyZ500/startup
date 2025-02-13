@@ -18,7 +18,7 @@ export function WritingAdvice() {
         <div className="theme-h adaptive textbody expanded">
                 <h1>Writing Advice</h1>
             </div>
-            // A button to open the form to submit advice
+            {/* A button to open the form to submit advice*/}
             <button className="btn btn-primary button-align" onClick={handleOpen} data-bs-toggle="offcanvas" data-bs-target="#offcanvasAdvice" aria-controls="offcanvasAdvice">New Advice</button>
             <Offcanvas show={visible} className="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasAdvice" aria-labelledby="offcanvasAdviceLabel">
                 

@@ -1,0 +1,36 @@
+.internal-nav{
+    width:50%;
+    display: flex;
+    flex-direction: column;
+}
+.internal-menu{
+    display: flex;
+    flex-direction: column !important;
+}
+.content-body{
+    float:left;
+}
+.infocard{
+    float:right;
+    width: 22em;
+    margin-left: 0.5em;
+    text-align:center;
+
+}
+.bio{
+    justify-content: start;
+    display: block ;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+@media (prefers-color-scheme: dark){
+    .table>:not(caption)>*>*{
+        color: white;
+        background-color: black;
+    }
+    th{
+        color: white;
+        background-color: black;
+    }
+}

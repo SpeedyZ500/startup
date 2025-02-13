@@ -4,6 +4,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
+import { NavLink } from 'react-router-dom';
+
 import { OffcanvasBody, OffcanvasHeader } from 'react-bootstrap';
 export function Worlds() {
         const [visible, setVisibility] = useState(false);
@@ -14,7 +16,7 @@ export function Worlds() {
                 const handleOpen = () => setVisibility(true);
     
     return (
-    <main>
+    <main className="worldbuilding">
         <div className="theme-h adaptive textbody">
                 <h1>Worlds</h1>
                 <aside>
@@ -143,7 +145,7 @@ export function Worlds() {
             <div className="card-columns d-flex" id="worlds">
                 <div className="card" style={{width: "18rem"}}>
                     <div className="card-body theme adaptive">
-                        <h5 className="card-title"><a className="card-link" to="templates/thevoid">The Void</a></h5>
+                        <h5 className="card-title"><NavLink className="card-link" to="thevoid">The Void</NavLink></h5>
                         <h6 className="card-subtitle">by: Spencer Zaugg</h6>
                         <p>
                             The World Between Worlds

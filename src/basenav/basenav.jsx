@@ -1,11 +1,8 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
-import Dropdown from 'react-bootstrap/Dropdown' 
-import DropdownToggle from 'react-bootstrap/DropdownToggle'
-import DropdownMenu from 'react-bootstrap/DropdownMenu'
-import DropdownItem from 'react-bootstrap/DropdownItem'
-import DropdownDivider from 'react-bootstrap/DropdownDivider'
+
+import NavDropdown from 'react-bootstrap/NavDropdown';
 
 export function BaseNav() {
     return (
@@ -20,26 +17,20 @@ export function BaseNav() {
                 <li className="nav-item">
                     <NavLink className="nav-link" to="/characters">Characters</NavLink>
                 </li>
-                <Dropdown className="nav-item">
-                    <DropdownToggle className="nav-link dropdown-toggle" to="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" id="dropdownMenuLink">
-                        World Building
-                    </DropdownToggle>
-                    <DropdownMenu className="dropdown-menu dropdown-menu-start"aria-labelledby="dropdownMenuLink">
-                        <DropdownItem ><NavLink className="dropdown-item" to="/worldbuilding">Overview</NavLink></DropdownItem>
-                        <DropdownItem>
-                            <DropdownDivider className="dropdown-divider"/>
-                        </DropdownItem>
-                        <DropdownItem ClassName="dropdown-item"><NavLink className="dropdown-item" to="/worldbuilding/magicsystems">Magic Systems</NavLink></DropdownItem>
-                        <DropdownItem className="dropdown-item"><NavLink className="dropdown-item" to="/worldbuilding/races">Races</NavLink></DropdownItem>
-                        <DropdownItem className="dropdown-item"><NavLink className="dropdown-item" to="/worldbuilding/countries">Countries</NavLink></DropdownItem>
-                        <DropdownItem className="dropdown-item"><NavLink className="dropdown-item" to="/worldbuilding/wildlife">Wildlife</NavLink></DropdownItem>
-                        <DropdownItem className="dropdown-item"><NavLink className="dropdown-item" to="/worldbuilding/flora">Flora</NavLink></DropdownItem>
-                        <DropdownItem className="dropdown-item"><NavLink className="dropdown-item" to="/worldbuilding/worlds">Worlds</NavLink></DropdownItem>
-                        <DropdownItem className="dropdown-item"><NavLink className="dropdown-item" to="/worldbuilding/organizations">Organizations</NavLink></DropdownItem>
-                        <DropdownItem className="dropdown-item"><NavLink className="dropdown-item" to="/worldbuilding/biomes">Biomes</NavLink></DropdownItem>
+                <NavDropdown title="World Building" id="collapsible-nav-dropdown">
+                    <NavDropdown.Item><NavLink className="dropdown-item" to="/worldbuilding/">Overview</NavLink></NavDropdown.Item>
+                    <NavDropdown.Divider/>
+                    <NavDropdown.Item><NavLink className="dropdown-item" to="/worldbuilding/magicsystems">Magic Systems</NavLink></NavDropdown.Item>
+                    <NavDropdown.Item><NavLink className="dropdown-item" to="/worldbuilding/races">Races</NavLink></NavDropdown.Item>
+                    <NavDropdown.Item><NavLink className="dropdown-item" to="/worldbuilding/countries">Countries</NavLink></NavDropdown.Item>
+                    <NavDropdown.Item><NavLink className="dropdown-item" to="/worldbuilding/wildlife">Wildlife</NavLink></NavDropdown.Item>
+                    <NavDropdown.Item><NavLink className="dropdown-item" to="/worldbuilding/flora">Flora</NavLink></NavDropdown.Item>
+                    <NavDropdown.Item><NavLink className="dropdown-item" to="/worldbuilding/worlds">Worlds</NavLink></NavDropdown.Item>
+                    <NavDropdown.Item><NavLink className="dropdown-item" to="/worldbuilding/organizations">Organizations</NavLink></NavDropdown.Item>
+                    <NavDropdown.Item><NavLink className="dropdown-item" to="/worldbuilding/biomes">Biomes</NavLink></NavDropdown.Item>
 
-                    </DropdownMenu>
-                </Dropdown>
+                </NavDropdown>
+                
                 <li className="nav-item">
                     <NavLink className="nav-link" to="/writingadvice">Writing Advice</NavLink>
                 </li>

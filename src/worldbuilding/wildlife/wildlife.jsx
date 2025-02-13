@@ -3,6 +3,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
+import { NavLink } from 'react-router-dom';
+
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { OffcanvasBody, OffcanvasHeader } from 'react-bootstrap';
 export function Wildlife() {
@@ -14,7 +16,7 @@ export function Wildlife() {
                 const handleOpen = () => setVisibility(true);
     
     return (
-    <main>
+    <main className="worldbuilding">
         <div className="theme-h adaptive textbody">
                 <h1>Wildlife</h1>
                 <aside>
@@ -128,10 +130,10 @@ export function Wildlife() {
             <div className="card-columns d-flex" id="wildlife">
                 <div className="card" style={{width: "18rem"}}>
                     <div className="card-header theme-c adaptive">
-                        <h4><a className="card-link" href="templates/voidreacher.html">Void Reacher</a></h4>
+                        <h4><NavLink className="card-link" to="voidreacher">Void Reacher</NavLink></h4>
                     </div>
                     <div className="card-body theme adaptive">
-                        <h5 className="card-title"><a className="card-link" href="templates/thevoid.html">The Void</a></h5>
+                        <h5 className="card-title"><NavLink className="card-link" to="/worldbuilding/worlds/thevoid">The Void</NavLink></h5>
                         <h6 className="card-subtitle">by: Spencer Zaugg</h6>
                         <p>
                             Type: Monster <br />

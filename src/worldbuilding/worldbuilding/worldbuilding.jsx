@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 
 export function WorldBuilding() {
     return (
-        <main>
+        <main className="worldbuilding">
             
             <div className="textbody">
                 <h1 className="theme-h adaptive">World Building</h1>

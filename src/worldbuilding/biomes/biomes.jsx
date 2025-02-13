@@ -1,8 +1,10 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Button from 'react-bootstrap/Button';
+import { NavLink } from 'react-router-dom';
 
 import { useState } from 'react';
-import Button from 'react-bootstrap/Button';
+
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { OffcanvasBody, OffcanvasHeader } from 'react-bootstrap';
 export function Biomes() {
@@ -14,7 +16,7 @@ export function Biomes() {
                 const handleOpen = () => setVisibility(true);
     
     return (
-    <main>
+    <main className="worldbuilding">
         <div className="theme-h adaptive textbody">
                 <h1>Biome</h1>
                 <p>
@@ -36,7 +38,7 @@ export function Biomes() {
                                 <input className="form-control" type="text" placheolder="name" name="name" required/> 
                             </div>
                             <div className="input-group">
-                                // Will make it multi select at some point
+                                {/* Will make it multi select at some point*/}
                                 <label className="input-group-text" htmlFor="world">World:</label>
                                 <select className="form-select" placheolder="world" name="type"> 
                                     <option defaultValue>Choose a world</option>
@@ -52,7 +54,7 @@ export function Biomes() {
                             
                             <div className="input-group">
                                 <label className="input-group-text" htmlFor="wildlife">Wildlife:</label>
-                                // Will make this multi Select at some point
+                                {/* Will make this multi Select at some point*/}
                                 <input className="form-control" type="text" placheolder="wildlife, what creatures" name="wildlife"/> 
                             </div>
                             <div className="input-group">
@@ -119,10 +121,10 @@ export function Biomes() {
             <div className="card-columns d-flex" id="biomes">
                 <div className="card" style={{width: "18rem"}}>
                     <div className="card-header theme-c adaptive">
-                        <h4><a className="card-link" href="templates/worldtreebiome.html">The World Tree (Biome)</a></h4>
+                        <h4><NavLink className="card-link" to="worldtreebiome">The World Tree (Biome)</NavLink></h4>
                     </div>
                     <div className="card-body theme adaptive">
-                        <h5 className="card-title"><a className="card-link" href="templates/thevoid.html">The Void</a></h5>
+                        <h5 className="card-title"><NavLink className="card-link" to="/worldbuilding/worlds/thevoid">The Void</NavLink></h5>
                         <h6 className="card-subtitle">by: Spencer Zaugg</h6>
                         <p>
                             The world tree biome is the only known biome to be able to sustane life.
@@ -135,10 +137,10 @@ export function Biomes() {
                 </div>    
                 <div className="card" style={{width: "18rem"}}>
                     <div className="card-header theme-c adaptive">
-                        <h4><a className="card-link" href="templates/thedeepvoid.html">The Deep Void</a></h4>
+                        <h4><NavLink className="card-link" to="thedeepvoid">The Deep Void</NavLink></h4>
                     </div>
                     <div className="card-body theme adaptive">
-                        <h5 className="card-title"><a className="card-link" href="templates/thevoid.html">The Void</a></h5>
+                        <h5 className="card-title"><NavLink className="card-link" to="/worldbuilding/worlds/thevoid">The Void</NavLink></h5>
                         <h6 className="card-subtitle">by: Spencer Zaugg</h6>
                         <p>
                             The origin of the Void Entities, the Space Between Earth and Yggdrasil

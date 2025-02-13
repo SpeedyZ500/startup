@@ -5,6 +5,8 @@ import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { OffcanvasBody, OffcanvasHeader } from 'react-bootstrap';
+import { NavLink } from 'react-router-dom';
+
 export function Flora() {
         const [visible, setVisibility] = useState(false);
             
@@ -14,7 +16,7 @@ export function Flora() {
                 const handleOpen = () => setVisibility(true);
     
     return (
-    <main>
+    <main className="worldbuilding">
         <div className="theme-h adaptive textbody">
                 <h1>Flora</h1>
                 <p>
@@ -132,10 +134,10 @@ export function Flora() {
             <div className="card-columns d-flex" id="wildlife">
                 <div className="card" style={{width: "18rem"}}>
                     <div className="card-header theme-c adaptive">
-                        <h4><a className="card-link" href="templates/worldtree.html">World Tree</a></h4>
+                        <h4><NavLink className="card-link" to="worldtree">World Tree</NavLink></h4>
                     </div>
                     <div className="card-body theme adaptive">
-                        <h5 className="card-title"><a className="card-link" href="templates/thevoid.html">The Void</a></h5>
+                        <h5 className="card-title"><NavLink className="card-link" to="/worldbuilding/worlds/thevoid">The Void</NavLink></h5>
                         <h6 className="card-subtitle">by: Spencer Zaugg</h6>
                         <p>
                             Type: Magic Tree
