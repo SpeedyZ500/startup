@@ -203,10 +203,7 @@ export default function App() {
                             <Route path=''element={<Biomes />}/>
                             <Route path=":id" element={<BiomeBio/>}/>
                         </Route>
-
-
-                        
-                        
+                        <Route path='*' element={<NotFound/>} />
                     </Route>
                     <Route path='stories'>
                         <Route path=''element={<Stories />}/>
@@ -229,6 +226,7 @@ export default function App() {
                         <Route path=':id' element={<CharacterBio />}/>
                     </Route>
                     <Route path='settings' element={<Settings />} />
+                    <Route path='*' element={<NotFound/>} />
                     
 
                     
@@ -249,3 +247,6 @@ export default function App() {
     </BrowserRouter>
   );
 }
+function NotFound() {
+    return <main className='container-fluid theme adaptive text-center' style={{padding:"20px", margin:"20px"}}>404: Return to sender. Address unknown.</main>;
+  }
