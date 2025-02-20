@@ -127,7 +127,7 @@ export function Wildlife() {
                     
                 </form>
             </div>
-            <div className="card-columns d-flex" id="wildlife">
+            <div className="card-columns my-container" id="wildlife">
                 <div className="card" style={{width: "18rem"}}>
                     <div className="card-header theme-c adaptive">
                         <h4><NavLink className="card-link" to="voidreacher">Void Reacher</NavLink></h4>

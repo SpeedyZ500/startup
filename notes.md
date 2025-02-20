@@ -83,3 +83,4 @@ Need to port everything to react
 Pretty much mostly dealating 
 Wish I only did a couple of example files
 You can fetch json data!!! I will create .jsx files that put data from .JSON files and pull the requisite info into the files!
+Each page may need to have a function that gets the list or the .json file, so that other files/folders/whatever can pass in an id, and then get the list, or the .json file and pull data from it

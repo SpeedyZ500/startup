@@ -142,7 +142,7 @@ export function Worlds() {
                 </form>
             </div>
 
-            <div className="card-columns d-flex" id="worlds">
+            <div className="card-columns my-container" id="worlds">
                 <div className="card" style={{width: "18rem"}}>
                     <div className="card-body theme adaptive">
                         <h5 className="card-title"><NavLink className="card-link" to="thevoid">The Void</NavLink></h5>

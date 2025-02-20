@@ -18,7 +18,7 @@ export function Home() {
             
             <hr />
             <h2 className="theme-h adaptive text-center expanded">Writing Prompts</h2>
-            <div className="prompts grid">
+            <div className="prompts grid my-container scrollable">
                 <div className="container text-center" data-bs-spy="scroll">
                     <div className="row">
                         <div className="col">
@@ -33,7 +33,7 @@ export function Home() {
             <div className ="new">
                 
                 
-                <div className="card-columns d-flex" data-bs-spy="scroll" id="new">
+                <div className="card-columns my-container scrollable" data-bs-spy="scroll" id="new" >
                     
                     <Card className="card" style={{width:"18rem"}}>
                         <div className="card-header theme-c adaptive">
@@ -62,7 +62,7 @@ export function Home() {
             <h2 className="theme-h adaptive expanded">Popular</h2>
             <div className="popular">
                 
-                <div className="card-columns d-flex" data-bs-spy="scroll" id="new">
+                <div className="card-columns my-container scrollable" data-bs-spy="scroll" id="new">
                     
                     <Card className="card" style={{width:"18rem"}}>
                         <div className="card-header theme-c adaptive">

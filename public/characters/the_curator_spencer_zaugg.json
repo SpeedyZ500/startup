@@ -1,0 +1,105 @@
+{
+    "infoCard":{
+        "name":"The Curator",
+        "cardData":[
+            {
+                "label":"Author",
+                "value":"Spencer Zaugg"
+            },
+            {
+                "label":"World",
+                "value":{
+                    "name":"The Void",
+                    "path":"/worldbuilding/worlds/the_void_spencer_zaugg"
+                }
+            },
+            {
+                "label":"Titles",
+                "value":[
+                    "The Curator",
+                    "The Story Teller",
+                    "",
+                    "The Story Keeper",
+                    "Hero of Dark Light",
+                    "Eternal Watcher",
+                    "",
+                    "Harbinger of Light",
+                    "Arborist of Reality",
+                    "Realm Lord",
+                    "Void Tamer",
+                    "Eternal Emperor of Yggdrasil",
+                    "Slayer of Demons",
+                    "The Stellar Story",
+                    "Exterminator of Darkness",
+                    "Returner",
+                    "",
+                    "Observer",
+                    "Freedom Bringer",
+                    "",
+                    "Star Warrior",
+                    "Originator",
+                    "Unifier",
+                    "Light Bringer",
+                    "Sorcerer of Light"
+                ]
+
+            },
+            {
+                "label":"Gender",
+                "value":"NB (Numerous Bees)"
+            },
+            {
+                "label":"Pronouns",
+                "value":"They/Them (collective)"
+            },
+            {
+                "label":"Type/Roles",
+                "value":[
+                    "Hero",
+                    "Protagonist"
+                ]
+            },
+            {
+                "label":"Race",
+                "value":"Unknown"
+            },
+            {
+                "label":"Abilities",
+                "value":[
+                    {
+                        "name":"Void Walking",
+                        "path":"/worldbuilding/magicsystems/void_walking_spencer_zaugg"
+                    },
+                    {
+                        "name":"Data Manipulation"
+                    }
+                ]
+            },
+            {
+                "label":"Allies",
+                "value":"Everyone :)"
+            },
+            {
+                "label":"Enemies",
+                "value":[
+                    {
+                        "name":"Alastor Moonblaze",
+                        "path":"/characters/alastor_moonblaze_spencer_zaugg"
+                    },
+                    {
+                        "name":"Spencer Zaugg"
+                    }
+                ]
+            }
+        ],
+        "created":"2025-02-18T16:43:20Z",
+        "modified":"2025-02-18T16:43:20Z"
+    },
+    "description":"A mysterious individual who claims to rule over Yggdrasil, the World Tree. Not much is known about them.",
+    "sections":[
+        {
+            "section":"Description",
+            "text":"They don't like when people use any gendered pronouns to describe them, also doesn't like when you refer to them as a singular entity, they much prefer ya'll to you. They consider themselves a hero, and the protagonist of all stories, more accurately however is that they are a godlike entity, in that they have godlike power, but they are not omniscient, omnipresent, nor are they omnipotent. They are however very powerful, being able to manipulate classification of them-self and other characters and creatures. They cannot read the contents of this specific entry, and yet they can manipulate the information contained within it. The less savory titles and what is likely a truer description of them is therefore not possible. This page is not to be considered entirely accurate. Some things that are accurate are hidden or altered, some words have been shifted and replaced with similar sounding words, which allows us to track information on them. Look for Patterns, especially for cases of the pattern being broken.\nThey look like a living cloak, with only darkness beneath the hood. This Cloak has colorful embroidery, and Golden Stars."
+        }
+    ]
+}

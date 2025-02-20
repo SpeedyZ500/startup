@@ -154,38 +154,69 @@ export function Characters() {
 
                
             </div>
-            <div className="card-columns d-flex" id="characters">
+            <div className="card-columns my-container" id="characters">
                     
-                <div className="card" style={{width:"18rem"}}>
-                    <div className="card-header theme-c adaptive">
-                        <h4><NavLink className="card-link" to="/characters/thecurator"> The Curator</NavLink></h4>
-
-                        </div>
-                    <div className="card-body theme adaptive">
-                    <h5 className="card-title">World: <NavLink className="card-link" to="/worldbuilding/worlds/thevoid">The Void</NavLink></h5>
-                    <h6 className="card-subtitle">by: Spencer Zaugg</h6>
-                        <p>
-                            A mysterious individual who claims to rule over Yggdrasil, the World Tree. Not much is known about them.
-                        </p>
-                        
-                    </div>
-                    
-                </div>              
-                <div className="card" style={{width:"18rem"}}>
-                    <div className="card-header theme-c adaptive">
-                        <h4><NavLink className="card-link" to="/characters/alastormoonblaze"> Alastor Moonblaze</NavLink></h4>
-
-                        </div>
-                    <div className="card-body theme adaptive">
+                    <div className="card" style={{width:"18em"}}>
+                        <div className="card-header theme-c adaptive">
+                            <h4><NavLink className="card-link" to="/characters/thecurator"> The Curator</NavLink></h4>
+    
+                            </div>
+                        <div className="card-body theme adaptive">
                         <h5 className="card-title">World: <NavLink className="card-link" to="/worldbuilding/worlds/thevoid">The Void</NavLink></h5>
                         <h6 className="card-subtitle">by: Spencer Zaugg</h6>
-                        <p>
-                            A mysterious Alchemist who seeks to restore his world
-                        </p>
+                            <p>
+                                A mysterious individual who claims to rule over Yggdrasil, the World Tree. Not much is known about them.
+                            </p>
+                            
+                        </div>
+                        
+                    </div>              
+                    <div className="card" style={{width:"18em"}}>
+                        <div className="card-header theme-c adaptive">
+                            <h4><NavLink className="card-link" to="/characters/alastor_moonblaze_spencer_zaugg"> Alastor Moonblaze</NavLink></h4>
+    
+                            </div>
+                        <div className="card-body theme adaptive">
+                            <h5 className="card-title">World: <NavLink className="card-link" to="/worldbuilding/worlds/thevoid">The Void</NavLink></h5>
+                            <h6 className="card-subtitle">by: Spencer Zaugg</h6>
+                            <p>
+                                A mysterious Alchemist who seeks to restore his world
+                            </p>
+                            
+                        </div>
                         
                     </div>
-                    
+                    <div className="card" style={{width:"18em"}}>
+                        <div className="card-header theme-c adaptive">
+                            <h4><NavLink className="card-link" to="/characters/alastormoonblaze"> Alastor Moonblaze</NavLink></h4>
+    
+                            </div>
+                        <div className="card-body theme adaptive">
+                            <h5 className="card-title">World: <NavLink className="card-link" to="/worldbuilding/worlds/thevoid">The Void</NavLink></h5>
+                            <h6 className="card-subtitle">by: Spencer Zaugg</h6>
+                            <p>
+                                A mysterious Alchemist who seeks to restore his world
+                            </p>
+                            
+                        </div>
+                        
+                    </div>
+                    <div className="card" style={{width:"18em"}}>
+                        <div className="card-header theme-c adaptive">
+                            <h4><NavLink className="card-link" to="/characters/alastormoonblaze"> Alastor Moonblaze</NavLink></h4>
+    
+                            </div>
+                        <div className="card-body theme adaptive">
+                            <h5 className="card-title">World: <NavLink className="card-link" to="/worldbuilding/worlds/thevoid">The Void</NavLink></h5>
+                            <h6 className="card-subtitle">by: Spencer Zaugg</h6>
+                            <p>
+                                A mysterious Alchemist who seeks to restore his world
+                            </p>
+                            
+                        </div>
+                        
+                    </div>
                 </div>
-            </div>
+            
     </main>);
 }

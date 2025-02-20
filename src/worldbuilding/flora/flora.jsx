@@ -131,7 +131,7 @@ export function Flora() {
                     
                 </form>
             </div>
-            <div className="card-columns d-flex" id="wildlife">
+            <div className="card-columns my-container" id="flora">
                 <div className="card" style={{width: "18rem"}}>
                     <div className="card-header theme-c adaptive">
                         <h4><NavLink className="card-link" to="worldtree">World Tree</NavLink></h4>

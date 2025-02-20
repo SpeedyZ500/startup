@@ -164,7 +164,7 @@ export function Countries() {
                 </form>
             </div>
 
-            <div className="card-columns d-flex" id="wildlife">
+            <div className="card-columns my-container" id="countries">
                 <div className="card" style={{width: "18rem"}}>
                     <div className="card-header theme-c adaptive">
                         <h4><NavLink className="card-link" to="yggdrasil">Yggdrasil</NavLink></h4>

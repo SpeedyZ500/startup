@@ -1,0 +1,69 @@
+{
+    
+    "infoCard":{
+        "name":"Alastor Moonblaze",
+        "cardData":[
+            {
+                "label":"Author",
+                "value":"Spencer Zaugg"
+            },
+            {
+                "label":"Family",
+                "value":[
+                    {
+                        "label":"Father?/Creator",
+                        "value":[
+                            {
+                                "name":"Spencer Zaugg",
+                                "id":null
+                            }
+                        ]
+                    }
+                ]
+            },
+            
+            {
+                "label":"Titles",
+                "value":[
+                    "The Moonlit Alchemist"
+                ]
+            },
+            {
+                "label":"Gender",
+                "value":"Male"
+            },
+            {
+                "label":"Pronouns",
+                "value":"He/Him"
+            },
+            {
+                "label":"Types/Roles",
+                "value":[
+                    "Side Character",
+                    "Protagonist"
+                ]
+            },
+            {
+                "label":"Enemies",
+                "value":[
+                    {
+                        "name":"The Curator",
+                        "path":"/characters/the_curator_spencer_zaugg"
+                    }
+                ]
+            }
+
+        ],
+        
+        "created":"2025-02-18T16:10:29Z",
+        "modified":"2025-02-18T16:10:29Z"
+
+    },
+    "description":"A mysterious Alchemist who seeks to restore his world",
+    "sections":[
+        {
+            "section":"Description",
+            "text":"A mysterious Alchemist who seeks to restore his world \n A fellow who is not just below average hight, he has Brown Hair and Brown eyes. Best we can tell \"Alastor Moonblaze\" was not his original name, though it is unlikely he remembers his original name, or more likely names, because he is a Remgulus. He is labeled a Side Character because he feels so strongly that he isn't anyone important, he is just some guy hanging out. \n He is someone who does his best to be a good person, and feels he often falls short."
+        }
+    ]
+}

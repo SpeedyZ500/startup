@@ -20,7 +20,7 @@ export function Biomes() {
         <div className="theme-h adaptive textbody">
                 <h1>Biome</h1>
                 <p>
-                   The Biomes you create, and they have the worlds and contenents that this type of biome appears in.
+                   The Biomes you create, and they have the worlds and continents that this type of biome appears in.
                 </p>
             </div>
             <button onClick={handleOpen} className="btn btn-primary button-align" data-bs-toggle="offcanvas" data-bs-target="#offcanvasBiome" aria-controls="offcanvasBiome">New Biome</button>
@@ -118,7 +118,7 @@ export function Biomes() {
                     
                 </form>
             </div>
-            <div className="card-columns d-flex" id="biomes">
+            <div className="card-columns my-container" id="biomes">
                 <div className="card" style={{width: "18rem"}}>
                     <div className="card-header theme-c adaptive">
                         <h4><NavLink className="card-link" to="worldtreebiome">The World Tree (Biome)</NavLink></h4>

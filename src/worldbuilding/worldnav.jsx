@@ -45,7 +45,7 @@ export function WorldNav() {
             <menu className="navbar-nav" id="navbar-desktop">
                 <div className="navbar-left">
                     <li className="nav-item">
-                        <NavLink className="nav-link active" to="/stories">Stories</NavLink>
+                        <NavLink className="nav-link" to="/stories">Stories</NavLink>
                     </li>
                     <li className="nav-item">
                         <NavLink className="nav-link" to="/writingprompts">Writing Prompts</NavLink>

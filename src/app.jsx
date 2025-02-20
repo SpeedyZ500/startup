@@ -23,19 +23,10 @@ import { MagicSystems}  from './worldbuilding/magicsystems/magicsystems';
 import { Organizations}  from './worldbuilding/organizations/organizations';
 import { Races}  from './worldbuilding/races/races';
 import { Wildlife}  from './worldbuilding/wildlife/wildlife';
-import { WorldBio } from './worldbuilding/worlds/worldbio/worldbio';
-import { WildlifeBio } from './worldbuilding/wildlife/wildlifebio/wildlifebio';
-import {RaceBio} from './worldbuilding/races/racebio/racebio';
-import { OrganizationBio } from './worldbuilding/organizations/organizationbio/organizationbio';
-import { MagicSystemBio } from './worldbuilding/magicsystems/magicsystembio/magicsystembio';
-import { FloraBio } from './worldbuilding/flora/florabio/florabio';
-import { CountryBio } from './worldbuilding/countries/countrybio/countrybio';
-import { BiomeBio } from './worldbuilding/biomes/biomebio/biomebio';
 import { StoryPage } from './stories/storypage/storypage';
 import { Chapter } from './stories/storypage/chapter/chapter';
-import { CharacterBio } from './characters/charaterbio/characterbio';
 import NavDropdown from 'react-bootstrap/NavDropdown';
-
+import { BioPage } from './biopage/biopage';
 
 
 
@@ -55,6 +46,18 @@ var offcanvasElementList = [].slice.call(document.querySelectorAll('.offcanvas')
 var offcanvasList = offcanvasElementList.map(function (offcanvasEl) {
 return new bootstrap.Offcanvas(offcanvasEl)
 })
+
+const worldbuildingCategories = [
+    "magicsystems",
+    "races",
+    "countries",
+    "wildlife",
+    "flora",
+    "worlds",
+    "organizations",
+    "biomes"
+];
+
 
 export default function App() {
 
@@ -100,33 +103,33 @@ export default function App() {
                                         <menu className="navbar-nav justify-content-end">
                                 
                                             <li className="nav-item">
-                                                <NavLink className="nav-link" to="/stories">Stories</NavLink>
+                                                <NavLink className="nav-link" onClick={handleHide} to="/stories">Stories</NavLink>
                                             </li>
                                             <li className="nav-item">
-                                                <NavLink className="nav-link" to="/writingprompts">Writing Prompts</NavLink>
+                                                <NavLink className="nav-link" onClick={handleHide} to="/writingprompts">Writing Prompts</NavLink>
                                             </li>
                                             <li className="nav-item">
-                                                <NavLink className="nav-link" to="/characters">Characters</NavLink>
+                                                <NavLink className="nav-link" onClick={handleHide} to="/characters">Characters</NavLink>
                                             </li>
                                             <NavDropdown title="World Building" id="collapsible-nav-dropdown">
-                                                <NavDropdown.Item><NavLink className="dropdown-item" to="/worldbuilding/">Overview</NavLink></NavDropdown.Item>
+                                                <NavDropdown.Item><NavLink onClick={handleHide} className="dropdown-item" to="/worldbuilding/">Overview</NavLink></NavDropdown.Item>
                                                 <NavDropdown.Divider/>
-                                                <NavDropdown.Item><NavLink className="dropdown-item" to="/worldbuilding/magicsystems">Magic Systems</NavLink></NavDropdown.Item>
-                                                <NavDropdown.Item><NavLink className="dropdown-item" to="/worldbuilding/races">Races</NavLink></NavDropdown.Item>
-                                                <NavDropdown.Item><NavLink className="dropdown-item" to="/worldbuilding/countries">Countries</NavLink></NavDropdown.Item>
-                                                <NavDropdown.Item><NavLink className="dropdown-item" to="/worldbuilding/wildlife">Wildlife</NavLink></NavDropdown.Item>
-                                                <NavDropdown.Item><NavLink className="dropdown-item" to="/worldbuilding/flora">Flora</NavLink></NavDropdown.Item>
-                                                <NavDropdown.Item><NavLink className="dropdown-item" to="/worldbuilding/worlds">Worlds</NavLink></NavDropdown.Item>
-                                                <NavDropdown.Item><NavLink className="dropdown-item" to="/worldbuilding/organizations">Organizations</NavLink></NavDropdown.Item>
-                                                <NavDropdown.Item><NavLink className="dropdown-item" to="/worldbuilding/biomes">Biomes</NavLink></NavDropdown.Item>
+                                                <NavDropdown.Item><NavLink onClick={handleHide} className="dropdown-item" to="/worldbuilding/magicsystems">Magic Systems</NavLink></NavDropdown.Item>
+                                                <NavDropdown.Item><NavLink onClick={handleHide} className="dropdown-item" to="/worldbuilding/races">Races</NavLink></NavDropdown.Item>
+                                                <NavDropdown.Item><NavLink onClick={handleHide} className="dropdown-item" to="/worldbuilding/countries">Countries</NavLink></NavDropdown.Item>
+                                                <NavDropdown.Item><NavLink onClick={handleHide} className="dropdown-item" to="/worldbuilding/wildlife">Wildlife</NavLink></NavDropdown.Item>
+                                                <NavDropdown.Item><NavLink onClick={handleHide} className="dropdown-item" to="/worldbuilding/flora">Flora</NavLink></NavDropdown.Item>
+                                                <NavDropdown.Item><NavLink onClick={handleHide} className="dropdown-item" to="/worldbuilding/worlds">Worlds</NavLink></NavDropdown.Item>
+                                                <NavDropdown.Item><NavLink onClick={handleHide} className="dropdown-item" to="/worldbuilding/organizations">Organizations</NavLink></NavDropdown.Item>
+                                                <NavDropdown.Item><NavLink onClick={handleHide} className="dropdown-item" to="/worldbuilding/biomes">Biomes</NavLink></NavDropdown.Item>
 
                                             </NavDropdown>
                                             
                                             <li className="nav-item">
-                                                <NavLink className="nav-link" to="/writingadvice">Writing Advice</NavLink>
+                                                <NavLink className="nav-link" onClick={handleHide} to="/writingadvice">Writing Advice</NavLink>
                                             </li>
                                             <li className="nav-item">
-                                                <NavLink className="nav-link" to="/about">About</NavLink>
+                                                <NavLink className="nav-link" onClick={handleHide} to="/about">About</NavLink>
                                             </li>
                                             <li className="nav-item">
                                                 <form className="d-flex" role="search">
@@ -135,12 +138,12 @@ export default function App() {
                                                 </form>
                                             </li>
                                             <li className="nav-item" id="settings">
-                                                <NavLink className="nav-link" to="/settings">
+                                                <NavLink className="nav-link" onClick={handleHide} to="/settings">
                                                     settings 
                                                 </NavLink>
                                             </li>
                                             <li className="nav-item" id="log-in">
-                                                <NavLink className="nav-link" to="/login">log-in</NavLink>
+                                                <NavLink className="nav-link" onClick={handleHide} to="/login">log-in</NavLink>
                                             </li>
                                         </menu>
                                     </OffcanvasBody>
@@ -164,55 +167,22 @@ export default function App() {
                     <Route path='about' element={<About />} />
                     <Route path='worldbuilding'>
                         <Route path='' element={<WorldBuilding/>} />
-                        <Route path='magicsystems'>
-                            <Route path='' element={<MagicSystems />}/>
-                            <Route path=":id" element={<MagicSystemBio/>}/>
-
-                        </Route>
-                        <Route path='races'>
-                            <Route path=''element={<Races />}/>
-                            <Route path=":id" element={<RaceBio/>}/>
-
-                        </Route>
-                        <Route path='countries'>
-                            <Route path=''element={<Countries />}/>
-                            <Route path=":id" element={<CountryBio/>}/>
-
-                        </Route>
-                        <Route path='wildlife'>
-                            <Route path=''element={<Wildlife />}/>
-                            <Route path=":id" element={<WildlifeBio/>}/>
-
-                        </Route>
-                        <Route path='flora'>
-                            <Route path=''element={<Flora />}/>
-                            <Route path=":id" element={<FloraBio/>}/>
-
-                        </Route>
-                        <Route path='worlds'>
-                            <Route path=''element={<Worlds />}/>
-                            <Route path=":id" element={<WorldBio/>}/>
-
-                        </Route>
-                        <Route path='organizations'>
-                            <Route path=''element={<Organizations />}/>
-                            <Route path=":id" element={<OrganizationBio/>}/>
-
-                        </Route>
-                        <Route path='biomes'>
-                            <Route path=''element={<Biomes />}/>
-                            <Route path=":id" element={<BiomeBio/>}/>
-                        </Route>
+                        {worldbuildingCategories.map((category) => (
+                            <Route key={category} path={category}>
+                                <Route path="" element={React.createElement(getComponent(category))} />
+                                <Route path=":id" element={<BioPage />} />
+                            </Route>
+                        ))}
                         <Route path='*' element={<NotFound/>} />
                     </Route>
                     <Route path='stories'>
                         <Route path=''element={<Stories />}/>
                         <Route path='*/chapter/*' element={<Chapter/>}/>
-                        <Route path=':id'>
+                        <Route path=':storyId'>
                             <Route path='' element={<StoryPage/>}/>
 
 
-                            <Route path=":id"element={<Chapter/>}/>
+                            <Route path=":chapterId"element={<Chapter/>}/>
                             
                         </Route>
                     </Route>
@@ -223,7 +193,7 @@ export default function App() {
                     
                     <Route path='characters'>
                         <Route path=''element={<Characters />}/>
-                        <Route path=':id' element={<CharacterBio />}/>
+                        <Route path=':id' element={<BioPage />}/>
                     </Route>
                     <Route path='settings' element={<Settings />} />
                     <Route path='*' element={<NotFound/>} />
@@ -250,3 +220,16 @@ export default function App() {
 function NotFound() {
     return <main className='container-fluid theme adaptive text-center' style={{padding:"20px", margin:"20px"}}>404: Return to sender. Address unknown.</main>;
   }
+function getComponent(category) {
+    const components = {
+        magicsystems: MagicSystems,
+        races: Races,
+        countries: Countries,
+        wildlife: Wildlife,
+        flora: Flora,
+        worlds: Worlds,
+        organizations: Organizations,
+        biomes: Biomes
+    };
+    return components[category] || NotFound;
+}

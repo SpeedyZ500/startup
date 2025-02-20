@@ -10,6 +10,7 @@ import { OffcanvasBody, OffcanvasHeader } from 'react-bootstrap';
 
 
 
+
 export function Stories() {
     const [visible, setVisibility] = useState(false);
     
@@ -100,7 +101,7 @@ export function Stories() {
                     
                 </form>
             </div>
-            <div className="card-columns d-flex" id="stories">
+            <div className="card-columns my-container" id="stories">
                 <div className="card" style={{width:"18rem"}}>
                     <div className="card-header theme-c adaptive">
                         <h4><NavLink className="card-link" to="/stories/themoonlitealchemist"> The Moonlit Alchemist</NavLink></h4>

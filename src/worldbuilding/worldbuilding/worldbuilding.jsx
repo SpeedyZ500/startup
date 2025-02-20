@@ -43,6 +43,9 @@ export function WorldBuilding() {
                     <NavLink to="/worldbuilding/organizations">Organizations</NavLink>: Here is where you will put the organizations you create. Why isn't it under worlds or countries? 
                     World Hopping is possible, even between branches of the same story, or even to another universe entirely. 
                     So your organizations doesn't have to remain on one world or one branch of the World Tree. Religions would be included in Organizations.
+                    <br/>
+                    <br/>
+                    <NavLink to="/worldbuilding/biomes">Biomes</NavLink>:The Biomes you create, and they have the worlds and continents that this type of biome appears in.
 
                 </aside>
             </div>
