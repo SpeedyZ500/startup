@@ -177,11 +177,8 @@ export default function App() {
                     </Route>
                     <Route path='stories'>
                         <Route path=''element={<Stories />}/>
-                        <Route path='*/chapter/*' element={<Chapter/>}/>
                         <Route path=':storyId'>
                             <Route path='' element={<StoryPage/>}/>
-
-
                             <Route path=":chapterId"element={<Chapter/>}/>
                             
                         </Route>

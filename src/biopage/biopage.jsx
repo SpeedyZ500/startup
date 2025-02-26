@@ -10,8 +10,7 @@ import "./biopage.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import Accordion from 'react-bootstrap/Accordion';
-
-const sanitizeId = (text) => text.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "");
+import {sanitizeId, fetchJSONByPath, formatJSONDate} from'../utility/utility.js';
 
 
 const Heading = ({ level, children, ...props }) => {
@@ -120,11 +119,11 @@ function InfoCard({name, cardData, created, modified}) {
             <tfoot>
                 <tr>
                     <th>Created:</th>
-                    <td>{created}</td>
+                    <td>{formatJSONDate(created)}</td>
                 </tr>
                 <tr>
                     <th>Modified:</th>
-                    <td>{modified}</td>
+                    <td>{formatJSONDate(modified)}</td>
                 </tr>
             </tfoot>
         </Table>
@@ -184,17 +183,9 @@ export function BioPage(){
         if(!path.startsWith("/")){
             path = "/" + path;
         }
-        const jsonPath = `${window.location.origin}${path}.json`
-
-        fetch(jsonPath)
-        .then((res) => {
-            if(!res.ok){
-                throw new Error (`page not found: ${id}`)
-            }
-            return res.json();
-
-        })
-        .then((data) => {
+        const jsonPath = `/data${path}.json`
+        console.log("Fetching from:", jsonPath);
+        fetchJSONByPath(jsonPath).then((data) => {
             setBio(data);
             setError(null);
         })

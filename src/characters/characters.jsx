@@ -1,20 +1,52 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { OffcanvasBody, OffcanvasHeader } from 'react-bootstrap';
 import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
-
+import {genFilter, updateFilter, sortList, SortOptions, fetchListByPath} from '../utility/utility.js'
+import {CardsRenderer} from '../utility/utility.jsx'
+import Select from 'react-select'
 
 export function Characters() {
     const [visible, setVisibility] = useState(false);
         
          
-            const handleClose = () => setVisibility(false);
+    const handleClose = () => setVisibility(false);
          
-            const handleOpen = () => setVisibility(true);
+    const handleOpen = () => setVisibility(true);
+    const [list, setList] = useState([]);
+    const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [filter, setFilter] = useState([]);
+    const path = window.location.pathname;
+
+
+    const [sortOptions, setSortOptions ] = useState(new SortOptions("created", false));
+    const handleSortChange = (event) => {
+        const parsedValue = JSON.parse(event.target.value);
+        setSortOptions(new SortOptions(parsedValue.category, parsedValue.az));
+    };
+    
+    useEffect(() => {
+        let paths = path;
+        if(!paths.startsWith("/")){
+            paths = "/" + paths;
+        }
+        const jsonPath = `/data${paths}`
+        fetchListByPath(jsonPath).then((data => {
+            setList(data);
+            setError(null);
+
+        }))
+        .catch((err) => setError(err.message))
+        .finally(() => setLoading(false));
+    }, [path]);
+    
+
     return (
+        
     <main>
         <div className="theme-h adaptive textbody">
                 <h1>Characters</h1>
@@ -137,15 +169,15 @@ export function Characters() {
                         </select>
                     </div>
                     <div className="input-group mb-3">
-                        <label className="input-group-text" htmlFor="sort">Sort </label>
-                        <select className="form-select" id="sort" name="varSort">
-                            <option defaultValue>Popular</option>
-                            <option>New to Old</option>
-                            <option>Old to New</option>
-                            <option>A-Z Name</option>
-                            <option>Z-A Name</option>
-                            <option>A-Z Author</option>
-                            <option>Z-A Author</option>
+                        <label className="input-group-text" htmlFor="sort" name="varSort" >Sort </label>
+                        <select defaultValue={JSON.stringify(new SortOptions("created", false))} className="form-select" id="sort" name="varSort" onChange={handleSortChange}>
+                            <option  value="">Popular</option>
+                            <option value={JSON.stringify(new SortOptions("created", false))}>New to Old</option>
+                            <option value={JSON.stringify(new SortOptions("created", true))}>Old to New</option>
+                            <option value={JSON.stringify(new SortOptions("Name", true))}>A-Z Name</option>
+                            <option value={JSON.stringify(new SortOptions("Name", false))}>Z-A Name</option>
+                            <option value={JSON.stringify(new SortOptions("Author", true))}>A-Z Author</option>
+                            <option value={JSON.stringify(new SortOptions("Author", false))}>Z-A Author</option>
                         </select>
                     </div>
                    
@@ -154,69 +186,12 @@ export function Characters() {
 
                
             </div>
-            <div className="card-columns my-container" id="characters">
-                    
-                    <div className="card" style={{width:"18em"}}>
-                        <div className="card-header theme-c adaptive">
-                            <h4><NavLink className="card-link" to="/characters/thecurator"> The Curator</NavLink></h4>
-    
-                            </div>
-                        <div className="card-body theme adaptive">
-                        <h5 className="card-title">World: <NavLink className="card-link" to="/worldbuilding/worlds/thevoid">The Void</NavLink></h5>
-                        <h6 className="card-subtitle">by: Spencer Zaugg</h6>
-                            <p>
-                                A mysterious individual who claims to rule over Yggdrasil, the World Tree. Not much is known about them.
-                            </p>
-                            
-                        </div>
-                        
-                    </div>              
-                    <div className="card" style={{width:"18em"}}>
-                        <div className="card-header theme-c adaptive">
-                            <h4><NavLink className="card-link" to="/characters/alastor_moonblaze_spencer_zaugg"> Alastor Moonblaze</NavLink></h4>
-    
-                            </div>
-                        <div className="card-body theme adaptive">
-                            <h5 className="card-title">World: <NavLink className="card-link" to="/worldbuilding/worlds/thevoid">The Void</NavLink></h5>
-                            <h6 className="card-subtitle">by: Spencer Zaugg</h6>
-                            <p>
-                                A mysterious Alchemist who seeks to restore his world
-                            </p>
-                            
-                        </div>
-                        
-                    </div>
-                    <div className="card" style={{width:"18em"}}>
-                        <div className="card-header theme-c adaptive">
-                            <h4><NavLink className="card-link" to="/characters/alastormoonblaze"> Alastor Moonblaze</NavLink></h4>
-    
-                            </div>
-                        <div className="card-body theme adaptive">
-                            <h5 className="card-title">World: <NavLink className="card-link" to="/worldbuilding/worlds/thevoid">The Void</NavLink></h5>
-                            <h6 className="card-subtitle">by: Spencer Zaugg</h6>
-                            <p>
-                                A mysterious Alchemist who seeks to restore his world
-                            </p>
-                            
-                        </div>
-                        
-                    </div>
-                    <div className="card" style={{width:"18em"}}>
-                        <div className="card-header theme-c adaptive">
-                            <h4><NavLink className="card-link" to="/characters/alastormoonblaze"> Alastor Moonblaze</NavLink></h4>
-    
-                            </div>
-                        <div className="card-body theme adaptive">
-                            <h5 className="card-title">World: <NavLink className="card-link" to="/worldbuilding/worlds/thevoid">The Void</NavLink></h5>
-                            <h6 className="card-subtitle">by: Spencer Zaugg</h6>
-                            <p>
-                                A mysterious Alchemist who seeks to restore his world
-                            </p>
-                            
-                        </div>
-                        
-                    </div>
-                </div>
+            {loading ? 
+                (
+                    <p>Loading</p>
+                ) : (error ? (<p style={{color:"red"}}>{error}</p>)
+                : (<CardsRenderer cards={list} filters ={filter} sort={sortOptions}/>))
+            }
             
     </main>);
 }

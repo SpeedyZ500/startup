@@ -1,0 +1,32 @@
+[
+    {
+        "text": "What if werewoves were real, but they aren't around today because they colonized the moon?",
+        "details":[
+            {
+                "label":"Author",
+                "value":"Spencer Zaugg"
+            }
+        ],
+        "id":"1"
+    },
+    {
+        "text": "What if I was actually good at writing?",
+        "details":[
+            {
+                "label":"Author",
+                "value":"Spencer Zaugg"
+            }
+        ],
+        "id":"2"
+    },
+    {
+        "text": "What if I was actually good at programming?",
+        "details":[
+            {
+                "label":"Author",
+                "value":"Spencer Zaugg"
+            }
+        ],
+        "id":"3"
+    }
+]

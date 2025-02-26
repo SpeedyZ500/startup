@@ -1,5 +1,5 @@
 {
-    
+    "id":1,
     "infoCard":{
         "name":"Alastor Moonblaze",
         "cardData":[
@@ -55,8 +55,8 @@
 
         ],
         
-        "created":"2025-02-18T16:10:29Z",
-        "modified":"2025-02-18T16:10:29Z"
+        "created":"2025-02-23T20:10:43.930Z",
+        "modified":"2025-02-23T20:10:43.930Z"
 
     },
     "description":"A mysterious Alchemist who seeks to restore his world",

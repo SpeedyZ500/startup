@@ -22,7 +22,7 @@ export function WritingPrompts() {
             </div>
 
             <button className="btn btn-primary button-align" onClick={handleOpen} data-bs-toggle="offcanvas" data-bs-target="#offcanvasPrompt" aria-controls="offcanvasPrompt">New Prompt</button>
-            <Offcanvas className="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasPrompt" aria-labelledby="offcanvasPromptLabel" >
+            <Offcanvas show={visible} className="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabIndex="-1" id="offcanvasPrompt" aria-labelledby="offcanvasPromptLabel" >
                 
                 <OffcanvasHeader className="offcanvas-header">
                     <h4 className="offcanvas-title" id="offcanvasPromptLabel">New Prompt</h4>
@@ -33,7 +33,7 @@ export function WritingPrompts() {
                         <form className="form-container">
                             <div className="input-group mb-3">
                                 <label className="input-group-text" htmlFor="prompt">writing prompt:</label>
-                                <input className="form-control" type="text" placheolder="Your prompt" name="prompt" required /> 
+                                <input className="form-control" type="text" name="prompt" required /> 
                             </div>
                             
                             <div className="btn-group">

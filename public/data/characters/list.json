@@ -1,0 +1,85 @@
+[
+    {
+        "id":1,
+        "details":[
+            {
+                "label":"Name",
+                "value":"Alastor Moonblaze",
+                "path":"/characters/alastor_moonblaze_spencer_zaugg",
+                "location":"head",
+                "filter":false
+            },
+            {
+                "label":"Author",
+                "value":"Spencer Zaugg"
+            },
+            {
+                "label":"World",
+                "value":"The Void",
+                "path":"/worldbuilding/worlds/the_void_spencer_zaugg"
+            },
+            {
+                "label":"Race",
+                "value":"Remgulus",
+                "path":"/worldbuilding/races/remgulus_spencer_zaugg"
+            },
+            {
+                "label":"Type",
+                "value":[
+                    "Side Character",
+                    "Protagonist"
+                ],
+                "display":false
+            },
+            {
+                "label":"created",
+                "display":false,
+                "value":"2025-02-23T20:10:43.930Z",
+                "filter":false
+
+            }
+        ],
+        "description":"A mysterious Alchemist who seeks to restore his world"
+    },
+    {
+        "id":2,
+        "details":[
+            {
+                "label":"Name",
+                "value":"The Curator",
+                "path":"/characters/the_curator_spencer_zaugg",
+                "location":"head",
+                "filter":false
+            },
+            {
+                "label":"Author",
+                "value":"Spencer Zaugg"
+            },
+            {
+                "label":"World",
+                "value":"The Void",
+                "path":"/worldbuilding/worlds/the_void_spencer_zaugg"
+            },
+            {
+                "label":"Race",
+                "value":"???"
+            },
+            {
+                "label":"Type",
+                "value":[
+                    "Hero",
+                    "Protagonist"
+                ],
+                "display":false
+            },
+            {
+                "label":"created",
+                "value":"2025-02-23T20:12:33.862Z",
+                "display":false,
+                "filter":false
+
+            }
+        ],
+        "description":"A mysterious individual who claims to rule over Yggdrasil, the World Tree. Not much is known about them."
+    }
+]

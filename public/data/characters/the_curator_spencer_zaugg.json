@@ -1,4 +1,5 @@
 {
+    "id":2,
     "infoCard":{
         "name":"The Curator",
         "cardData":[
@@ -92,14 +93,19 @@
                 ]
             }
         ],
-        "created":"2025-02-18T16:43:20Z",
-        "modified":"2025-02-18T16:43:20Z"
+        "created":"2025-02-23T20:12:33.862Z",
+        "modified":"2025-02-23T20:12:33.862Z"
     },
     "description":"A mysterious individual who claims to rule over Yggdrasil, the World Tree. Not much is known about them.",
     "sections":[
         {
             "section":"Description",
-            "text":"They don't like when people use any gendered pronouns to describe them, also doesn't like when you refer to them as a singular entity, they much prefer ya'll to you. They consider themselves a hero, and the protagonist of all stories, more accurately however is that they are a godlike entity, in that they have godlike power, but they are not omniscient, omnipresent, nor are they omnipotent. They are however very powerful, being able to manipulate classification of them-self and other characters and creatures. They cannot read the contents of this specific entry, and yet they can manipulate the information contained within it. The less savory titles and what is likely a truer description of them is therefore not possible. This page is not to be considered entirely accurate. Some things that are accurate are hidden or altered, some words have been shifted and replaced with similar sounding words, which allows us to track information on them. Look for Patterns, especially for cases of the pattern being broken.\nThey look like a living cloak, with only darkness beneath the hood. This Cloak has colorful embroidery, and Golden Stars."
+            "text":[
+                "They don't like when people use any gendered pronouns to describe them, also doesn't like when you refer to them as a singular entity, they much prefer ya'll to you. They consider themselves a hero, and the protagonist of all stories, more accurately however is that they are a godlike entity, in that they have godlike power, but they are not omniscient, omnipresent, nor are they omnipotent. They are however very powerful, being able to manipulate classification of them-self and other characters and creatures. They cannot read the contents of this specific entry, and yet they can manipulate the information contained within it. The less savory titles and what is likely a truer description of them is therefore not possible. This page is not to be considered entirely accurate. Some things that are accurate are hidden or altered, some words have been shifted and replaced with similar sounding words, which allows us to track information on them. Look for Patterns, especially for cases of the pattern being broken.",
+                "They look like a living cloak, with only darkness beneath the hood. This Cloak has colorful embroidery, and Golden Stars."
+            ]
         }
-    ]
+        
+    ],
+    "":"The Curator may be a representation of how we are giving away or free will and the ability to choose to curate our own experiences"
 }
