@@ -8,7 +8,6 @@ import { Login } from './login/login';
 import { BaseNav, WorldNav, SubNav } from './nav/nav';
 import { Home } from './home/home';
 import { About } from './about/about';
-import { Characters } from './characters/characters';
 import { Settings } from './settings/settings';
 import { Stories} from './stories/stories';
 import { WritingPrompts } from './writingprompts/writingprompts';

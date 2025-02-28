@@ -342,11 +342,11 @@ export function CategoryPage(props) {
                 if(key === "Author"){
                     cardData.push(data);
                     data.display = true;
-                    data.filterable = true;
+                    data.filter = true;
                 }
                 else{
                     data.display = false;
-                    data.filterable = false;
+                    data.filter = false;
                 }
                 listData.push(data);
 
@@ -358,8 +358,8 @@ export function CategoryPage(props) {
             if(requirements.inCard === true){
                 cardData.push(data);
             }
-            data.display = !requirements.display ? true : requirements.display;
-            data.filterable = !requirements.filterable ? true : requirements.filterable;
+            data.display = requirements.display !== undefined ? requirements.display : true ;
+            data.filter = requirements.filterable !== undefined ? requirements.filterable : true ;
             data.location = !requirements.location ? "body" : requirements.location;
             if(requirements.addPath === true){
                 data.path = filePath;
