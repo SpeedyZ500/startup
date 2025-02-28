@@ -369,7 +369,7 @@ export function CategoryPage(props) {
             }
 
         });
-        const outputFile = {infoCard:{cardData:{cardData}}, }
+        const outputFile = {infoCard:{cardData:cardData}, }
         outputFile.id = formOutput.created;
         outputFile.infoCard.Name = formOutput.Name;
         outputFile.infoCard.created = formOutput.created;
@@ -379,7 +379,7 @@ export function CategoryPage(props) {
         if(findSections){
             outputFile.sections = sections;
         }
-        const outputListData = {details:{listData}};
+        const outputListData = {details:listData};
         outputListData.id = formOutput.created;
         outputListData.description = formOutput.description;
 
@@ -416,28 +416,35 @@ export function CategoryPage(props) {
     
     useEffect(() => {
         let paths = path;
-        if(!paths.startsWith("/")){
+        if (!paths.startsWith("/")) {
             paths = "/" + paths;
         }
-        const jsonPath = `/data${paths}`
-        fetchJSONByPath(`${jsonPath}.json`).then((data => {
-            setPage(data);
-            setError(null);
-            setSortOptions(data.sort[0])
-        }))
-        .catch((err) => setError(err.message))
-        fetchListByPath(jsonPath).then((data => {
-            const storedData = JSON.parse(localStorage.getItem(`${paths}/list`) ?? '[]');
-            data.push(...storedData);
-            setList(data);
-            setError(null);
-
-        }))
-        .catch((err) => setError(err.message))
-        .finally(() => setLoading(false));
-        
-        
-        
+        const jsonPath = `/data${paths}`;
+    
+        // Use async function to handle multiple async calls sequentially
+        const fetchData = async () => {
+            try {
+                // Fetch the page data
+                const pageData = await fetchJSONByPath(`${jsonPath}.json`);
+                setPage(pageData);
+                setSortOptions(pageData.sort[0]);
+                setError(null);
+    
+                // Fetch list data
+                const listData = await fetchListByPath(jsonPath);
+                const storedData = JSON.parse(localStorage.getItem(`${paths}/list`) ?? '[]');
+                listData.push(...storedData); // Merge fetched data with localStorage data
+                setList(listData);
+                setError(null);
+    
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false); // Make sure loading state is reset
+            }
+        };
+    
+        fetchData(); // Call the async function
     }, [path]);
     useEffect(() => {
         let newFilter = new FilterOptions();

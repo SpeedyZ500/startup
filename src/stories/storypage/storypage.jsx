@@ -1,18 +1,30 @@
 import React, {Fragment, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import ReactFlow, {MiniMap, Controls, Background} from "reactflow";
+import { useParams, useNavigate, NavLink} from "react-router-dom";
+import ReactFlow, {MiniMap, Controls, Background, Handle} from "reactflow";
 
-import { NavLink } from 'react-router-dom';
 import "../../app.css"
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {sanitizeId, fetchJSONByPath, fetchListByPath, formatJSONDate} from'../../utility/utility.js';
 
+const CustomNode = ({data}) => {
+    const navigate = useNavigate();
+
+    return(<div className="bg-white border border-gray-300 px-4 py-2 rounded shadow text-center"
+    onClick={(e) => {e.stopPropagation()}}
+    >
+        <Handle type="target" position="top" />
+        <span onClick={() => navigate(data.path)}>{data.label}</span>
+       
+        <Handle type="source" position="bottom" />
+    </div>);
+}
 const generateGraph = (chapters) => {
     const nodes = chapters.map((chapter) => ({
       id: chapter.chapterId.toString(),
+      type:"custom",
       position: { x: chapter.chapterId * 200, y: chapter.chapterNumber * 100 },
-      data: { label: `${chapter.chapterNumber}: ${chapter.title}` },
+      data: { label: `${chapter.chapterNumber}: ${chapter.title}`, path: chapter.path },
     }));
   
     const edges = [];
@@ -119,7 +131,7 @@ export function StoryPage() {
         </div>
         
         <div style={{ width: "100vw", height: "90vh" }}>
-            <ReactFlow nodes={nodes} edges={edges} fitView>
+            <ReactFlow nodes={nodes} edges={edges} nodeTypes={{ custom: CustomNode }} fitView>
                 <MiniMap />
                 <Controls />
                 <Background />
