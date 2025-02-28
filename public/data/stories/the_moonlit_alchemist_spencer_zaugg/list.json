@@ -13,7 +13,7 @@
         "author":"Spencer Zaugg",
         "previous":null,
         "branches": [2,3],
-        "path":"#/1_the_end_and_a_beginning_spencer_zaugg.json"
+        "path":"stories/the_moonlit_alchemist_spencer_zaugg/1_the_end_and_a_beginning_spencer_zaugg"
     },
     {
         "chapterId":2,
@@ -26,10 +26,10 @@
             "Example",
             "Fantasy"
         ],
-        "author":"Author Name",
+        "author":"Spencer Zaugg",
         "previous":1,
         "branches": [],
-        "path":"#/2_seeking_a_new_home_author_name.json"
+        "path":"stories/the_moonlit_alchemist_spencer_zaugg.json"
     },
     {
         "chapterId":3,
@@ -42,9 +42,9 @@
             "Example",
             "Fantasy"
         ],
-        "author":"Author Name",
+        "author":"Spencer Zaugg",
         "previous":1,
         "branches": [],
-        "path":"#/3_a_new_friend_author_name.json"
+        "path":"stories/the_moonlit_alchemist_spencer_zaugg.json"
     }
 ]

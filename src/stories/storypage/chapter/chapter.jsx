@@ -1,4 +1,5 @@
-import React from 'react';
+import React, {Fragment, useEffect, useState } from "react";
+
 import { NavLink } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from 'react-bootstrap/Button';
@@ -6,6 +7,34 @@ import './chapter.css';
 
 
 export function Chapter() {
+    const [chapter, setChapter] = useState(null);
+    useEffect(() => {
+
+        //Get full path
+        let path = window.location.pathname;
+        if(!path.startsWith("/")){
+            path = "/" + path;
+        }
+        const jsonPath = `/data${path}.json`
+        console.log("Fetching from:", jsonPath);
+        fetchJSONByPath(jsonPath).then((data) => {
+            setChapter(data);
+            setError(null);
+        }).catch((err) => {
+            console.warn("Fetch failed, checking local storage:", err.message);
+            const localData = localStorage.getItem(`${path}`);
+            if (localData){
+                setBio(JSON.parse(localData));
+                setError(null)
+            }
+            else{
+                setError(err.message)
+            }
+        }
+            
+        )
+        .finally(() => setLoading(false));
+    })
     return (
     <main className="chapter">
         <h1 id="title" className="theme-h adaptive">Chapter Title</h1>
