@@ -1,0 +1,73 @@
+{
+    "title":"Biome",
+    "description":"The Biomes you create, and they have the worlds and continents that this type of biome appears in.",
+    "buttonLabel":"New Biome",
+    "form":{
+        "title":"New Biome",
+        "fields":[
+            {
+                "label":"Name",
+                "required":true,
+                "type":"text",
+                "onCard":true,
+                "inList":true,
+                "filterable":false,
+                "location":"head"
+            },
+            {
+                "label":"Description",
+                "type":"text-area",
+                "placeholder":"A short description/summary of your Biome",
+                "onCard":false,
+                "inList":true,
+                "filterable":false
+            },
+            {
+                "label":"World",
+                "type":"multi-select",
+                "source":"./data/worldbuilding/worlds"
+            },
+            {
+                "label":"Wildlife",
+                "type":"multi-select",
+                "source":"./data/worldbuilding/wildlife"
+            },
+            {
+                "label":"Abilities",
+                "type":"multi-select",
+                "source":"./data/worldbuilding/flora"
+            },
+            {
+                "label":"Full",
+                "type":"section-adder"
+            }
+        ]
+    },
+    "sort":[
+        {
+            "label":"New to Old",
+            "value":{"category":"created", "az":false}
+        },
+        {
+            "label":"Old to New",
+            "value":{"category":"created", "az":true}
+        },
+        {
+            "label":"A-Z Name",
+            "value":{"category":"Name", "az":true}
+        },
+        {
+            "label":"Z-A Name",
+            "value":{"category":"Name", "az":false}
+        },
+        {
+            "label":"A-Z Author",
+            "value":{"category":"Author", "az":true}
+        },
+        {
+            "label":"Z-A Author",
+            "value":{"category":"Author", "az":false}
+        }
+    ]
+
+}

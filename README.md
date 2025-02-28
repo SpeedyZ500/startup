@@ -141,8 +141,8 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] **All functionality implemented or mocked out** - Implement same as system, dark and light modes, mock out bio page creation, as well as story and chapter creation, writing advice and writing prompt submission. Implement must be logged in to submit stories, and change settings. Implement .json file readings, and hopefully filter, try and implement search.
-- [ ] **Hooks** - Implement json file reading, already implemented the offcanvas buttons, which use useState, also add generators for data
+- [X] **All functionality implemented or mocked out** - , mock out bio page creation, as well as story and chapter creation, writing advice and writing prompt submission. Implement must be logged in to submit stories, and change settings. Implement .json file readings, and hopefully filter, try and implement search.
+- [X] **Hooks** - Implement json file reading, already implemented the offcanvas buttons, which use useState, also add generators for data
 
 ## 🚀 Service deliverable
 

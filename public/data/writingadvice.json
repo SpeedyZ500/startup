@@ -1,0 +1,38 @@
+{
+  "title":"Writing Advice",
+  "description":"User Submitted Writing Advice",
+  "buttonLabel":"New Advice",
+  "form":{
+    "title":"New Advice",
+    "fields":[
+        {
+            "label":"Description",
+            "type":"text-area",
+            "placeholder":"Your Advice",
+            "onCard":false,
+            "inList":true,
+            "filterable":false
+        }
+    ]
+
+  },
+  "sort":[
+        {
+            "label":"New to Old",
+            "value":{"category":"created", "az":false}
+        },
+        {
+            "label":"Old to New",
+            "value":{"category":"created", "az":true}
+        },
+        {
+            "label":"A-Z Author",
+            "value":{"category":"Author", "az":true}
+        },
+        {
+            "label":"Z-A Author",
+            "value":{"category":"Author", "az":false}
+        }
+    ]
+
+}

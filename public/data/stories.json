@@ -1,0 +1,64 @@
+{
+    "title":"Stories",
+    "description":"All the wonderful User Generated Stories.",
+    "buttonLabel":"New Story",
+    "form":{
+        "title":"New Stories",
+        "fields":[
+            {
+                "label":"Name",
+                "required":true,
+                "type":"text",
+                "onCard":true,
+                "inList":true,
+                "filterable":false,
+                "location":"head"
+            },
+            {
+                "label":"Description",
+                "type":"text-area",
+                "placeholder":"A short description/summary of your character",
+                "onCard":false,
+                "inList":true,
+                "filterable":false
+            },
+            {
+                "label":"Genre",
+                "type":"creatable",
+                "source":"./data/genres"
+            },
+            {
+                "label":"Content Warnings",
+                "type":"creatable",
+                "source":"./data/contentwarnings"
+            }
+        ]
+    },
+    "sort":[
+        {
+            "label":"New to Old",
+            "value":{"category":"created", "az":false}
+        },
+        {
+            "label":"Old to New",
+            "value":{"category":"created", "az":true}
+        },
+        {
+            "label":"A-Z Name",
+            "value":{"category":"Name", "az":true}
+        },
+        {
+            "label":"Z-A Name",
+            "value":{"category":"Name", "az":false}
+        },
+        {
+            "label":"A-Z Author",
+            "value":{"category":"Author", "az":true}
+        },
+        {
+            "label":"Z-A Author",
+            "value":{"category":"Author", "az":false}
+        }
+    ]
+
+}

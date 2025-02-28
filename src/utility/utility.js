@@ -28,22 +28,16 @@ async function fetchJSONByPath(path){
     }
 }
 
-function fetchAdvice(){
-    return fetchJSONByPath("/data/advice.json");
-}
 
-function fetchPrompts(){
-    return fetchJSONByPath("/data/prompts.json");
-}
 
 function fetchStoriesList(){
     return fetchJSONByPath("/data/stories/list.json");
 }
 
 
-function fetchListByPath(path){
+async function fetchListByPath(path){
     try{
-        return fetchJSONByPath(`${path}/list.json`);
+        return await fetchJSONByPath(`${path}/list.json`);
     }
     catch(error){
         throw new Error(`Unable to fetch list from: ${path}: ${error.message}`)
@@ -74,13 +68,14 @@ async function loadBioDetail(path){
 
 
 function filterList(list, filters){
+    console.log(JSON.stringify(filters))
     return list.filter(item => 
-        filters.every(filter =>
-            item.details.some(detail =>
-                detail.label === filter.attribute &&
+        filters.every((filter) =>
+            item.details.some((detail) =>
+                detail.label === filter.attribute && detail.value !== undefined &&
                 (Array.isArray(detail.value)
-                    ? detail.value.some(v => filter.value.includes(v))
-                    : filter.value.includes(detail.value)
+                    ? detail.value.some(v => filter.values.includes(v))
+                    : filter.values.includes(detail.value)
                 )
             )
         )
@@ -100,6 +95,16 @@ class FilterOptions{
         else{
             this.filters = [];
         }
+    }
+    addOption(attribute, value){
+        const foundIndex = this.filters.findIndex(item => item.attribute === attribute);
+        if(foundIndex !== -1){
+            this.filters[foundIndex].addToFilter(value)
+        }
+        else{
+            this.filters.push(new FilterItem(attribute, value))
+        }
+
     }
     updateFilter(attribute, value){
         const foundIndex = this.filters.findIndex(item => item.attribute === attribute);
@@ -135,10 +140,14 @@ class FilterItem{
     }
     addToFilter(value){
         if(Array.isArray(value)){
-            
+            value.forEach((val) => {
+                if(!this.values.includes(val)){
+                    this.values.push(val);
+                }
+            })
         }
         else if (!this.values.includes(value)){
-            this.values.push(values)
+            this.values.push(value)
         }
         
     }
@@ -174,7 +183,13 @@ function updateFilter(filter, attribute, value){
 }
 
 function sortList(list, sort){
+    if(!Array.isArray(list)){
+        return list;
+    }
     return [...list].sort((a, b) => {
+        if(!Array.isArray(a) || !Array.isArray(b)){
+            return 0;
+        }
         const valueA = a.details.find(detail => sanitizeId(detail.label) === sanitizeId(sort.category))?.value ?? 0;
         const valueB = b.details.find(detail => sanitizeId(detail.label) === sanitizeId(sort.category))?.value ?? 0;
         if(valueA > valueB){
@@ -216,6 +231,8 @@ export {
     sortList,
     filterAndSort,
     SortOptions,
+    FilterOptions,
+    FilterItem,
     formatJSONDate,
     updateFilter,
     genFilter,
@@ -225,8 +242,6 @@ export {
     fetchChapterList,
     fetchListByPath,
     fetchStoriesList,
-    fetchPrompts,
-    fetchAdvice,
     fetchJSONByPath,
     sanitizeId
 };

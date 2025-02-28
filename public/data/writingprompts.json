@@ -1,0 +1,39 @@
+{
+    "title":"Writing Prompts",
+    "description":"Need ideas for a story? here are some ideas",
+    "buttonLabel":"New Prompt",
+    "form":{
+        "title":"New Prompt",
+        "fields":[
+            {
+                "label":"Description",
+                "type":"text-area",
+                "placeholder":"Your Prompt",
+                "onCard":false,
+                "inList":true,
+                "filterable":false
+            }
+        ]
+
+
+    },
+    "sort":[
+        {
+            "label":"New to Old",
+            "value":{"category":"created", "az":false}
+        },
+        {
+            "label":"Old to New",
+            "value":{"category":"created", "az":true}
+        },
+        {
+            "label":"A-Z Author",
+            "value":{"category":"Author", "az":true}
+        },
+        {
+            "label":"Z-A Author",
+            "value":{"category":"Author", "az":false}
+        }
+    ]
+
+}

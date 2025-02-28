@@ -20,9 +20,9 @@ export function Countries() {
         <div className="theme-h adaptive textbody">
                 <h1>Countries</h1>
                 <p>
-                    The countries of your stories, contains information of what races are in them, their allies, their enimies.
-                    It also contains information on thier culture, history, religions, and the lands within them, and the common creatures within,
-                    don't feel to be exaustive, you will be able to add to your own countries and stuff later.
+                    The countries of your stories, contains information of what races are in them, their allies, their enemies.
+                    It also contains information on their culture, history, religions, and the lands within them, and the common creatures within,
+                    don't feel to be exhaustive, you will be able to add to your own countries and stuff later.
                 </p>
             </div>
             <button className="btn btn-primary button-align" onClick={handleOpen} data-bs-toggle="offcanvas" data-bs-target="#offcanvasCountry" aria-controls="offcanvasCountry">New Country</button>

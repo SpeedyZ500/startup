@@ -1,13 +1,15 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { OffcanvasBody, OffcanvasHeader } from 'react-bootstrap';
 import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
-import {genFilter, updateFilter, sortList, SortOptions, fetchListByPath} from '../utility/utility.js'
+import {genFilter, updateFilter, sortList, SortOptions, fetchListByPath, FilterOptions, FilterItem} from '../utility/utility.js'
 import {CardsRenderer} from '../utility/utility.jsx'
 import Select from 'react-select'
+
+
 
 export function Characters() {
     const [visible, setVisibility] = useState(false);
@@ -19,11 +21,18 @@ export function Characters() {
     const [list, setList] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [filter, setFilter] = useState([]);
+    const [filter, setFilter] = useState(FilterOptions);
+    const [filters, setFilters] = useState(new FilterOptions)
     const path = window.location.pathname;
 
 
     const [sortOptions, setSortOptions ] = useState(new SortOptions("created", false));
+    const handleFilterChange = (event) => {
+        const parseValue = JSON.parse(event.target.value)
+        const temp = filter
+        temp.updateFilter(parseValue.attribute, parseValue.value);
+        setFilter(temp);
+    };
     const handleSortChange = (event) => {
         const parsedValue = JSON.parse(event.target.value);
         setSortOptions(new SortOptions(parsedValue.category, parsedValue.az));
@@ -43,6 +52,19 @@ export function Characters() {
         .catch((err) => setError(err.message))
         .finally(() => setLoading(false));
     }, [path]);
+    useEffect(() => {
+        const newFilter = new FilterOptions;
+        list.forEach((card) => {
+            card.details.forEach((detail) => {
+                if((!detail.filter || detail.filter === true) 
+                    && detail.label && detail.value){
+                    newFilter.addOption(detail.label,detail.value);
+                }
+            })
+        })
+        setFilters(newFilter);
+
+    }, [list])
     
 
     return (
@@ -131,6 +153,8 @@ export function Characters() {
                 
                 <form className="filterAndSort theme-h adaptive" action="" method="get">
                     <h4>Filter:</h4>
+                    
+
                     <div className="input-group mb-3">
                         <label className="input-group-text"htmlFor="world">World </label>
                         <select className="form-select" id="world" name="varWorld">

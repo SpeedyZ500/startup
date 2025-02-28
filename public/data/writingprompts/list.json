@@ -1,6 +1,6 @@
 [
     {
-        "text": "What if werewoves were real, but they aren't around today because they colonized the moon?",
+        "description": "What if werewoves were real, but they aren't around today because they colonized the moon?",
         "details":[
             {
                 "label":"Author",
@@ -10,7 +10,7 @@
         "id":"1"
     },
     {
-        "text": "What if I was actually good at writing?",
+        "description": "What if I was actually good at writing?",
         "details":[
             {
                 "label":"Author",
@@ -20,7 +20,7 @@
         "id":"2"
     },
     {
-        "text": "What if I was actually good at programming?",
+        "description": "What if I was actually good at programming?",
         "details":[
             {
                 "label":"Author",

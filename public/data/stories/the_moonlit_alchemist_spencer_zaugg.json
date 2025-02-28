@@ -1,0 +1,22 @@
+{
+    "id":1,
+    "Name":"The Moonlit Alchemist",
+    "Author":"Spencer Zaugg",
+    "description":"The story of a mysterious Alchemist who's alchemy is enhanced by moonlight, displaced from his world",
+    "info":[
+        {
+            "label":"Genre",
+            "value":[
+                "Example",
+                "Fantasy"
+            ]
+        },
+        {
+            "label":"Content Warnings",
+            "value":[
+                "Fallen Universe"
+            ]
+
+        }
+    ]
+}

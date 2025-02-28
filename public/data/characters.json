@@ -1,0 +1,121 @@
+{
+    "title":"Characters",
+    "description":"All the Characters that are currently on the site.",
+    "buttonLabel":"New Character",
+    "form":{
+        "title":"New Character",
+        "fields":[
+            {
+                "label":"Name",
+                "required":true,
+                "type":"text",
+                "onCard":false,
+                "inList":true,
+                "filterable":false,
+                "location":"head",
+                "addPath":true
+            },
+            {
+                "label":"Titles",
+                "type":"text",
+                "placeholder":"a list of titles separated by semicolons ;",
+                "onCard":true,
+                "inList":false
+            },
+            {
+                "label":"Description",
+                "type":"text-area",
+                "placeholder":"A short description/summary of your character",
+                "onCard":false,
+                "inList":false,
+                "filterable":false
+            },
+            {
+                "label":"Gender",
+                "type":"text",
+                "onCard":true,
+                "inList":false
+            },
+            {
+                "label":"Pronouns",
+                "type":"text",
+                "onCard":true,
+                "inList":false
+            },
+            {
+                "label":"World",
+                "type":"select",
+                "source":"./data/worldbuilding/worlds",
+                "onCard":true,
+                "inList":true
+            },
+            {
+                "label":"Race",
+                "type":"select",
+                "source":"./data/worldbuilding/races",
+                "onCard":true,
+                "inList":true
+            },
+            {
+                "label":"Abilities",
+                "type":"multi-select",
+                "source":"./data/worldbuilding/magicsystems",
+                "onCard":true,
+                "inList":false
+            },
+            {
+                "label":"Enemies",
+                "type":"multi-select",
+                "source":"./data/characters",
+                "onCard":true,
+                "inList":false
+            },
+            {
+                "label":"Allies",
+                "type":"multi-select",
+                "source":"./data/characters",
+                "onCard":true,
+                "inList":false
+            },
+            {
+                "label":"Family",
+                "type":"super-select",
+                "categoryLabel":"Relation",
+                "source":"./data/characters",
+                "onCard":true,
+                "inList":false
+            },
+            {
+                "label":"Full",
+                "type":"section-adder"
+            }
+        ]
+    },
+    "sort":[
+        {
+            "label":"New to Old",
+            "value":{"category":"created", "az":false}
+        },
+        {
+            "label":"Old to New",
+            "value":{"category":"created", "az":true}
+        },
+        {
+            "label":"A-Z Name",
+            "value":{"category":"Name", "az":true}
+        },
+        {
+            "label":"Z-A Name",
+            "value":{"category":"Name", "az":false}
+        },
+        {
+            "label":"A-Z Author",
+            "value":{"category":"Author", "az":true}
+        },
+        {
+            "label":"Z-A Author",
+            "value":{"category":"Author", "az":false}
+        }
+    ]
+
+}

@@ -157,9 +157,10 @@ function SectionsParse({data, level=2, sectionPref=""}){
         return(
             <Fragment key={index}>
                 <Heading level={level} id={`${sectionPref}${index}-${sanitizeId(entry.section)}`}>{entry.section}</Heading>
-                {entry.subSections ? (
+                {entry.text && <p>{entry.text}</p>}
+                {entry.subSections && 
                     <SectionsParse data={entry.subSections} level={level + 1} sectionPref={`${sectionPref}${index}.`}/>
-                ) :(entry.text && <p>{entry.text}</p>)}
+                }
             </Fragment>
         )
     })
@@ -189,7 +190,19 @@ export function BioPage(){
             setBio(data);
             setError(null);
         })
-        .catch((err) => setError(err.message))
+        .catch((err) => {
+            console.warn("Fetch failed, checking local storage:", err.message);
+            const localData = localStorage.getItem(`${path}`);
+            if (localData){
+                setBio(JSON.parse(localData));
+                setError(null)
+            }
+            else{
+                setError(err.message)
+            }
+        }
+            
+        )
         .finally(() => setLoading(false));
 
     }, [id]);

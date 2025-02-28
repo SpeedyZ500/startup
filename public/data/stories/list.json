@@ -1,16 +1,49 @@
 [
     {
-        "title":"The Moonlit Alchemist",
+        "name":"The Moonlit Alchemist",
         "id":1,
-        "author":"Spencer Zaugg",
-        "description":"The story of a mysterious Alchemist who's alchemy is enhanced by moonlight, displaced from his world",
-        "genre":[
-            "Example",
-            "Fantasy"
+        "details":[
+            {
+                "label":"Name",
+                "value":"The Moonlit Alchemist",
+                "path":"/stories/the_moonlit_alchemist_spencer_zaugg",
+                "location":"head",
+                "filter":false
+            },
+            {
+                "label":"Author",
+                "value":"Spencer Zaugg"
+            },
+            {
+                "label":"Genre",
+                "value":[
+                    "Example",
+                    "Fantasy"
+                ],
+                "location":"footer"
+            },
+            {
+                "label":"Content Warnings",
+                "value":[
+                    "Fallen Universe"
+                ],
+                "location":"footer"
+
+            },
+            {
+                "label":"created",
+                "value":"2025-02-23T20:10:43.930Z",
+                "display":false,
+                "filter":false
+            },
+            {
+                "label":"expanded",
+                "value":"2025-02-23T20:10:43.930Z",
+                "display":false,
+                "filter":false
+            }
         ],
-        "contentwarnings":[
-            "Fallen Universe"
-        ],
-        "expanded":1739222421
+
+        "description":"The story of a mysterious Alchemist who's alchemy is enhanced by moonlight, displaced from his world"
     }
 ]

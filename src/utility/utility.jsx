@@ -7,11 +7,15 @@ import Button from 'react-bootstrap/Button';
 import Overlay from 'react-bootstrap/Overlay';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Popover from 'react-bootstrap/Popover';
+import Select from 'react-select'
+
+
 
 import {
     sortList, filterAndSort,
     formatJSONDate
 }  from './utility.js';
+
 
 function renderItem(item, cardId){
     if(item.display === false) return null;
@@ -67,6 +71,9 @@ function renderCard(cards){
     
     return (
         cards.map((card, index) => {
+            if(!Array.isArray(card.details)){
+                return;
+            }
             const headerData = card.details.filter(item => item.location === "head")
     
             const footerData = card.details.filter(item =>  item.location === "footer")
@@ -90,7 +97,7 @@ function renderCard(cards){
                             </Fragment>
                         ))}
                     </Fragment>
-                    <p>{card.description}</p>
+                    {card.description && <p>{card.description}</p>}
                 </Card.Body>
                 <Card.Footer className="theme-c adaptive">
                     {footerData.map((item, index) =>(
@@ -110,19 +117,12 @@ function renderCard(cards){
 }
 export function CardsRenderer({cards, filters, sort}){
     //const currSort = useEffect(() => console.log(JSON.stringify(sort)), [sort]);
-    //const filteredAndSorted = useMemo(() => filterAndSort(cards, filters, sort), [cards, filters, sort], );
-    const sorted = useMemo(() => sortList(cards, sort), [cards, sort], );
-    //useCallback(() => console.log(JSON.stringify(sorted)), [sorted]);
+    const filteredAndSorted = useMemo(() => filterAndSort(cards, filters, sort), [cards, filters, sort], );
     
-    
-    const memonizedRenderCard = useCallback(() => {
-        //console.log("Sorted cards:", JSON.stringify(sorted));
-
-        return renderCard(sorted);
-    }, [sorted]);
+    const renderCards = useMemo(() => renderCard(filteredAndSorted), [filteredAndSorted]);
     return(
         <div className="card-columns my-container scrollable" data-bs-spy="scroll">
-            {memonizedRenderCard()}
+            {renderCards}
         </div>
 
     );

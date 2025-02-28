@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './app.css';
 import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
 import { Login } from './login/login';
-import { BaseNav } from './basenav/basenav';
+import { BaseNav, WorldNav, SubNav } from './nav/nav';
 import { Home } from './home/home';
 import { About } from './about/about';
 import { Characters } from './characters/characters';
@@ -13,7 +13,6 @@ import { Settings } from './settings/settings';
 import { Stories} from './stories/stories';
 import { WritingPrompts } from './writingprompts/writingprompts';
 import { WritingAdvice } from './writingadvice/writingadvice';
-import { WorldNav, SubNav } from './worldbuilding/worldnav';
 import { WorldBuilding } from './worldbuilding/worldbuilding/worldbuilding';
 import { Worlds}  from './worldbuilding/worlds/worlds';
 import { Biomes}  from './worldbuilding/biomes/biomes';
@@ -27,7 +26,8 @@ import { StoryPage } from './stories/storypage/storypage';
 import { Chapter } from './stories/storypage/chapter/chapter';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import { BioPage } from './biopage/biopage';
-
+import { CategoryPage } from './categorypage/categorypage';
+import { AuthState } from './login/authState';
 
 
 
@@ -60,6 +60,9 @@ const worldbuildingCategories = [
 
 
 export default function App() {
+    const [userName, setUserName] = React.useState(localStorage.getItem('userName') || '');
+    const currentAuthState = userName ? AuthState.Authenticated : AuthState.Unauthenticated;
+    const [authState, setAuthState] = React.useState(currentAuthState);
 
     const [show, setShow] = useState(false);
 
@@ -67,6 +70,14 @@ export default function App() {
     const handleHide = () => setShow(false);
  
     const handleShow = () => setShow(true);
+    const onAuthChange= (userName, authState) => {
+        setAuthState(authState);
+        setUserName(userName);
+    }
+    function logout(){
+        localStorage.removeItem('userName');
+        onAuthChange(userName, AuthState.Unauthenticated);
+    }
  
   return (
     <BrowserRouter>
@@ -84,8 +95,8 @@ export default function App() {
                                 </NavLink>
                             </div>
                             <Routes>
-                                <Route path='/*' element={< BaseNav/>}/>
-                                <Route path='/worldbuilding/*' element={<WorldNav />} />
+                                <Route path='/*' element={< BaseNav authState={authState} userName={userName} logout={logout}/>}/>
+                                <Route path='/worldbuilding/*' element={<WorldNav authState={authState} userName={userName} logout={logout}/>} />
                                 <Route path='/login' element={<></>} />
 
                             </Routes>
@@ -137,14 +148,18 @@ export default function App() {
                                                     <button className="btn btn-outline-success" type="submit">Search</button>
                                                 </form>
                                             </li>
-                                            <li className="nav-item" id="settings">
-                                                <NavLink className="nav-link" onClick={handleHide} to="/settings">
-                                                    settings 
-                                                </NavLink>
-                                            </li>
-                                            <li className="nav-item" id="log-in">
-                                                <NavLink className="nav-link" onClick={handleHide} to="/login">log-in</NavLink>
-                                            </li>
+                                            {authState === AuthState.Authenticated &&
+                                                <NavDropdown title={userName}>
+                                                    <NavDropdown.Item as={NavLink} to="/settings" onClick={handleHide}>settings</NavDropdown.Item>
+                                                    <NavDropdown.Item to="" onClick={handleHide}><Button variant="secondary"onClick={() => logout()}>Logout</Button></NavDropdown.Item>
+                                               </NavDropdown>
+                                            }
+                                            {authState === AuthState.Unauthenticated &&
+                                                <li className="nav-item" id="log-in">
+                                                    <NavLink className="nav-link" onClick={handleHide} to="/login">log-in</NavLink>
+
+                                                </li>
+                                            }
                                         </menu>
                                     </OffcanvasBody>
                                 </Offcanvas>
@@ -163,20 +178,26 @@ export default function App() {
             <div className="scrollable">
                 <Routes>
                     <Route path='/' element={< Home/>} />
-                    <Route path='login' element={<Login />} />
+                    <Route path='login' element={<Login 
+                        userName={userName}
+                        onLogin={(loginUserName) => {
+                            onAuthChange(loginUserName, AuthState.Authenticated);
+                        }}
+                        
+                    />} />
                     <Route path='about' element={<About />} />
                     <Route path='worldbuilding'>
                         <Route path='' element={<WorldBuilding/>} />
                         {worldbuildingCategories.map((category) => (
                             <Route key={category} path={category}>
-                                <Route path="" element={React.createElement(getComponent(category))} />
+                                <Route path="" element={<CategoryPage authState={authState} userName={userName}/>} />
                                 <Route path=":id" element={<BioPage />} />
                             </Route>
                         ))}
                         <Route path='*' element={<NotFound/>} />
                     </Route>
                     <Route path='stories'>
-                        <Route path=''element={<Stories />}/>
+                        <Route path=''element={<CategoryPage authState={authState} userName={userName} />}/>
                         <Route path=':storyId'>
                             <Route path='' element={<StoryPage/>}/>
                             <Route path=":chapterId"element={<Chapter/>}/>
@@ -184,15 +205,15 @@ export default function App() {
                         </Route>
                     </Route>
 
-                    <Route path='writingprompts' element={<WritingPrompts />} />
+                    <Route path='writingprompts' element={<CategoryPage/>} />
                     
-                    <Route path='writingadvice' element={<WritingAdvice />} />
+                    <Route path='writingadvice' element={<CategoryPage/>} />
                     
                     <Route path='characters'>
-                        <Route path=''element={<Characters />}/>
-                        <Route path=':id' element={<BioPage />}/>
+                        <Route path=''element={<CategoryPage authState={authState} userName={userName}/>}/>
+                        <Route path=':id' element={<BioPage authState={authState} userName={userName}/>}/>
                     </Route>
-                    <Route path='settings' element={<Settings />} />
+                    <Route path='settings' element={<Settings userName={userName}/>} />
                     <Route path='*' element={<NotFound/>} />
                     
 
