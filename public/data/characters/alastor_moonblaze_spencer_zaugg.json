@@ -14,7 +14,7 @@
                         "label":"Father?/Creator",
                         "value":[
                             {
-                                "name":"Spencer Zaugg",
+                                "value":"Spencer Zaugg",
                                 "id":null
                             }
                         ]
@@ -47,7 +47,7 @@
                 "label":"Enemies",
                 "value":[
                     {
-                        "name":"The Curator",
+                        "value":"The Curator",
                         "path":"/characters/the_curator_spencer_zaugg"
                     }
                 ]

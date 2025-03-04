@@ -13,7 +13,7 @@
         "author":"Spencer Zaugg",
         "previous":null,
         "branches": [2,3],
-        "path":"stories/the_moonlit_alchemist_spencer_zaugg/1_the_end_and_a_beginning_spencer_zaugg"
+        "path":"/stories/the_moonlit_alchemist_spencer_zaugg/1_the_end_and_a_beginning_spencer_zaugg"
     },
     {
         "chapterId":2,
@@ -29,7 +29,7 @@
         "author":"Spencer Zaugg",
         "previous":1,
         "branches": [],
-        "path":"stories/the_moonlit_alchemist_spencer_zaugg/2_seeking_a_new_home"
+        "path":"/stories/the_moonlit_alchemist_spencer_zaugg/2_seeking_a_new_home"
     },
     {
         "chapterId":3,
@@ -45,6 +45,6 @@
         "author":"Spencer Zaugg",
         "previous":1,
         "branches": [],
-        "path":"stories/the_moonlit_alchemist_spencer_zaugg/3_a_new_friend"
+        "path":"/stories/the_moonlit_alchemist_spencer_zaugg/3_a_new_friend"
     }
 ]

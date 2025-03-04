@@ -7,6 +7,17 @@ import "../../app.css"
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {sanitizeId, fetchJSONByPath, fetchListByPath, formatJSONDate} from'../../utility/utility.js';
 
+const NavLinkNode = ({ data, id }) => {
+    return (
+      <div className="navlink-node">
+        <Handle type="target" position="top" />
+        <h3>{data.label}</h3>
+        <NavLink to={data.path}>Go to {data.label}</NavLink>
+         <Handle type="source" position="bottom" />
+      </div>
+    );
+  };
+
 const CustomNode = ({data}) => {
     const navigate = useNavigate();
 
@@ -131,7 +142,7 @@ export function StoryPage() {
         </div>
         
         <div style={{ width: "100vw", height: "90vh" }}>
-            <ReactFlow nodes={nodes} edges={edges} nodeTypes={{ custom: CustomNode }} fitView>
+            <ReactFlow nodes={nodes} edges={edges} nodeTypes={{ custom: NavLinkNode }} fitView>
                 <MiniMap />
                 <Controls />
                 <Background />

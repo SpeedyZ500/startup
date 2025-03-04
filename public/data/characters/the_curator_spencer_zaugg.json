@@ -10,7 +10,7 @@
             {
                 "label":"World",
                 "value":{
-                    "name":"The Void",
+                    "value":"The Void",
                     "path":"/worldbuilding/worlds/the_void_spencer_zaugg"
                 }
             },
@@ -68,11 +68,11 @@
                 "label":"Abilities",
                 "value":[
                     {
-                        "name":"Void Walking",
+                        "value":"Void Walking",
                         "path":"/worldbuilding/magicsystems/void_walking_spencer_zaugg"
                     },
                     {
-                        "name":"Data Manipulation"
+                        "value":"Data Manipulation"
                     }
                 ]
             },
@@ -84,11 +84,11 @@
                 "label":"Enemies",
                 "value":[
                     {
-                        "name":"Alastor Moonblaze",
+                        "value":"Alastor Moonblaze",
                         "path":"/characters/alastor_moonblaze_spencer_zaugg"
                     },
                     {
-                        "name":"Spencer Zaugg"
+                        "value":"Spencer Zaugg"
                     }
                 ]
             }

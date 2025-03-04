@@ -26,7 +26,7 @@ function FilterGenerator({filters, onFilterChange}){
                 <Select 
                     isMulti 
                     options={filter.value} 
-                    className="form-select" 
+                    className="form-control" 
                     onChange={(selectedOptions) => handleChange(selectedOptions, filter.attribute)}
                     name={filter.attribute}
                 />
@@ -107,7 +107,7 @@ const SuperSelect = ({data, options, onCategoriesChange}) => {
     }
     const updateSelections = (index, selected) => {
         const updatedCategories = [...categories];
-        updatedCategories[index].selections = selected;
+        updatedCategories[index].selections = selected.map(option => option.value);
         setCategories(updatedCategories);
     };
     const removeCategory = (index) => {
@@ -143,7 +143,7 @@ const SuperSelect = ({data, options, onCategoriesChange}) => {
                                     options={options}
                                     value={category.selections}
                                     onChange={(selected) => updateSelections(index, selected)}
-                                    className="form-select"
+                                    className="form-control"
                                 />
                             </td>
                             <td>
@@ -163,9 +163,26 @@ const SuperSelect = ({data, options, onCategoriesChange}) => {
     
 }
 
-function FormGenerator({form, sections, setSections, onCategoriesChange}){
+function FormGenerator({form, sections, setSections, onCategoriesChange, onSelectionChange}){
     const [optionsMap, setOptionsMap] = useState({});
-    
+    const [selections, setSelections] = useState([]);
+    useEffect(() => {
+        onSelectionChange(selections);
+    }, [selections, onSelectionChange]);
+
+    const updateSelections = (label, selected) => {
+        const updatedSelections = [...selections];
+        const index = updatedSelections.findIndex(item => item.label === label)
+        if(index !== -1){
+            updatedSelections[index].value = selected.map(option => option.value);
+        }
+        else{
+            const values = selected.map(option => option.value);
+            updatedSelections.push({label:label, value:values});
+        }
+        setSelections(updatedSelections);
+    };
+
     useEffect(() => {
         async function fetchOptions() {
             const newOptionsMap = {};
@@ -175,10 +192,10 @@ function FormGenerator({form, sections, setSections, onCategoriesChange}){
                         try {
                             const optionsList = await fetchListByPath(data.source);
                             newOptionsMap[data.source] = optionsList.map((item) => {
-                                const option = item.details.find(detail => detail.label === "Name");
+                                const option = item.details.find(detail => detail.label === "name");
                                 return !option.path
-                                    ? { value: { value: option.value }, label: option.value }:
-                                    { value: { value: option.value, path: option.path }, label: option.value };
+                                    ? { value: { value:option.value }, label:option.value }:
+                                    { value: { value:option.value, path:option.path }, label: option.value };
                             });
                         } catch (error) {
                             console.error(`Error fetching options for ${data.source}:`, error);
@@ -194,6 +211,9 @@ function FormGenerator({form, sections, setSections, onCategoriesChange}){
     }, [form])
 
     return form.map((data, index) => {
+        if(data.hidden === true){
+            return;
+        }
         if(data.source &&   ["select", "multi-select", "creatable", "super-select"].includes(data.type)){
             
             const options = optionsMap[data.source] || []; 
@@ -208,7 +228,9 @@ function FormGenerator({form, sections, setSections, onCategoriesChange}){
                         <label className="input-group-text" htmlFor={data.label}>
                             {data.label}
                         </label>
-                        <SelectComponent isMulti={isMulti} options={options} className="form-select" name={data.label}/>
+                        <SelectComponent isMulti={isMulti} options={options} className="form-control" name={data.label}
+                        onChange={(selected) => updateSelections(data.label, selected)}
+                        />
                     </div>
                 );
             }
@@ -297,96 +319,134 @@ function FormGenerator({form, sections, setSections, onCategoriesChange}){
 
 export function CategoryPage(props) {
     const [visible, setVisibility] = useState(false);
+    const [selections, onSelectionChange] = useState([]);
     const handleSubmit = async (event) =>{
         event.preventDefault();
         const formData = new FormData(event.target);
-        const formOutput = {};
-        formOutput.Author = props.userName;
+        formData.append("Author", props.userName);
         
+        
+        
+        const keys = formData.keys();
+        
+        const authorRequirements = page.form.fields.find(item => item.label === "Author");
+        const created = new Date().toJSON();
+
+        const listOutput = {id:created, details:[
+            {label:"Author", value:props.userName, hidden:authorRequirements.hidden, filter:authorRequirements.filter},
+            {label:"created", hidden:true, filter:false, value:created}]};
+        const bioOutput = {id:created, infoCard:{cardData:[{label:"Author", value:props.userName}], created: created, modified:created}};
+
+    
         const findSuperSelect = page.form.fields.find(item => item.type === "super-select");
         if(findSuperSelect){
-            formOutput[findSuperSelect.label] = categories;
+            const superOut = {label:findSuperSelect.label, type:findSuperSelect.type, source:findSuperSelect.source, value:[]}
+            superOut.value = categories.map(item => {
+                return {label:item.label, value:item.selections}
+            });
+            if(findSuperSelect.onCard === true){
+                bioOutput.infoCard.cardData.push(superOut);
+            }
+            else{
+                bioOutput[findSuperSelect.label] = superOut;
+            }
+            if(findSuperSelect.inList === true){
+                listOutput.push(superOut);
+            }
         }
-
+        const findAddPath = page.form.fields.find(item => item.addPath === true);
+        let fileName =  null;
+        let filePath = `${path}/`;
+        const findSectionAdder = page.form.fields.find(item => item.type === "section-adder");
+        
+        if(findSectionAdder){
+            bioOutput.sections= sections;
+        }
         formData.forEach((value, key) => {
-            formOutput[key] = value;
+            const requirements = page.form.fields.find(item => item.label === key);
+            const data = {label: key,
+                type:requirements.type,
+                location:requirements.location, 
+                filter:requirements.filter,
+                hidden:requirements.hidden,
+            }
+            if(["select", "multi-select", "creatable", "super-select"].includes(requirements.type)){
+                return;
+            }
+        
+            data.value = requirements.split ? 
+            value.split(requirements.split).map(item => item.trim()).filter(item => item !== ''):value;
+            
+            if(page.form.createBioPage !== false){
+                if(requirements.onCard === true){
+                    if(location === "head"){
+                        bioOutput.infoCard[key] = value;
+                    }
+                    bioOutput.infoCard.cardData.push(data);
+                }
+                else if(requirements.location === "body"){
+                    bioOutput[key] = value;
+                }
+                else{
+                    bioOutput[key] = data;
+                }
+            }
+            if(requirements.inList === true){
+                if(requirements.location === "body"){
+                    listOutput[key] = value;
+                }
+                else{       
+                    if(requirements.addPath === true){
+                        fileName = sanitizeId(`${value}_${props.userName}`);
+                        filePath = `${filePath}${fileName}`
+                        data.path = filePath;
+                    }
+                    listOutput.details.push(data);
+                }
+
+            }
         });
-         formOutput.Author = props.userName;
+        selections.forEach(selection => {
+            const requirements = page.form.fields.find(item => item.label === selection.label);
+            const data = {label: selection.label,
+                type:requirements.type,
+                location:requirements.location, 
+                filter:requirements.filter,
+                hidden:requirements.hidden,
+                source:requirements.source,
+                value:selection.value
+            }
+            if(page.form.createBioPage !== false){
+                if(requirements.onCard === true){
+                    bioOutput.infoCard.cardData.push(data);
+                }
+            }
+            else if(requirements.location === "body"){
+                bioOutput[selection.label] = value;
+            }
+            else{
+                bioOutput[selection.label] = data;
+            }
+        })
+
          
-        formOutput.created = new Date().toJSON()
         
 
        
 
 
-        console.log(`test:  ${JSON.stringify(formOutput)}`);
-        const listData = [];
-        const cardData = [];
+        
         const localListData = localStorage.getItem(`${path}/list`) ?? '[]';
-        const fileName = sanitizeId(`${formOutput.Name}_${props.userName}`);
-        const filePath = `${path}/${fileName}`;
         const localList = JSON.parse(localListData);
 
-        Object.entries(formOutput).forEach(([key, value]) => {
-            if(key === "description"){
-                return;
-            }
-            const requirements = page.form.fields.find(item => item.label === key);
-            const types= ["select", "multi-select", "super-select"]
-            
-            const data = {label:key, value:value}
-            
-            if(!requirements){
-                
-                
-                if(key === "Author"){
-                    cardData.push(data);
-                    data.display = true;
-                    data.filter = true;
-                }
-                else{
-                    data.display = false;
-                    data.filter = false;
-                }
-                listData.push(data);
-
-                return;
-            }
-            if(types.includes(requirements.type) && Array.isArray(value)){
-                data.value = [];
-            }
-            if(requirements.inCard === true){
-                cardData.push(data);
-            }
-            data.display = requirements.display !== undefined ? requirements.display : true ;
-            data.filter = requirements.filterable !== undefined ? requirements.filterable : true ;
-            data.location = !requirements.location ? "body" : requirements.location;
-            if(requirements.addPath === true){
-                data.path = filePath;
-            }
-            if(requirements.inList === true){
-                listData.push(data)
-            }
-
-        });
-        const outputFile = {infoCard:{cardData:cardData}, }
-        outputFile.id = formOutput.created;
-        outputFile.infoCard.Name = formOutput.Name;
-        outputFile.infoCard.created = formOutput.created;
-        outputFile.infoCard.modified = formOutput.created;
-        outputFile.description = formOutput.description;
-        const findSections = page.form.fields.find(item => item.type === "section-adder");
-        if(findSections){
-            outputFile.sections = sections;
-        }
-        const outputListData = {details:listData};
-        outputListData.id = formOutput.created;
-        outputListData.description = formOutput.description;
-
-        localList.push(outputListData);
+        
+       
+        localList.push(listOutput);
         localStorage.setItem(`${path}/list`, JSON.stringify(localList));
-        localStorage.setItem(filePath, JSON.stringify(outputFile));
-
+        if(page.form.createBioPage !== false){
+            localStorage.setItem(filePath, JSON.stringify(bioOutput));
+        }
+        
     }
          
     const handleClose = () => setVisibility(false);
@@ -497,7 +557,7 @@ export function CategoryPage(props) {
                         </OffcanvasHeader>
                         <OffcanvasBody className="new">
                             <form onSubmit={handleSubmit} className="form-container">
-                                <FormGenerator form={page.form.fields} sections={sections} setSections={setSections} onCategoriesChange={onCategoriesChange}/>
+                                <FormGenerator form={page.form.fields} sections={sections} setSections={setSections} onCategoriesChange={onCategoriesChange} onSelectionChange={onSelectionChange}/>
                                 <div className="btn-group">
                                     <button className="btn btn-primary" type="submit">Create</button>
                                     <button onClick={handleClose} type="button" className="btn btn-secondary cancel" data-bs-dismiss="offcanvas" aria-label="Close">Cancel</button>
@@ -518,7 +578,7 @@ export function CategoryPage(props) {
                                 <Select 
                                     options={page.sort}
                                     value={sortOptions}
-                                    className="form-select" 
+                                    className="form-control" 
                                     id="sort" 
                                     name="varSort" 
                                     onChange={setSortOptions}

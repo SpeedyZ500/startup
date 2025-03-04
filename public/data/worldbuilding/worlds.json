@@ -1,0 +1,41 @@
+{
+    "title":"Worlds",
+    "description":"This is where you put your worlds, what races are their, which ones are native, which ones are worlds that had mass migration from another world due to _unfortunate_ and _unforeseen_ circumstances. Feel free to add biome info as well, and you don't need to fill it all out at the beginning, you will be able to make edits later. You will also be able to add additional information within the world's page, including defining the biomes you make up, and creating/adding wildlife, races, flora, organizations and countries which will automatically be added to the relevant tabs.",
+    "buttonLabel":"New World",
+    "form":{
+        "title":"New World",
+        "fields":[
+            {
+                
+            },
+            {
+                "label":"Description",
+                "type":"text-area",
+                "placeholder":"Your Prompt",
+                "onCard":false,
+                "inList":true,
+                "filterable":false
+            }
+        ]
+
+
+    },
+    "sort":[
+        {
+            "label":"New to Old",
+            "value":{"category":"created", "az":false}
+        },
+        {
+            "label":"Old to New",
+            "value":{"category":"created", "az":true}
+        },
+        {
+            "label":"A-Z Author",
+            "value":{"category":"Author", "az":true}
+        },
+        {
+            "label":"Z-A Author",
+            "value":{"category":"Author", "az":false}
+        }
+    ]
+}

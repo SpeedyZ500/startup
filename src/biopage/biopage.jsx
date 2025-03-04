@@ -54,11 +54,11 @@ function generateRows(data){
                             <Fragment>
                                 {entry.value.map((item,subIndex) =>(
                                     <Fragment key={subIndex}>
-                                        {typeof item === "object" && item.name ? (
+                                        {typeof item === "object" && item.value ? (
                                         item.path ? (
-                                            <NavLink to={item.path}>{item.name}</NavLink>
+                                            <NavLink to={item.path}>{item.value}</NavLink>
                                         ) : (
-                                            <span>{item.name}</span>
+                                            <span>{item.value}</span>
                                         ) ) : (
                                             <span>{item}</span>
                                         )}
@@ -92,10 +92,10 @@ function generateRows(data){
         return (
             <tr key={index}>
                 <th>{entry.label}</th>
-                <td>{typeof entry.value === "object" && entry.value.name ? (
-                            entry.value.path ? (<NavLink to={entry.value.path}>{entry.value.name}</NavLink>
+                <td>{typeof entry.value === "object" && entry.value.value ? (
+                            entry.value.path ? (<NavLink to={entry.value.path}>{entry.value.value}</NavLink>
                         ): (
-                            <span>{entry.value.name}</span>
+                            <span>{entry.value.value}</span>
                         )
                         ): <span>{entry.value}</span>
                     }

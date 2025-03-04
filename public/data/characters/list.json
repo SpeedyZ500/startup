@@ -3,7 +3,7 @@
         "id":1,
         "details":[
             {
-                "label":"Name",
+                "label":"name",
                 "value":"Alastor Moonblaze",
                 "path":"/characters/alastor_moonblaze_spencer_zaugg",
                 "location":"head",
@@ -45,7 +45,7 @@
         "id":2,
         "details":[
             {
-                "label":"Name",
+                "label":"name",
                 "value":"The Curator",
                 "path":"/characters/the_curator_spencer_zaugg",
                 "location":"head",
