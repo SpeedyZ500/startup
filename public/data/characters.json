@@ -29,7 +29,7 @@
                 "placeholder":"A short description/summary of your character",
                 "onCard":false,
                 "inList":true,
-                "filterable":false,
+                "filter":false,
                 "location":"body"
             },
             {
@@ -95,7 +95,7 @@
                 "label":"Author",
                 "onCard":true,
                 "inList":true,
-                "hidden":true
+                "hidden":false
             },
             {
                 "label":"created",

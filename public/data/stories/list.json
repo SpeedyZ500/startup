@@ -4,14 +4,14 @@
         "id":1,
         "details":[
             {
-                "label":"Name",
+                "label":"name",
                 "value":"The Moonlit Alchemist",
                 "path":"/stories/the_moonlit_alchemist_spencer_zaugg",
                 "location":"head",
                 "filter":false
             },
             {
-                "label":"Author",
+                "label":"author",
                 "value":"Spencer Zaugg"
             },
             {

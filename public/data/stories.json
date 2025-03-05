@@ -24,13 +24,35 @@
             },
             {
                 "label":"Genre",
-                "type":"creatable",
-                "source":"./data/genres"
+                "type":"text",
+                "split":";",
+                "placeholder":"a list of genres separated by semicolons ;"
             },
             {
                 "label":"Content Warnings",
-                "type":"creatable",
-                "source":"./data/contentwarnings"
+                "type":"text",
+                "split":";",
+                "placeholder":"a list of content warnings separated by semicolons ;"
+            },
+            {
+                "label":"Author",
+                "inList":true,
+                "hidden":false,
+                "filter":false
+            },
+            {
+                "label":"created",
+                "onCard":false,
+                "inList":true,
+                "hidden":true,
+                "filter":false
+            },
+            {
+                "label":"modified",
+                "onCard":false,
+                "inList":true,
+                "hidden":true,
+                "filter":false
             }
         ]
     },

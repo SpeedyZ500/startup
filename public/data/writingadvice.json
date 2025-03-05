@@ -4,6 +4,7 @@
   "buttonLabel":"New Advice",
   "form":{
     "title":"New Advice",
+    "createBioPage":false,
     "fields":[
         {
             "label":"Description",
@@ -11,7 +12,14 @@
             "placeholder":"Your Advice",
             "onCard":false,
             "inList":true,
-            "filterable":false
+            "filter":false,
+            "location":"body"
+        },
+        {
+            "label":"Author",
+            "inList":true,
+            "hidden":true,
+            "filter":false
         }
     ]
 

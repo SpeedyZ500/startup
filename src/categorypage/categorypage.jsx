@@ -299,7 +299,7 @@ function FormGenerator({form, sections, setSections, onCategoriesChange, onSelec
             return (
                 <div key={index} className="input-group">
                     <label className="input-group-text">{data.label}</label>
-                    <button onClick={addSection} className="btn btn-primary">Add Section</button>
+                    <Button onClick={addSection} className="btn btn-primary">Add Section</Button>
                     {sections.map((section, i) => (
                         <Section
                             key={section.id}
@@ -321,23 +321,19 @@ export function CategoryPage(props) {
     const [visible, setVisibility] = useState(false);
     const [selections, onSelectionChange] = useState([]);
     const handleSubmit = async (event) =>{
-        event.preventDefault();
+        //event.preventDefault();
         const formData = new FormData(event.target);
-        formData.append("Author", props.userName);
-        
-        
         
         const keys = formData.keys();
         
         const authorRequirements = page.form.fields.find(item => item.label === "Author");
         const created = new Date().toJSON();
 
-        const listOutput = {id:created, details:[
+        const listOutput = {id:created, author:props.userName, details:[
             {label:"Author", value:props.userName, hidden:authorRequirements.hidden, filter:authorRequirements.filter},
             {label:"created", hidden:true, filter:false, value:created}]};
         const bioOutput = {id:created, infoCard:{cardData:[{label:"Author", value:props.userName}], created: created, modified:created}};
 
-    
         const findSuperSelect = page.form.fields.find(item => item.type === "super-select");
         if(findSuperSelect){
             const superOut = {label:findSuperSelect.label, type:findSuperSelect.type, source:findSuperSelect.source, value:[]}
@@ -353,6 +349,10 @@ export function CategoryPage(props) {
             if(findSuperSelect.inList === true){
                 listOutput.push(superOut);
             }
+        }
+        const findModified = page.form.fields.find(item => item.label === "modified");
+        if(findModified.inList === true){
+            listOutput.push({label:findModified.label, value:created, hidden:findModified.hidden, filter:findModified.filter})
         }
         const findAddPath = page.form.fields.find(item => item.addPath === true);
         let fileName =  null;
@@ -547,7 +547,7 @@ export function CategoryPage(props) {
                 <div className="theme-h adaptive textbody">
                         <h1>{page.title}</h1>
                         <p>{page.description}</p>
-                    </div>
+                </div>
                     <button onClick={handleOpen} disabled={props.authState !== AuthState.Authenticated}className="btn btn-primary button-align"  data-bs-toggle="offcanvas" data-bs-target="#offcanvas" aria-controls="offcanvas">{page.buttonLabel}</button>
                     <Offcanvas show={visible} className="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabIndex="-1" id="offcanvas" aria-labelledby="offcanvasLabel">
                         

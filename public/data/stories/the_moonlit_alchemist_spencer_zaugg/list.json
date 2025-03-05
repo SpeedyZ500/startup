@@ -3,7 +3,7 @@
         "chapterId":1,
         "chapterNumber":1,
         "title":"The End and a Beginning",
-        "contentwarnings":[
+        "contentwarning":[
             "Fallen Universe"
         ],
         "genre":[
@@ -11,7 +11,7 @@
             "Fantasy"
         ],
         "author":"Spencer Zaugg",
-        "previous":null,
+        "previous":[],
         "branches": [2,3],
         "path":"/stories/the_moonlit_alchemist_spencer_zaugg/1_the_end_and_a_beginning_spencer_zaugg"
     },
@@ -19,7 +19,7 @@
         "chapterId":2,
         "chapterNumber":2,
         "title":"Seeking a New Home",
-        "contentwarnings":[
+        "contentwarning":[
             "Fallen Universe"
         ],
         "genre":[
@@ -27,7 +27,7 @@
             "Fantasy"
         ],
         "author":"Spencer Zaugg",
-        "previous":1,
+        "previous":[1],
         "branches": [],
         "path":"/stories/the_moonlit_alchemist_spencer_zaugg/2_seeking_a_new_home"
     },
@@ -35,7 +35,7 @@
         "chapterId":3,
         "chapterNumber":2,
         "title":"A new Friend",
-        "contentwarnings":[
+        "contentwarning":[
             "Fallen Universe"
         ],
         "genre":[
@@ -43,7 +43,7 @@
             "Fantasy"
         ],
         "author":"Spencer Zaugg",
-        "previous":1,
+        "previous":[1],
         "branches": [],
         "path":"/stories/the_moonlit_alchemist_spencer_zaugg/3_a_new_friend"
     }

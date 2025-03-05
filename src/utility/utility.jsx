@@ -18,7 +18,7 @@ import {
 
 
 function renderItem(item, cardId){
-    if(item.display === false || item.hidden == true) return null;
+    if(item.display === false || item.hidden === true) return null;
     if(Array.isArray(item.value)){
         return(
             <OverlayTrigger 

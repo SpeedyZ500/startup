@@ -227,14 +227,15 @@ export function BioPage(){
                         <nav>
 
                             <menu className="internal-menu">
-                                <MemoizedNavGen data={bio.sections}/>
+                                {BioPage.sections && <MemoizedNavGen data={bio.sections}/>}
+                                
                             </menu>
                         </nav>
                     </Accordion.Body>
                 </Accordion.Item>
                         
             </Accordion>
-            <MemoizedSectionsParse data={bio.sections}/>
+            {BioPage.sections && <MemoizedSectionsParse data={bio.sections}/>}
         </main>
     )
 }
