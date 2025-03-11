@@ -227,6 +227,45 @@ function filterAndSort(list, filter, sort){
     return sortList(filtered, sort)
 }
 
+export async function filterProfanity(json, profanityFilterEnabled){
+    if(profanityFilterEnabled === false){
+        return json
+    }
+    // Clone the JSON to avoid modifying the original object
+    const filteredJson = Array.isArray(json) ? [...json] : { ...json };
+    if(Array.isArray(filteredJson)){
+        for (let i = 0; i < filteredJson.length; i++) {
+            if(Array.isArray(filteredJson[i]) || typeof filteredJson[i] === 'object'){
+                filteredJson[i] = await filterProfanity(filteredJson[i], profanityFilterEnabled);
+            }
+            else if(typeof filteredJson[i] === 'string'){
+                filteredJson[i] = await applyProfFilter(filteredJson[i])
+            }
+        }
+    }
+    else{
+        for(const key in filteredJson){
+            if(typeof filteredJson[key] === 'string'){
+                filteredJson[key] = await applyProfFilter(filteredJson[key]);
+            }
+            else if(Array.isArray(filteredJson[key]) || typeof filteredJson[key] === 'object'){
+                filteredJson[key] = await filterProfanity(filteredJson[key], profanityFilterEnabled);
+            }
+        }
+    }
+    return filteredJson;
+}
+async function applyProfFilter(text){
+    try {
+        const response = await fetch(`https://www.purgomalum.com/service/json?text=${encodeURIComponent(text)}`);
+        const data = await response.json();
+        return data.result; // Return the filtered text
+    } catch (error) {
+        console.error("Error filtering text:", error);
+        return text; // In case of failure, return the original text
+    }
+}
+
 export {
     sortList,
     filterAndSort,

@@ -283,9 +283,20 @@ app.get('/api/user/me', async (req, res) => {
         res.send({email:user.email, username:user.username, displayname:user.displayname});
     }
     else{
-        req.status(401).send({msg: 'Unauthorized'});
+        res.status(401).send({msg: 'Unauthorized'});
     }
 });
+
+app.get('/api/user/prof', async(req, res) => {
+    const token = req.cookies['token'];
+    const user = await getUser('token', token);
+    if (user){
+        res.send({profanityFilter:user.profanityFilter});
+    }
+    else{
+        res.send({profanityFilter:true});
+    }
+})
 
 const port = 4000;
 app.listen(port, function () {
