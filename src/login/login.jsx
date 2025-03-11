@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "./login.css";
+import Button from 'react-bootstrap/Button';
+
 import { MessageDialog } from './messageDialog';
 import { Link, useNavigate} from 'react-router-dom'; 
 
@@ -11,10 +13,11 @@ export function Login(props) {
     const [username, setUsername] = React.useState(props.username);
     const [password, setPassword] = React.useState('');
     const [displayError, setDisplayError] = React.useState(null);
+    const navigate = useNavigate();
 
-    function handleRegister() {
-        const json = JSON.stringify({username, password});
-        createAuth('PUT', json);
+    function handleLogin() {
+        const json = ({username:username, password:password});
+        createAuth('PUT', json, setDisplayError, navigate);
     }
 
     async function loginUser() {
@@ -29,7 +32,6 @@ export function Login(props) {
     return (
         <main className="container-fluid text-center">
             <fieldset className="theme-l adaptive">
-                <form method="get">
                     <legend>Log-In</legend>
                     <div className="input-group mp-3">
                         <span className="input-group-text">Username/Email:</span>
@@ -42,8 +44,8 @@ export function Login(props) {
                     
                     
                         <div className="btn-group">
-                            <button onClick={() => loginUser()} className="btn btn-primary" disabled={!username || !password} >Login</button>
-                            <button className="btn btn-secondary" onClick={()=> createServerModuleRunner() } to="/" disabled={!username || !password}>Create</button>
+                            <button onClick={() => handleLogin()} className="btn btn-primary" disabled={!username || !password} >Login</button>
+                            <button className="btn btn-secondary" onClick={()=> navigate('/login/register') }>Create</button>
                         </div>
                     
                     
@@ -52,39 +54,104 @@ export function Login(props) {
                         <input type="checkbox" />
                     </div>
 
-                    <MessageDialog message={displayError} onHide={() => setDisplayError(null)} />
+                    {displayError && <MessageDialog message={displayError} onHide={() => setDisplayError(null)} />}
 
-                </form>
             </fieldset>
         </main>);
 }
 
 
-async function createAuth(method, json){
-    const navigate = useNavigate();
-    const res = await fetch('api/auth', {
-        method: method,
-        headers: {'Content-Type': 'application/json'},
-        body: json,
-    });
-    await res.json();
-    if(res.ok){
-        navigate('/');
+async function createAuth(method, json, setDisplayError, navigate){
+    try{
+        const res = await fetch('/api/auth', {
+            method: method,
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(json),
+        });
+        if(res.ok){
+            navigate('/');
+        }
+        else{
+            let errorMessage = "An unknown error occurred";
+
+            // Ensure response has JSON data before parsing
+            if (res.headers.get("content-type")?.includes("application/json")) {
+                const body = await res.json();
+                errorMessage = body.msg || errorMessage;
+            }
+
+            setDisplayError(`Error: ${errorMessage}`);
+    
+    
+        }
     }
-    else{
-        alert('Authentication failed');
+    catch (e){
+        setDisplayError(`Error: ${error.message || "Network error"}`);
     }
 }
+
 export function Register(){
     const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [displayname, setDisplayname] = useState('');
+    const [confirm, setConfirm] = useState('');
 
-    function handleRegister() {
-        const json = JSON.stringify({email, username, password, displayname});
-        createAuth('POST', json);
+    const [displayname, setDisplayname] = useState('');
+    const [displayError, setDisplayError] = React.useState(null);
+    const navigate = useNavigate();
+
+
+    async function handleRegister() {
+        if(password === confirm){
+            const json = ({email:email, username:username, password:password, displayname:displayname});
+            createAuth('POST', json, setDisplayError, navigate);    
+        }
     }
+
+    return (
+        <main className="container-fluid text-center">
+            <fieldset className="theme-l adaptive">
+                    <legend>Register</legend>
+                    <div className="input-group mp-3">
+                        <span className="input-group-text">Email:</span>
+                        <input className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} type="text" placeholder="your@email.com"/>
+                    </div>
+                    <div className="input-group mp-3">
+                        <span className="input-group-text">Username:</span>
+                        <input className="form-control" value={username} onChange={(e) => setUsername(e.target.value)} type="text" placeholder="username"/>
+                    </div>
+                    <div className="input-group mp-3">
+                        <span className="input-group-text">Display Name:</span>
+                        <input className="form-control" value={displayname} onChange={(e) => setDisplayname(e.target.value)} type="text" placeholder="username"/>
+                    </div>
+                    <div className="input-group mp-3">
+                        <span className="input-group-text">Password:</span>
+                        <input className="form-control" type="password" onChange={(e) => setPassword(e.target.value)} placeholder="password"/>
+                    </div>
+                    <div className="input-group mp-3">
+                        <span className="input-group-text">Confirm Password:</span>
+                        <input className="form-control" type="password" onChange={(e) => setConfirm(e.target.value)} placeholder="Confirm password"/>
+                    </div>
+                    
+                    
+                        <div className="btn-group">
+                            <Button onClick={() => handleRegister()} variant="primary" disabled={!username || !password || password !== confirm || !email} >
+                                Register
+                            </Button>
+                            <Button variant="secondary" onClick={()=> navigate('/login') }>Cancel</Button>
+                        </div>
+                    
+                    
+                    <div>
+                        <span>Stay Signed in?</span>
+                        <input type="checkbox" />
+                    </div>
+
+                    {displayError && <MessageDialog message={displayError} onHide={() => setDisplayError(null)} />}
+
+            </fieldset>
+        </main>
+        );
    
 
 }

@@ -6,6 +6,9 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
+
+
+
 const authCookieName = 'token';
 
 let users = [];
@@ -155,6 +158,8 @@ let writingprompts = [];
 let wildlife = [];
 let flora = [];
 let countries = [];
+let biopages = [];
+
 
 async function createUser(email, username, password, displayname) {
     const passwordHash = await bcrypt.hash(password, 10);
@@ -165,7 +170,7 @@ async function createUser(email, username, password, displayname) {
         password: passwordHash,
         profanityFilter:true
     };
-    if(displayname || displayname === ''){
+    if(displayname && displayname !== ''){
         user.displayname = displayname;
     }
     else{
@@ -229,11 +234,17 @@ app.post('/api/auth', async (req, res) => {
         res.status(409).send({msg:"Email already registered to a user"})
     }
     else if(await getUser('username', req.body.username)){
-        res.status(409).send({msg:"Existing user"})
+        res.status(409).send({msg:"Username already taken"})
     } else{
+
         const user = await createUser(req.body.email, req.body.username, req.body.password, req.body.displayname);
-        setAuthCookie(res, user);
-        res.send({email:user.email, username:user.username, displayname:user.displayname});
+        if(user){
+            setAuthCookie(res, user);
+            res.send({email:user.email, username:user.username, displayname:user.displayname});    
+        }
+        else{
+            res.status(500).send({ msg: "User creation failed" });
+        }
     }
     
 });

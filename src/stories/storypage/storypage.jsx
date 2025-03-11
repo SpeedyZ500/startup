@@ -4,7 +4,7 @@ import ReactFlow, {MiniMap, Controls, Background, Handle} from "reactflow";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from 'react-bootstrap/Button';
 
-import { AuthState } from '../login/authState.js';
+//import { AuthState } from '../login/authState.js';
 import Select from 'react-select'
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { OffcanvasBody, OffcanvasHeader } from 'react-bootstrap';
@@ -65,19 +65,20 @@ const generateGraph = (chapters) => {
   
     return { nodes, edges };
   };
-function widthCalculator(chapters, visited){
+function widthCalculator(chapters){
     const visited = new Set();
     const minWidths = new Map();
     const dfs = (chapter) => {
         if(visited.has(chapter.chapterId)){
             return minWidths[chapter.chapterId] || NODE_WIDTH + NODE_SPACING;
         }
+        visited.add(chapter);
 
     }
 
     chapters.forEach((chapter) => {
         if(!visited.has(chapter.chapterId)){
-            
+            dfs(chapter)
         }
     });
 
@@ -287,7 +288,7 @@ export function StoryPage(props) {
                 <h3 className="theme-h adaptive"id="title">{story.author}</h3>
 
 
-                <button onClick={handleOpen} disabled={props.authState !== AuthState.Authenticated}className="btn btn-primary button-align"  data-bs-toggle="offcanvas" data-bs-target="#offcanvas" aria-controls="offcanvas">New Chapter</button>
+                <button onClick={handleOpen} /*disabled={props.authState !== AuthState.Authenticated*/ className="btn btn-primary button-align"  data-bs-toggle="offcanvas" data-bs-target="#offcanvas" aria-controls="offcanvas">New Chapter</button>
                 <Offcanvas show={visible} className="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabIndex="-1" id="offcanvas" aria-labelledby="offcanvasLabel">
                     
                     <OffcanvasHeader className="offcanvas-header">

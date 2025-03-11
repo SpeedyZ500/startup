@@ -4,7 +4,7 @@ import { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './app.css';
 import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
-import { Login } from './login/login';
+import { Login, Register } from './login/login';
 import { BaseNav, WorldNav, SubNav } from './nav/nav';
 import { Home } from './home/home';
 import { About } from './about/about';
@@ -27,6 +27,7 @@ import NavDropdown from 'react-bootstrap/NavDropdown';
 import { BioPage } from './biopage/biopage';
 import { CategoryPage } from './categorypage/categorypage';
 import { AuthState } from './login/authState';
+
 
 
 
@@ -178,13 +179,8 @@ export default function App() {
                 <Routes>
                     <Route path='/' element={< Home/>} />
                     <Route path='login'> 
-                        <Route path="" element={<Login 
-                            username={username}
-                            onLogin={(loginUsername) => {
-                                onAuthChange(loginUsername, AuthState.Authenticated);
-                            }}
-                            />}/>
-                        <Route path="/register"/>
+                        <Route path="" element={<Login/>}/>
+                        <Route path="register" element={<Register/>} />
                     </Route>
                     <Route path='about' element={<About />} />
                     <Route path='worldbuilding'>
