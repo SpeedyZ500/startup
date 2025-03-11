@@ -148,12 +148,12 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] **Node.js/Express HTTP service** - I did not complete this part of the deliverable.
-- [ ] **Static middleware for frontend** - I did not complete this part of the deliverable.
-- [ ] **Calls to third party endpoints** - I did not complete this part of the deliverable.
-- [ ] **Backend service endpoints** - I did not complete this part of the deliverable.
-- [ ] **Frontend calls service endpoints** - I did not complete this part of the deliverable.
-- [ ] **Supports registration, login, logout, and restricted endpoint** - I did not complete this part of the deliverable.
+- [ ] **Node.js/Express HTTP service** -  Installed Express with NPM. Default port on 4000.js`.
+- [ ] **Static middleware for frontend** - Simple endpoints in `service/index`.
+- [ ] **Calls to third party endpoints** - Bio, Story, Chapter, home, user, and category pages call `https://www.purgomalum.com/service/` passing in the text or json, to filter the display, assuming that the current user's profanityFilter tag is not false
+- [ ] **Backend service endpoints** - Simple endpoints in `service/index` for auth and users, as well as the lists for characters, stories, writing prompts, writing advice, and world building elements.
+- [ ] **Frontend calls service endpoints** - All mocked functionality removed from the frontend and replaced with calls to the service.
+- [ ] **Supports registration, login, logout, and restricted endpoint** - Fully support authentication and restrict access to settings, as well as restricting access to editing.
 
 ## 🚀 DB deliverable
 

@@ -59,8 +59,8 @@ const worldbuildingCategories = [
 
 
 export default function App() {
-    const [userName, setUserName] = React.useState(localStorage.getItem('userName') || '');
-    const currentAuthState = userName ? AuthState.Authenticated : AuthState.Unauthenticated;
+    const [username, setUsername] = React.useState(localStorage.getItem('username') || '');
+    const currentAuthState = username ? AuthState.Authenticated : AuthState.Unauthenticated;
     const [authState, setAuthState] = React.useState(currentAuthState);
 
     const [show, setShow] = useState(false);
@@ -69,13 +69,13 @@ export default function App() {
     const handleHide = () => setShow(false);
  
     const handleShow = () => setShow(true);
-    const onAuthChange= (userName, authState) => {
+    const onAuthChange= (username, authState) => {
         setAuthState(authState);
-        setUserName(userName);
+        setUsername(username);
     }
     function logout(){
-        localStorage.removeItem('userName');
-        onAuthChange(userName, AuthState.Unauthenticated);
+        localStorage.removeItem('username');
+        onAuthChange(username, AuthState.Unauthenticated);
     }
  
   return (
@@ -94,8 +94,8 @@ export default function App() {
                                 </NavLink>
                             </div>
                             <Routes>
-                                <Route path='/*' element={< BaseNav authState={authState} userName={userName} logout={logout}/>}/>
-                                <Route path='/worldbuilding/*' element={<WorldNav authState={authState} userName={userName} logout={logout}/>} />
+                                <Route path='/*' element={< BaseNav authState={authState} username={username} logout={logout}/>}/>
+                                <Route path='/worldbuilding/*' element={<WorldNav authState={authState} username={username} logout={logout}/>} />
                                 <Route path='/login' element={<></>} />
 
                             </Routes>
@@ -148,7 +148,7 @@ export default function App() {
                                                 </form>
                                             </li>
                                             {authState === AuthState.Authenticated &&
-                                                <NavDropdown title={userName}>
+                                                <NavDropdown title={username}>
                                                     <NavDropdown.Item as={NavLink} to="/settings" onClick={handleHide}>settings</NavDropdown.Item>
                                                     <NavDropdown.Item to="" onClick={handleHide}><Button variant="secondary"onClick={() => logout()}>Logout</Button></NavDropdown.Item>
                                                </NavDropdown>
@@ -177,26 +177,28 @@ export default function App() {
             <div className="scrollable">
                 <Routes>
                     <Route path='/' element={< Home/>} />
-                    <Route path='login' element={<Login 
-                        userName={userName}
-                        onLogin={(loginUserName) => {
-                            onAuthChange(loginUserName, AuthState.Authenticated);
-                        }}
-                        
-                    />} />
+                    <Route path='login'> 
+                        <Route path="" element={<Login 
+                            username={username}
+                            onLogin={(loginUsername) => {
+                                onAuthChange(loginUsername, AuthState.Authenticated);
+                            }}
+                            />}/>
+                        <Route path="/register"/>
+                    </Route>
                     <Route path='about' element={<About />} />
                     <Route path='worldbuilding'>
                         <Route path='' element={<WorldBuilding/>} />
                         {worldbuildingCategories.map((category) => (
                             <Route key={category} path={category}>
-                                <Route path="" element={<CategoryPage authState={authState} userName={userName}/>} />
+                                <Route path="" element={<CategoryPage authState={authState} username={username}/>} />
                                 <Route path=":id" element={<BioPage />} />
                             </Route>
                         ))}
                         <Route path='*' element={<NotFound/>} />
                     </Route>
                     <Route path='stories'>
-                        <Route path=''element={<CategoryPage authState={authState} userName={userName} />}/>
+                        <Route path=''element={<CategoryPage authState={authState} username={username} />}/>
                         <Route path=':storyId'>
                             <Route path='' element={<StoryPage/>}/>
                             <Route path=":chapterId"element={<Chapter/>}/>
@@ -209,10 +211,10 @@ export default function App() {
                     <Route path='writingadvice' element={<CategoryPage/>} />
                     
                     <Route path='characters'>
-                        <Route path=''element={<CategoryPage authState={authState} userName={userName}/>}/>
-                        <Route path=':id' element={<BioPage authState={authState} userName={userName}/>}/>
+                        <Route path=''element={<CategoryPage authState={authState} username={username}/>}/>
+                        <Route path=':id' element={<BioPage authState={authState} username={username}/>}/>
                     </Route>
-                    <Route path='settings' element={<Settings userName={userName}/>} />
+                    <Route path='settings' element={<Settings username={username}/>} />
                     <Route path='*' element={<NotFound/>} />
                     
 

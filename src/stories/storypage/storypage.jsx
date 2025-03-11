@@ -65,7 +65,51 @@ const generateGraph = (chapters) => {
   
     return { nodes, edges };
   };
+function widthCalculator(chapters, visited){
+    const visited = new Set();
+    const minWidths = new Map();
+    const dfs = (chapter) => {
+        if(visited.has(chapter.chapterId)){
+            return minWidths[chapter.chapterId] || NODE_WIDTH + NODE_SPACING;
+        }
 
+    }
+
+    chapters.forEach((chapter) => {
+        if(!visited.has(chapter.chapterId)){
+            
+        }
+    });
+
+    return minWidths;
+}
+const generateEdges = (chapters) => {
+    const edges = [];
+    chapters.forEach((chapter) => {
+        if(chapter.previous){
+            if(Array.isArray(chapter.previous)){
+                chapter.previous.forEach((previousID) => {
+                    edges.push({
+                        id: `e${previousID}-${chapter.chapterId}`,
+                        source: previousID.toString(),
+                        target: chapter.chapterId.toString()
+                    });
+                });
+            }
+            else{
+                edges.push({
+                    id: `e${chapter.previous}-${chapter.chapterId}`,
+                    source: chapter.previous.toString(),
+                    target: chapter.chapterId.toString()
+                });
+            }
+        }
+    });
+    return edges;
+}
+
+const NODE_WIDTH = 200;
+const NODE_SPACING = 50;
   
 function StoryFlow({list}){
     const { nodes, edges } = generateGraph(list);
@@ -197,7 +241,7 @@ export function StoryPage(props) {
             title:formData.title,
             genre:genres,
             contentwarning:contentwarning,
-            author:props.userName,
+            author:props.username,
             body:formData.body,
             chapterId:chapterId,
             chapterNumber:chapterNumber,
@@ -213,7 +257,7 @@ export function StoryPage(props) {
             path:filePath,
             genre:genres,
             contentwarning:contentwarning,
-            author:props.userName,
+            author:props.username,
             chapterId:chapterId,
             chapterNumber:chapterNumber,
             previous:previousIds,

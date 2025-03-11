@@ -329,10 +329,10 @@ export function CategoryPage(props) {
         const authorRequirements = page.form.fields.find(item => item.label === "Author");
         const created = new Date().toJSON();
 
-        const listOutput = {id:created, author:props.userName, details:[
-            {label:"Author", value:props.userName, hidden:authorRequirements.hidden, filter:authorRequirements.filter},
+        const listOutput = {id:created, author:props.username, details:[
+            {label:"Author", value:props.username, hidden:authorRequirements.hidden, filter:authorRequirements.filter},
             {label:"created", hidden:true, filter:false, value:created}]};
-        const bioOutput = {id:created, infoCard:{cardData:[{label:"Author", value:props.userName}], created: created, modified:created}};
+        const bioOutput = {id:created, infoCard:{cardData:[{label:"Author", value:props.username}], created: created, modified:created}};
 
         const findSuperSelect = page.form.fields.find(item => item.type === "super-select");
         if(findSuperSelect){
@@ -397,7 +397,7 @@ export function CategoryPage(props) {
                 }
                 else{       
                     if(requirements.addPath === true){
-                        fileName = sanitizeId(`${value}_${props.userName}`);
+                        fileName = sanitizeId(`${value}_${props.username}`);
                         filePath = `${filePath}${fileName}`
                         data.path = filePath;
                     }
