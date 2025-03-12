@@ -10,7 +10,7 @@ import "./biopage.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import Accordion from 'react-bootstrap/Accordion';
-import {sanitizeId, fetchJSONByPath, formatJSONDate} from'../utility/utility.js';
+import {sanitizeId, fetchJSONByPath, formatJSONDate, filterProfanity} from'../utility/utility.js';
 
 
 const Heading = ({ level, children, ...props }) => {
@@ -178,6 +178,19 @@ export function BioPage(){
     const [bio, setBio] = useState(null);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
+
+    async function profanityFilter(){
+        try{
+            const res = await fetch('/api/user/prof', {
+                method: 'GET',
+            });
+            setBio(filterProfanity(bio, res.body.profanityFilter))
+        }
+        catch{
+
+        }
+    }
+
     useEffect(() => {
         //Get full path
         let path = window.location.pathname;
@@ -203,7 +216,12 @@ export function BioPage(){
         }
             
         )
-        .finally(() => setLoading(false));
+        .finally(() => {
+            profanityFilter();
+            setLoading(false);
+        });
+
+        
 
     }, [id]);
     if (loading) return <main><p>Loading...</p></main>;

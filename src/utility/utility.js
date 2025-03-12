@@ -245,7 +245,10 @@ export async function filterProfanity(json, profanityFilterEnabled){
     }
     else{
         for(const key in filteredJson){
-            if(typeof filteredJson[key] === 'string'){
+            if(key === "source" || key === "path" || key === "username" || key === "email"){
+                continue;
+            }
+            else if(typeof filteredJson[key] === 'string'){
                 filteredJson[key] = await applyProfFilter(filteredJson[key]);
             }
             else if(Array.isArray(filteredJson[key]) || typeof filteredJson[key] === 'object'){
@@ -257,8 +260,8 @@ export async function filterProfanity(json, profanityFilterEnabled){
 }
 async function applyProfFilter(text){
     try {
-        const response = await fetch(`https://www.purgomalum.com/service/json?text=${encodeURIComponent(text)}`);
-        const data = await response.json();
+        const response = await fetch(`https://www.purgomalum.com/service/plain?text=${encodeURIComponent(text)}`);
+        const data = await response.text();
         return data.result; // Return the filtered text
     } catch (error) {
         console.error("Error filtering text:", error);

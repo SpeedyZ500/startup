@@ -275,6 +275,27 @@ app.delete('/api/auth', async (req, res) => {
     res.send({});
 });
 
+app.get(`/api/auth`, async (req, res) => {
+    const token = req.cookies['token'];
+    const user = await getUser('token', token);
+    if(user){
+        res.send({authenticated:true});
+    }
+    else{
+        res.send({authenticated:false});
+    }
+})
+app.get('/api/user/any', async (req, res) => {
+    const username = req.body.username
+    const user = await getUser('username', username);
+    if(user){
+        res.send({displayname:user.displayname});
+    }
+    else{
+        res.status(404).send({displayname:username, msg: 'User not found'});
+    }
+
+});
 // getMe
 app.get('/api/user/me', async (req, res) => {
     const token = req.cookies['token'];
