@@ -13,7 +13,7 @@ import Select from 'react-select'
 
 import {
     sortList, filterAndSort,
-    formatJSONDate
+    formatJSONDate, filterProfanity
 }  from './utility.js';
 
 
@@ -69,6 +69,7 @@ function renderItem(item, cardId){
 
 function renderCard(cards){
     
+    
     return (
         cards.map((card, index) => {
             if(!Array.isArray(card.details)){
@@ -117,9 +118,31 @@ function renderCard(cards){
 }
 export function CardsRenderer({cards, filters, sort}){
     //const currSort = useEffect(() => console.log(JSON.stringify(sort)), [sort]);
-    const filteredAndSorted = useMemo(() => filterAndSort(cards, filters, sort), [cards, filters, sort], );
     
-    const renderCards = useMemo(() => renderCard(filteredAndSorted), [filteredAndSorted]);
+    
+    const filteredAndSorted = useMemo(() => filterAndSort(cards, filters, sort), [cards, filters, sort], );
+    const [cleanCards, setCleanCards] = useState(filteredAndSorted);
+    async function profanityFilter(){
+        try{
+            const res = await fetch('/api/user/prof', {
+                method: 'GET',
+            });
+            return res.body.profanityFilter;
+        }
+        catch{
+            return true
+        }
+    }
+    const profanity = profanityFilter();
+    useEffect(() => {
+        setCleanCards(filterProfanity(cleanCards, profanity))
+        
+    }, [filteredAndSorted])
+    
+    
+    const renderCards = useMemo(() => renderCard(cleanCards), [cleanCards]);
+    
+
     return(
         <div className="card-columns my-container scrollable" data-bs-spy="scroll">
             {renderCards}
