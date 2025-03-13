@@ -316,7 +316,9 @@ app.get('/api/user/prof', async(req, res) => {
         res.send({profanityFilter:true});
     }
 })
+// app.put('/api/user/setting/prof', async(req, res) => {
 
+// })
 const port = 4000;
 app.listen(port, function () {
   console.log(`Listening on port ${port}`);

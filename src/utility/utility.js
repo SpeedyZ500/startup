@@ -228,72 +228,55 @@ function filterAndSort(list, filter, sort){
 }
 
 export async function filterProfanity(json, profanityFilterEnabled){
-    // Always seek out and replace author/label first, before filtering for profanity
-    if (typeof json === "object") {
-        const updatedJson = await replaceAuthor(json); // Replace author/label before profanity filtering
-        if (profanityFilterEnabled === false) {
-            return updatedJson;
+    if(typeof json === "string" && profanityFilterEnabled !== false){
+        return await applyProfFilter(json);
+    }
+    if(Array.isArray(json)){
+        return await Promise.all(json.map(async (item) => {
+            if(typeof item === 'string' || Array.isArray(item) || typeof item === 'object'){
+                return await filterProfanity(item, profanityFilterEnabled);
+            }
+            return item;
+        }))
+    }
+    else if(typeof json === 'object'){
+        const updatedJson = {};
+        if(json.hasOwnProperty("label")){
+            Object.assign(updatedJson, json);
+            if(json.label.toLowerCase() === "author"){
+                updatedJson.value = await replaceAuthor(json.value);
+            }
+            updatedJson.value = await filterProfanity(updatedJson.value, profanityFilterEnabled);
         }
-        
-        // If profanity filtering is enabled, proceed to apply it
-        return await applyProfanityToJson(updatedJson);
+        else{
+            for(const key in json){
+                if(key.toLowerCase() === "author"){
+                    updatedJson[key] = await filterProfanity(await replaceAuthor(json[key]));
+                }
+                else if(["source", "username", "path", "display", "filter", "hidden"].includes(key)){
+                    updatedJson[key] = json[key]
+                }
+                else{
+                    updatedJson[key] = await filterProfanity(json[key])
+                }
+            }
+        }
+        return updatedJson;
     }
-
-    // If it's a simple string, apply profanity filter immediately
-    if (typeof json === "string") {
-        return applyProfFilter(json);
-    }
-
     return json;
 }
 
-async function replaceAuthor(json) {
-    // If the object contains label "Author" or "author", replace the value
-    if ((json.hasOwnProperty("label") && (json.label === "Author" || json.label === "author")) || json.hasOwnProperty("author") || json.hasOwnProperty("Author")) {
-        const username = json.value || json.author; // Assuming the username is stored in value or author
-        const res = await fetch(`/api/user/any?username=${encodeURIComponent(username)}`, {
-            method: `GET`,
-            headers: { 'Content-Type': 'application/json' }
-        });
-        const data = await res.json();
-        json.value = data.displayname; // Replace the value with the display name
-
-    }
-
-    // If the JSON is an array or an object, recurse into it
-    if (Array.isArray(json)) {
-        await Promise.all(json.map(async (item, idx) => {
-            json[idx] = await replaceAuthor(item); // Recurse into array items
-        }));
-    } else if (typeof json === 'object') {
-        for (const key in json) {
-            if (json.hasOwnProperty(key)) {
-                json[key] = await replaceAuthor(json[key]); // Recurse into object keys
-            }
-        }
-    }
-    
-    return json;
+export async function replaceAuthor(username) {
+    const res = await fetch(`/api/user/any?username=${encodeURIComponent(username)}`, {
+        method: `GET`,
+        headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await res.json();
+    return data.displayname;
 }
 
-async function applyProfanityToJson(json) {
-    // Clone the JSON to avoid modifying the original object
-    const filteredJson = Array.isArray(json) ? [] : {};
 
-    for (const key in json) {
-        if (json.hasOwnProperty(key)) {
-            if (typeof json[key] === 'string') {
-                filteredJson[key] = await applyProfFilter(json[key]); // Apply profanity filter for strings
-            } else if (Array.isArray(json[key]) || typeof json[key] === 'object') {
-                filteredJson[key] = await applyProfanityToJson(json[key]); // Recurse for nested objects/arrays
-            } else {
-                filteredJson[key] = json[key]; // Keep other types as is
-            }
-        }
-    }
 
-    return filteredJson;
-}
 
 
 
