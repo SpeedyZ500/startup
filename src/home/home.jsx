@@ -16,6 +16,9 @@ export function Home() {
     const [prompts, setPrompts] = useState([])
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
+    const path = window.location.pathname;
+
+    
     useEffect(() => {
         fetchStoriesList()
             .then((data => {
@@ -35,7 +38,7 @@ export function Home() {
         }))
         .catch((err) => setError(err.message))
         .finally(() => setLoading(false));
-    })
+    }, [path])
     return (
     <main>
         <h1 className="page-title theme-h adaptive expanded">Home</h1>
