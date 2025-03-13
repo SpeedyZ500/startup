@@ -240,7 +240,7 @@ app.post('/api/auth', async (req, res) => {
         const user = await createUser(req.body.email, req.body.username, req.body.password, req.body.displayname);
         if(user){
             setAuthCookie(res, user);
-            res.send({email:user.email, username:user.username, displayname:user.displayname});    
+            res.send({email:user.email, username:user.username, displayname:user.displayname, profanityFilter:user.profanityFilter});    
         }
         else{
             res.status(500).send({ msg: "User creation failed" });
@@ -258,7 +258,7 @@ app.put('/api/auth', async (req, res) => {
     const user = await getUser(isEmail ? "email" : "username", identifier);
     if (user && (await bcrypt.compare(req.body.password, user.password))){
         setAuthCookie(res, user);
-        res.send({email:user.email, username:user.username, displayname:user.displayname});
+        res.send({email:user.email, username:user.username, displayname:user.displayname, profanityFilter:user.profanityFilter});
     }
     else{
         req.status(401).send({msg: 'Unauthorized'});
@@ -292,7 +292,6 @@ app.get('/api/user/any', async (req, res) => {
         displayname: user ? user.displayname : username,
 
     })
-
 });
 // getMe
 app.get('/api/user/me', async (req, res) => {

@@ -8,7 +8,7 @@ import { OffcanvasBody, OffcanvasHeader } from 'react-bootstrap';
 
 export function Settings(props) {
     const [userData, setUserData] = useState({})
-    const [displayName, setDisplayName] = useState("");
+    const [displayName, setDisplayName] = useState(props.user.displayname || "");
     const [savedName, setSavedName] = useState(null); 
   
     const [oldPassword, setOldPassword] = useState("");
@@ -35,7 +35,7 @@ export function Settings(props) {
         
         <h1 className="theme-h adaptive expanded text-center">Settings</h1>
         <div className="settings">
-            <h1>Username:{props.userName}</h1>
+            <h1>Username:{props.user.username}</h1>
                 
                 <form className="theme-h adaptive" onSubmit={handleSubmit} method="post">
                     <label htmlFor="username">Display Name:</label>

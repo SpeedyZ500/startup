@@ -5,7 +5,7 @@ import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { OffcanvasBody, OffcanvasHeader } from 'react-bootstrap';
 import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
-import {genFilter, updateFilter, sortList, SortOptions, fetchListByPath, FilterOptions, fetchJSONByPath, FilterItem, sanitizeId} from '../utility/utility.js'
+import {genFilter, updateFilter, sortList, SortOptions, fetchListByPath, FilterOptions, fetchJSONByPath, FilterItem, sanitizeId, filterProfanity} from '../utility/utility.js'
 import {CardsRenderer} from '../utility/utility.jsx'
 import Select from 'react-select'
 import Creatable from 'react-select/creatable';
@@ -163,7 +163,7 @@ const SuperSelect = ({data, options, onCategoriesChange}) => {
     
 }
 
-function FormGenerator({form, sections, setSections, onCategoriesChange, onSelectionChange}){
+function FormGenerator({form, sections, setSections, onCategoriesChange, onSelectionChange, profanity}){
     const [optionsMap, setOptionsMap] = useState({});
     const [selections, setSelections] = useState([]);
     useEffect(() => {
@@ -186,17 +186,22 @@ function FormGenerator({form, sections, setSections, onCategoriesChange, onSelec
     useEffect(() => {
         async function fetchOptions() {
             const newOptionsMap = {};
+    
             await Promise.all(
                 form.map(async (data) => {
                     if (data.source && ["select", "multi-select", "creatable", "super-select"].includes(data.type)) {
                         try {
                             const optionsList = await fetchListByPath(data.source);
-                            newOptionsMap[data.source] = optionsList.map((item) => {
-                                const option = item.details.find(detail => detail.label === "name");
-                                return !option.path
-                                    ? { value: { value:option.value }, label:option.value }:
-                                    { value: { value:option.value, path:option.path }, label: option.value };
-                            });
+                            newOptionsMap[data.source] = await Promise.all(
+                                optionsList.map(async (item) => {
+                                    const option = item.details.find(detail => detail.label === "name");
+                                    const filteredLabel = await filterProfanity(option.value, profanity);
+    
+                                    return !option.path
+                                        ? { value: { value: option.value }, label: filteredLabel }
+                                        : { value: { value: option.value, path: option.path }, label: filteredLabel };
+                                })
+                            );
                         } catch (error) {
                             console.error(`Error fetching options for ${data.source}:`, error);
                             newOptionsMap[data.source] = [];
@@ -204,11 +209,12 @@ function FormGenerator({form, sections, setSections, onCategoriesChange, onSelec
                     }
                 })
             );
+    
             setOptionsMap(newOptionsMap);
         }
-
+    
         fetchOptions();
-    }, [form])
+    }, [form, profanity]);
 
     return form.map((data, index) => {
         if(data.hidden === true){
@@ -329,10 +335,10 @@ export function CategoryPage(props) {
         const authorRequirements = page.form.fields.find(item => item.label === "Author");
         const created = new Date().toJSON();
 
-        const listOutput = {id:created, author:props.username, details:[
-            {label:"Author", value:props.username, hidden:authorRequirements.hidden, filter:authorRequirements.filter},
+        const listOutput = {id:created, author:props.user.username, details:[
+            {label:"Author", value:props.user.username, hidden:authorRequirements.hidden, filter:authorRequirements.filter},
             {label:"created", hidden:true, filter:false, value:created}]};
-        const bioOutput = {id:created, infoCard:{cardData:[{label:"Author", value:props.username}], created: created, modified:created}};
+        const bioOutput = {id:created, infoCard:{cardData:[{label:"Author", value:props.user.username}], created: created, modified:created}};
 
         const findSuperSelect = page.form.fields.find(item => item.type === "super-select");
         if(findSuperSelect){
@@ -397,7 +403,7 @@ export function CategoryPage(props) {
                 }
                 else{       
                     if(requirements.addPath === true){
-                        fileName = sanitizeId(`${value}_${props.username}`);
+                        fileName = sanitizeId(`${value}_${props.user.username}`);
                         filePath = `${filePath}${fileName}`
                         data.path = filePath;
                     }
@@ -506,31 +512,49 @@ export function CategoryPage(props) {
     
         fetchData(); // Call the async function
     }, [path]);
+    const [profanity, setProfanity] = useState(true);
+    
     useEffect(() => {
-        let newFilter = new FilterOptions();
-        list.forEach((card) => {
-            if(!Array.isArray(card.details)){
-                return;
+        async function fetchProfanitySetting() {
+            try {
+                const res = await fetch('/api/user/prof', { method: 'GET' });
+                const data = await res.json(); // Ensure it's parsed correctly
+                setProfanity(data.profanityFilter);
+            } catch {
+                setProfanity(true);
             }
-            card.details.forEach((detail) => {
-                if(( detail.filter !== false) 
-                    && detail.label && detail.value){
-                    newFilter.addOption(detail.label, detail.value);
-                }
-            })
-        })
-       const filterTemp = ([]);
-       newFilter.filters.forEach((filter) =>{
-        const options = ([]);
-        filter.values.forEach((value) => {
-            options.push({label:`${value}`, value:`${value}`});
-        })
-        filterTemp.push({attribute:`${filter.attribute}`, value:options});
-       })
-        setFilters(filterTemp);
-        
+        }
 
-    }, [list])
+        fetchProfanitySetting();
+    }, []);
+    useEffect(() => {
+        async function applyProfanityFilter() {
+            let newFilter = new FilterOptions();
+    
+            for (const card of list) {
+                if (!Array.isArray(card.details)) {
+                    continue;
+                }
+    
+                for (const detail of card.details) {
+                    if (detail.filter !== false && detail.label && detail.value) {
+                        const cleanedLabel = await filterProfanity(detail.label, profanity);
+                        newFilter.addOption(cleanedLabel, detail.value);
+                    }
+                }
+            }
+    
+            const filterTemp = newFilter.filters.map(filter => ({
+                attribute: filter.attribute,
+                value: filter.values.map(value => ({ label: value, value }))
+            }));
+    
+            setFilters(filterTemp);
+        }
+    
+        applyProfanityFilter();
+    }, [list, profanity]);
+    
     if(loading){
         <main>
              <p>Loading</p>
@@ -557,7 +581,7 @@ export function CategoryPage(props) {
                         </OffcanvasHeader>
                         <OffcanvasBody className="new">
                             <form onSubmit={handleSubmit} className="form-container">
-                                <FormGenerator form={page.form.fields} sections={sections} setSections={setSections} onCategoriesChange={onCategoriesChange} onSelectionChange={onSelectionChange}/>
+                                <FormGenerator form={page.form.fields} sections={sections} setSections={setSections} onCategoriesChange={onCategoriesChange} onSelectionChange={onSelectionChange} profanity={profanity}/>
                                 <div className="btn-group">
                                     <button className="btn btn-primary" type="submit">Create</button>
                                     <button onClick={handleClose} type="button" className="btn btn-secondary cancel" data-bs-dismiss="offcanvas" aria-label="Close">Cancel</button>

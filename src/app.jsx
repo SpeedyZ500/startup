@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './app.css';
@@ -60,9 +60,32 @@ const worldbuildingCategories = [
 
 
 export default function App() {
-    const [username, setUsername] = React.useState(localStorage.getItem('username') || '');
-    const currentAuthState = username ? AuthState.Authenticated : AuthState.Unauthenticated;
+    const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")) || {});
+    
+    const currentAuthState = user ? AuthState.Authenticated : AuthState.Unauthenticated;
     const [authState, setAuthState] = React.useState(currentAuthState);
+
+    
+
+    useEffect(() => {
+        async function fetchUser() {
+            try {
+                const res = await fetch('/api/user/me', { credentials: 'include' }); 
+                if (res.status === 401) {
+                    console.warn("User not authenticated.");
+                    return null; // 
+                }
+                const data = await res.json();
+                localStorage.setItem("user", JSON.stringify(data));
+                onAuthChange(data, AuthState.Authenticated)
+            } catch (error) {
+                console.error("Error fetching user:", error);
+                return null;
+            }
+        }        
+        fetchUser();
+    }, []);
+
 
     const [show, setShow] = useState(false);
 
@@ -70,13 +93,25 @@ export default function App() {
     const handleHide = () => setShow(false);
  
     const handleShow = () => setShow(true);
-    const onAuthChange= (username, authState) => {
+    const onAuthChange= (user, authState) => {
         setAuthState(authState);
-        setUsername(username);
+        setUser(user);
     }
     function logout(){
-        localStorage.removeItem('username');
-        onAuthChange(username, AuthState.Unauthenticated);
+        localStorage.removeItem('user');
+        onAuthChange(user, AuthState.Unauthenticated);
+    }
+    function logout(){
+        fetch(`/api/auth/logout`, {
+            method: 'delete',
+          })
+            .catch(() => {
+              // Logout failed. Assuming offline
+            })
+            .finally(() => {
+                onAuthChange(user, AuthState.Unauthenticated);
+                props.onLogout();
+            });
     }
  
   return (
@@ -95,8 +130,8 @@ export default function App() {
                                 </NavLink>
                             </div>
                             <Routes>
-                                <Route path='/*' element={< BaseNav authState={authState} username={username} logout={logout}/>}/>
-                                <Route path='/worldbuilding/*' element={<WorldNav authState={authState} username={username} logout={logout}/>} />
+                                <Route path='/*' element={< BaseNav authState={authState} user={user} logout={logout}/>}/>
+                                <Route path='/worldbuilding/*' element={<WorldNav authState={authState} user={user} logout={logout}/>} />
                                 <Route path='/login' element={<></>} />
 
                             </Routes>
@@ -149,7 +184,7 @@ export default function App() {
                                                 </form>
                                             </li>
                                             {authState === AuthState.Authenticated &&
-                                                <NavDropdown title={username}>
+                                                <NavDropdown title={user.displayname}>
                                                     <NavDropdown.Item as={NavLink} to="/settings" onClick={handleHide}>settings</NavDropdown.Item>
                                                     <NavDropdown.Item to="" onClick={handleHide}><Button variant="secondary"onClick={() => logout()}>Logout</Button></NavDropdown.Item>
                                                </NavDropdown>
@@ -179,22 +214,32 @@ export default function App() {
                 <Routes>
                     <Route path='/' element={< Home/>} />
                     <Route path='login'> 
-                        <Route path="" element={<Login/>}/>
-                        <Route path="register" element={<Register/>} />
+                        <Route path="" element={<Login
+                            user={user}
+                            onLogin={(loginUser) => {
+                                onAuthChange(loginUser, AuthState.Authenticated);
+                            }}
+                        />}/>
+                        <Route path="register" element={<Register
+                            user={user}
+                            onLogin={(loginUser) => {
+                                onAuthChange(loginUser, AuthState.Authenticated);
+                            }}
+                        />} />
                     </Route>
                     <Route path='about' element={<About />} />
                     <Route path='worldbuilding'>
                         <Route path='' element={<WorldBuilding/>} />
                         {worldbuildingCategories.map((category) => (
                             <Route key={category} path={category}>
-                                <Route path="" element={<CategoryPage authState={authState} username={username}/>} />
-                                <Route path=":id" element={<BioPage />} />
+                                <Route path="" element={<CategoryPage authState={authState} user={user}/>} />
+                                <Route path=":id" element={<BioPage user={user}/>} />
                             </Route>
                         ))}
                         <Route path='*' element={<NotFound/>} />
                     </Route>
                     <Route path='stories'>
-                        <Route path=''element={<CategoryPage authState={authState} username={username} />}/>
+                        <Route path=''element={<CategoryPage authState={authState} user={user} />}/>
                         <Route path=':storyId'>
                             <Route path='' element={<StoryPage/>}/>
                             <Route path=":chapterId"element={<Chapter/>}/>
@@ -202,15 +247,15 @@ export default function App() {
                         </Route>
                     </Route>
 
-                    <Route path='writingprompts' element={<CategoryPage/>} />
+                    <Route path='writingprompts' element={<CategoryPage authState={authState} user={user}/>} />
                     
-                    <Route path='writingadvice' element={<CategoryPage/>} />
+                    <Route path='writingadvice' element={<CategoryPage authState={authState} user={user}/>} />
                     
                     <Route path='characters'>
-                        <Route path=''element={<CategoryPage authState={authState} username={username}/>}/>
-                        <Route path=':id' element={<BioPage authState={authState} username={username}/>}/>
+                        <Route path=''element={<CategoryPage authState={authState} user={user}/>}/>
+                        <Route path=':id' element={<BioPage authState={authState} user={user}/>}/>
                     </Route>
-                    <Route path='settings' element={<Settings username={username}/>} />
+                    <Route path='settings' element={<Settings user={user}/>} />
                     <Route path='*' element={<NotFound/>} />
                     
 

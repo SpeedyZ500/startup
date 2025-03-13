@@ -10,25 +10,20 @@ import { Link, useNavigate} from 'react-router-dom';
 
 
 export function Login(props) {
-    const [username, setUsername] = React.useState(props.username);
+    const [username, setUsername] = React.useState(props.user ? props.user.username : '');
+
     const [password, setPassword] = React.useState('');
     const [displayError, setDisplayError] = React.useState(null);
     const navigate = useNavigate();
 
     function handleLogin() {
         const json = ({username:username, password:password});
-        createAuth('PUT', json, setDisplayError, navigate);
+        createAuth('PUT', json, setDisplayError, navigate, props.onLogin);
     }
 
-    async function loginUser() {
-      localStorage.setItem('username', username);
-      props.onLogin(username);
-    }
+    
   
-    async function createUser() {
-      localStorage.setItem('username', username);
-      props.onLogin(username);
-    }
+    
     return (
         <main className="container-fluid text-center">
             <fieldset className="theme-l adaptive">
@@ -61,7 +56,8 @@ export function Login(props) {
 }
 
 
-async function createAuth(method, json, setDisplayError, navigate){
+async function createAuth(method, json, setDisplayError, navigate, onLogin){
+    
     try{
         const res = await fetch('/api/auth', {
             method: method,
@@ -69,6 +65,10 @@ async function createAuth(method, json, setDisplayError, navigate){
             body: JSON.stringify(json),
         });
         if(res.ok){
+            const user = await res.json();
+            localStorage.setItem('user', JSON.stringify(user));
+            onLogin(user);
+      
             navigate('/');
         }
         else{
@@ -86,11 +86,11 @@ async function createAuth(method, json, setDisplayError, navigate){
         }
     }
     catch (e){
-        setDisplayError(`Error: ${error.message || "Network error"}`);
+        setDisplayError(`Error: ${e.message || "Network error"}`);
     }
 }
 
-export function Register(){
+export function Register(props){
     const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -104,7 +104,7 @@ export function Register(){
     async function handleRegister() {
         if(password === confirm){
             const json = ({email:email, username:username, password:password, displayname:displayname});
-            createAuth('POST', json, setDisplayError, navigate);    
+            createAuth('POST', json, setDisplayError, navigate, props.onLogin);    
         }
     }
 

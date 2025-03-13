@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useState } from "react";
+import React, {Fragment, useEffect, useState, useRef} from "react";
 import { useParams } from "react-router-dom";
 
 import {NavLink } from 'react-router-dom';
@@ -178,21 +178,7 @@ export function BioPage(){
     const [bio, setBio] = useState(null);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
-    async function profanityFilter(){
-        try{
-            const res = await fetch('/api/user/prof', {
-                method: 'GET',
-                
-            });
-            return res.body.profanityFilter;
-        }
-        catch{
-            return true
-        }
-    }
-    const profanity = profanityFilter();
     
-
     useEffect(() => {
         //Get full path
         let path = window.location.pathname;
@@ -225,18 +211,57 @@ export function BioPage(){
         
 
     }, [id]);
+
+    const [cleanBio, setCleanBio] = useState(bio);
+
+    const prevBio = useRef(bio);
+
+    const [profanity, setProfanity] = useState(true);
+
+    useEffect(() => {
+        async function fetchProfanitySetting() {
+            try {
+                const res = await fetch('/api/user/prof', { method: 'GET' });
+                const data = await res.json(); // Ensure it's parsed correctly
+                setProfanity(data.profanityFilter);
+            } catch {
+                setProfanity(true);
+            }
+        }
+
+        fetchProfanitySetting();
+    }, []);
+    const prevProfanity = useRef(profanity);
+
+
+    useEffect(() => {
+        if (prevBio.current === bio && prevProfanity.current === profanity) {
+            return; // No changes, avoid unnecessary updates
+        }
+        prevBio.current = bio;
+        prevProfanity.current = profanity;
+
+        async function cleanData() {
+            const cleaned = await filterProfanity(bio, profanity);
+            setCleanBio(cleaned);
+        }
+
+        cleanData();
+    }, [bio, profanity]);
+    
+
     
     if (loading) return <main><p>Loading...</p></main>;
     if (error) return <main><p style={{color:"red"}}>{error}</p></main>
-    if (!bio || !bio.infoCard || !bio.sections) {
+    if (!cleanBio || !cleanBio.infoCard || !cleanBio.sections) {
         return <p>Error: Missing or invalid data.</p>;
     }
     return(
         <main className="bio">
-            <MemoizedInfoCard {...bio.infoCard} />
+            <MemoizedInfoCard {...cleanBio.infoCard} />
             <div>
                 <h2>Description</h2>
-                <p>{bio.description}</p>
+                <p>{cleanBio.description}</p>
             </div>
             <Accordion width="50%" className="internal-nav">
                 <Accordion.Item eventKey="0">
@@ -247,7 +272,7 @@ export function BioPage(){
                         <nav>
 
                             <menu className="internal-menu">
-                                {BioPage.sections && <MemoizedNavGen data={bio.sections}/>}
+                                {BioPage.sections && <MemoizedNavGen data={cleanBio.sections}/>}
                                 
                             </menu>
                         </nav>
@@ -255,7 +280,7 @@ export function BioPage(){
                 </Accordion.Item>
                         
             </Accordion>
-            {BioPage.sections && <MemoizedSectionsParse data={bio.sections}/>}
+            {BioPage.sections && <MemoizedSectionsParse data={cleanBio.sections}/>}
         </main>
     )
 }

@@ -10,7 +10,7 @@ import Button from 'react-bootstrap/Button';
 
 import NavDropdown from 'react-bootstrap/NavDropdown';
 
-export function BaseNav({userName, authState, logout}) {
+export function BaseNav({user, authState, logout}) {
 
     return (
         <menu className="navbar-nav" id="navbar-desktop">
@@ -56,7 +56,7 @@ export function BaseNav({userName, authState, logout}) {
                     </form>
                 </li>
                 {authState === AuthState.Authenticated &&
-                    <NavDropdown title={userName}>
+                    <NavDropdown title={user.displayname}>
                         <NavDropdown.Item as={NavLink} to="/settings" >settings</NavDropdown.Item>
                         <NavDropdown.Item to="" ><Button variant="secondary"onClick={() => logout()}>Logout</Button></NavDropdown.Item>
                     </NavDropdown>
@@ -107,7 +107,7 @@ export function SubNav(){
 );
 }
 
-export function WorldNav({userName, authState, logout}) {
+export function WorldNav({user, authState, logout}) {
     return (
         
             <menu className="navbar-nav" id="navbar-desktop">
@@ -144,7 +144,7 @@ export function WorldNav({userName, authState, logout}) {
                         </form>
                     </li>
                     {authState === AuthState.Authenticated &&
-                        <NavDropdown title={userName}>
+                        <NavDropdown title={user.displayname}>
                             <NavDropdown.Item as={NavLink} to="/settings" >settings</NavDropdown.Item>
                             <NavDropdown.Item to="" ><Button variant="secondary"onClick={() => logout()}>Logout</Button></NavDropdown.Item>
                         </NavDropdown>
