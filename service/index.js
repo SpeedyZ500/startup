@@ -392,6 +392,9 @@ app.get('/api/characters/:id?', async (req, res) => {
             res.status(404).json({ error: "Character not found" });
         }
     }
+});
+
+app.post('/api/characters/', verifyAuth, async (req, res) => {
 
 });
 
@@ -534,6 +537,34 @@ app.get('/api/worldbuilding/countries/:id?', async (req, res) => {
         }
         else{
             res.status(404).json({ error: "Country not found" });
+        }
+    }
+});
+
+app.get('/api/stories/:storyID?/:chapterID?', async (req, res) => {
+    const {storyID, chapterID} = req.params;
+    if(!storyID){
+        res.send(stories);
+    }
+    else{
+        const story = stories.find(story => story.id === storyID);
+        if(story){
+            if(!chapterID){
+                res.send(story);
+            }
+            else{
+                const chapter = story.chapters.find(chapter => chapter.id === chapterID);
+                if(chapter){
+                    res.send(chapter);
+                }
+                else{
+                    res.status(404).send({ error: "Chapter not found" });
+                }
+            }
+
+        }
+        else{
+            res.status(404).send({ error: "Story not found" });
         }
     }
 });
