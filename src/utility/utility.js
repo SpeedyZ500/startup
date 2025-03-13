@@ -231,46 +231,56 @@ export async function filterProfanity(json, profanityFilterEnabled){
     if(profanityFilterEnabled === false){
         return json
     }
-    if(typeof filteredJson === "string"){
+    
+    // Clone the JSON to avoid modifying the original object
+    if(typeof json === "string"){
         return applyProfFilter(json);
     }
-    // Clone the JSON to avoid modifying the original object
-    const filteredJson = Array.isArray(json) ? [...json] : { ...json };
-    if(Array.isArray(filteredJson)){
-        for (let i = 0; i < filteredJson.length; i++) {
-            if(Array.isArray(filteredJson[i]) || typeof filteredJson[i] === 'object'){
-                filteredJson[i] = await filterProfanity(filteredJson[i], profanityFilterEnabled);
+    if(Array.isArray(json)){
+        return await Promise.all(json.map(async (item) => {
+            if(typeof item === 'string'){
+                return await applyProfFilter(item)
             }
-            else if(typeof filteredJson[i] === 'string'){
-                filteredJson[i] = await applyProfFilter(filteredJson[i])
+            else if(Array.isArray(item) || typeof item === 'object'){
+                return await filterProfanity(item, profanityFilterEnabled);
             }
+            
+            return item;
+        }))
+    }
+    else if(typeof json === 'object'){
+        const filteredJson = {};
+        for(const key in json){
+            if(key === "source" || key === "path" || key === "username" || key === "email"){
+                filteredJson[key] = json[key]
+            }
+            else if(typeof json[key] === 'string'){
+                filteredJson[key] = await applyProfFilter(json[key]);
+            }
+            else if(Array.isArray(json[key]) || typeof json[key] === 'object'){
+                filteredJson[key] = await filterProfanity(json[key], profanityFilterEnabled);
+            }
+        
         }
+        return filteredJson;
     }
     else{
-        for(const key in filteredJson){
-            if(key === "source" || key === "path" || key === "username" || key === "email"){
-                continue;
-            }
-            else if(typeof filteredJson[key] === 'string'){
-                filteredJson[key] = await applyProfFilter(filteredJson[key]);
-            }
-            else if(Array.isArray(filteredJson[key]) || typeof filteredJson[key] === 'object'){
-                filteredJson[key] = await filterProfanity(filteredJson[key], profanityFilterEnabled);
-            }
-        }
+        return applyProfFilter(JSON.stringify(json));
     }
-    return filteredJson;
+    return JSON.stringify(json);
 }
 async function applyProfFilter(text){
     try {
         const response = await fetch(`https://www.purgomalum.com/service/plain?text=${encodeURIComponent(text)}`);
         const data = await response.text();
-        return data.result; // Return the filtered text
+        return data; // Return the filtered text
     } catch (error) {
         console.error("Error filtering text:", error);
         return text; // In case of failure, return the original text
     }
 }
+
+
 
 export {
     sortList,

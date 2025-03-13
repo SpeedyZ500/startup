@@ -19,6 +19,19 @@ const Heading = ({ level, children, ...props }) => {
   };
 
 function generateRows(data){
+    async function profanityFilter(){
+        try{
+            const res = await fetch('/api/user/prof', {
+                method: 'GET',
+                
+            });
+            return res.body.profanityFilter;
+        }
+        catch{
+            return true
+        }
+    }
+    const profanity = profanityFilter();
     return data.map((entry, index) => {
         if (!entry) return null;
         if(Array.isArray(entry.value)){
@@ -178,18 +191,20 @@ export function BioPage(){
     const [bio, setBio] = useState(null);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
-
     async function profanityFilter(){
         try{
             const res = await fetch('/api/user/prof', {
                 method: 'GET',
+                
             });
-            setBio(filterProfanity(bio, res.body.profanityFilter))
+            return res.body.profanityFilter;
         }
         catch{
-
+            return true
         }
     }
+    const profanity = profanityFilter();
+    
 
     useEffect(() => {
         //Get full path
@@ -217,13 +232,13 @@ export function BioPage(){
             
         )
         .finally(() => {
-            profanityFilter();
             setLoading(false);
         });
 
         
 
     }, [id]);
+    
     if (loading) return <main><p>Loading...</p></main>;
     if (error) return <main><p style={{color:"red"}}>{error}</p></main>
     if (!bio || !bio.infoCard || !bio.sections) {
