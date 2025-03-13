@@ -253,9 +253,10 @@ export async function filterProfanity(json, profanityFilterEnabled){
                 if(key.toLowerCase() === "author"){
                     updatedJson[key] = await filterProfanity(await replaceAuthor(json[key]));
                 }
-                else if(["source", "username", "path", "display", "filter", "hidden"].includes(key)){
+                else if(["source", "username", "path", "display", "filter", "hidden", "chapters"].includes(key)){
                     updatedJson[key] = json[key]
                 }
+                
                 else{
                     updatedJson[key] = await filterProfanity(json[key])
                 }

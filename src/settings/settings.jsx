@@ -14,7 +14,7 @@ export function Settings(props) {
     const [oldPassword, setOldPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-    const [filterProf, setFilterProf] = useState(true);
+    const [filterProf, setFilterProf] = useState(props.user.profanityFilter || true);
     useEffect(() => {
         //will update the user's Profanity filter properties
         
@@ -52,7 +52,7 @@ export function Settings(props) {
 
                 </form>
                 <div className="form-check form-switch">
-                    <input className="form-check-input" type="checkbox" role="switch" id="profanityFilter" value={filterProf} onChange={(e) => setFilterProf(e.target.value)}/>
+                    <input className="form-check-input" type="checkbox" role="switch" id="profanityFilter" checked={filterProf} onChange={(e) => setFilterProf(e.target.checked)}/>
                     <label htmlFor="ProfanityFilter">Profanity Filter</label>
                     </div>
                 

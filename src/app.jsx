@@ -103,7 +103,7 @@ export default function App() {
     }
     function logout(){
         fetch(`/api/auth/logout`, {
-            method: 'delete',
+            method: 'DELETE',
           })
             .catch(() => {
               // Logout failed. Assuming offline
@@ -112,6 +112,12 @@ export default function App() {
                 onAuthChange(user, AuthState.Unauthenticated);
                 props.onLogout();
             });
+    }
+    function updateProfanityFilter(profanityFilter){
+        user.profanityFilter = profanityFilter;
+        fetch(`/api/user/settings`, {
+            method: 'PUT'
+        })
     }
  
   return (

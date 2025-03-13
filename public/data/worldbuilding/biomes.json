@@ -25,17 +25,17 @@
             {
                 "label":"World",
                 "type":"multi-select",
-                "source":"./data/worldbuilding/worlds"
+                "source":"/api/worldbuilding/worlds"
             },
             {
                 "label":"Wildlife",
                 "type":"multi-select",
-                "source":"./data/worldbuilding/wildlife"
+                "source":"/api/worldbuilding/wildlife"
             },
             {
                 "label":"Abilities",
                 "type":"multi-select",
-                "source":"./data/worldbuilding/flora"
+                "source":"/api/worldbuilding/flora"
             },
             {
                 "label":"Full",

@@ -47,35 +47,35 @@
             {
                 "label":"World",
                 "type":"select",
-                "source":"./data/worldbuilding/worlds",
+                "source":"/api/worldbuilding/worlds",
                 "onCard":true,
                 "inList":true
             },
             {
                 "label":"Race",
                 "type":"select",
-                "source":"./data/worldbuilding/races",
+                "source":"/api/worldbuilding/races",
                 "onCard":true,
                 "inList":true
             },
             {
                 "label":"Abilities",
                 "type":"multi-select",
-                "source":"./data/worldbuilding/magicsystems",
+                "source":"/api/worldbuilding/magicsystems",
                 "onCard":true,
                 "inList":false
             },
             {
                 "label":"Enemies",
                 "type":"multi-select",
-                "source":"./data/characters",
+                "source":"/api/characters",
                 "onCard":true,
                 "inList":false
             },
             {
                 "label":"Allies",
                 "type":"multi-select",
-                "source":"./data/characters",
+                "source":"/api/characters",
                 "onCard":true,
                 "inList":false
             },
@@ -83,7 +83,7 @@
                 "label":"Family",
                 "type":"super-select",
                 "categoryLabel":"Relation",
-                "source":"./data/characters",
+                "source":"/api/characters",
                 "onCard":true,
                 "inList":false
             },
