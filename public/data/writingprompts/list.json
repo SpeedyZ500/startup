@@ -4,6 +4,8 @@
         "details":[
             {
                 "label":"Author",
+                "display":false,
+
                 "value":"Spencer Zaugg"
             }
         ],
@@ -14,6 +16,7 @@
         "details":[
             {
                 "label":"Author",
+                "display":false,
                 "value":"Spencer Zaugg"
             }
         ],
@@ -24,6 +27,8 @@
         "details":[
             {
                 "label":"Author",
+                "display":false,
+
                 "value":"Spencer Zaugg"
             }
         ],

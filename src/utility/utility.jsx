@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import React, {Fragment, useMemo, useCallback, useEffect, useState} from 'react';
+import React, {Fragment, useMemo, useCallback, useEffect, useState, useRef} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Card from 'react-bootstrap/Card';
 import "../app.css"
@@ -29,7 +29,6 @@ function renderItem(item, cardId){
                     <Popover id={`popover-${cardId}-${item.label}`}>
                         <Popover.Header as="h4">{item.label}:</Popover.Header>
                         <Popover.Body>
-                            <Fragment>
                                 {item.value.map((detail, subIndex) => (
                                     <Fragment key={subIndex}>
                                         {typeof detail == "object" && detail.label ? (
@@ -44,7 +43,6 @@ function renderItem(item, cardId){
                                         {subIndex < item.value.length - 1 && <span>, </span>}
                                     </Fragment>
                                 ))}
-                            </Fragment>
                         </Popover.Body>
                     </Popover>
                 }
@@ -63,121 +61,23 @@ function renderItem(item, cardId){
         }
     }
     else{
-        if(item.label === "Author"){
-            return  <AuthorDisplay item = {item}/>
-        }
-        else{
-            return <span>{item.label}: {item.value}</span>
-        }
+        
+        return <span>{item.label}: {item.value}</span>
+        
     }
 }
-export function AuthorDisplay({ item }) {
-    const [authorContent, setAuthorContent] = useState(null);
-    const [loading, setLoading] = useState(true); // Loading state
-    const [error, setError] = useState(null); // Error state
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const content = await displayAuthor(item); // Get the content from the async function
-                setAuthorContent(content); // Set content if found
-            } catch (err) {
-                setError('User not found or error occurred'); // Set error message
-            } finally {
-                setLoading(false); // Always stop loading after the async operation
-            }
-        };
-
-        fetchData();
-    }, [item]); // Run this effect whenever 'item' changes
-
-    // Loading state
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-
-    // Error state
-    if (error) {
-        return <div>{error}</div>; // Display error message if something went wrong
-    }
-
-    // Render author content if found
-    return <div>{authorContent}</div>;
-}
-
-
-
-export async function displayAuthor(info){
-    async function profanityFilter(){
-        try{
-            const res = await fetch('/api/user/prof', {
-                method: 'GET',
-            });
-            return res.body.profanityFilter;
-        }
-        catch{
-            return true
-        }
-    }
-    const profanity = await profanityFilter();
-
-    const filtercard = async (filter) => {
-        return await filterProfanity(filter, profanity);
-    }
-    try{
-        const res = await fetch('/api/user/any', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username: info.value }) // Sending username in the request body
-        });
-        const data = await res.json();
-        if(data.displayname){
-            const filtered = await filtercard(data);
-
-            return <span>{info.label}: {filtered.displayname}</span>;
-
-
-        }
-        else{
-            const filtered = await filtercard(info);
-            return <span>{info.label}: {filtered.value}</span>
-        }
-    }
-    catch (error) {
-        const filtered = await filtercard(info);
-        return <span>{info.label}: {filtered.value}</span>;
-    };
-}
 
 function renderCard(cards){
-    async function profanityFilter(){
-        try{
-            const res = await fetch('/api/user/prof', {
-                method: 'GET',
-            });
-            return res.body.profanityFilter;
-        }
-        catch{
-            return true
-        }
-    }
-    const profanity = profanityFilter();
-
-    const filtercard = (filter) => {
-        return filterProfanity(filter, profanity).then((filtered) => {
-            return filtered;
-        });
-    }
-   
-    const filteredCards = filtercard(cards);
+    
+    
 
 
 
     
     return (
         cards.map((card, index) => {
+        
 
             if(!Array.isArray(card.details)){
                 return;
@@ -227,10 +127,50 @@ export function CardsRenderer({cards, filters, sort}){
     //const currSort = useEffect(() => console.log(JSON.stringify(sort)), [sort]);
     
     
-    const filteredAndSorted = useMemo(() => filterAndSort(cards, filters, sort), [cards, filters, sort], );
-    const renderCards = useMemo(() => renderCard(filteredAndSorted), [filteredAndSorted]);
+    const filteredAndSorted = useMemo(() => filterAndSort(cards, filters, sort), [cards, filters, sort]);
     
+    const [profanity, setProfanity] = useState(true);
+    const [cleanCards, setCleanCards] = useState(filteredAndSorted);
 
+    const prevFilteredAndSorted = useRef(filteredAndSorted);
+    const prevProfanity = useRef(profanity);
+
+
+    useEffect(() => {
+        async function fetchProfanitySetting() {
+            try {
+                const res = await fetch('/api/user/prof', { method: 'GET' });
+                const data = await res.json(); // Ensure it's parsed correctly
+                setProfanity(data.profanityFilter);
+            } catch {
+                setProfanity(true);
+            }
+        }
+
+        fetchProfanitySetting();
+    }, []);
+
+    useEffect(() => {
+        if (prevFilteredAndSorted.current === filteredAndSorted && prevProfanity.current === profanity) {
+            return; // No changes, avoid unnecessary updates
+        }
+        prevFilteredAndSorted.current = filteredAndSorted;
+        prevProfanity.current = profanity;
+
+        async function cleanData() {
+            const cleaned = await filterProfanity(filteredAndSorted, profanity);
+            setCleanCards(cleaned);
+        }
+
+        cleanData();
+    }, [filteredAndSorted, profanity]);
+      
+
+    const renderCards = useMemo(() => renderCard(cleanCards), [cleanCards]);
+    
+    useEffect(() => {
+        console.log("CardsRenderer re-rendered");
+    }, [cleanCards, renderCards]);
     return(
         <div className="card-columns my-container scrollable" data-bs-spy="scroll">
             {renderCards}

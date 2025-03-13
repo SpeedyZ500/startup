@@ -228,47 +228,75 @@ function filterAndSort(list, filter, sort){
 }
 
 export async function filterProfanity(json, profanityFilterEnabled){
-    if(profanityFilterEnabled === false){
-        return json
+    // Always seek out and replace author/label first, before filtering for profanity
+    if (typeof json === "object") {
+        const updatedJson = await replaceAuthor(json); // Replace author/label before profanity filtering
+        if (profanityFilterEnabled === false) {
+            return updatedJson;
+        }
+        
+        // If profanity filtering is enabled, proceed to apply it
+        return await applyProfanityToJson(updatedJson);
     }
-    
-    // Clone the JSON to avoid modifying the original object
-    if(typeof json === "string"){
+
+    // If it's a simple string, apply profanity filter immediately
+    if (typeof json === "string") {
         return applyProfFilter(json);
     }
-    if(Array.isArray(json)){
-        return await Promise.all(json.map(async (item) => {
-            if(typeof item === 'string'){
-                return await applyProfFilter(item)
-            }
-            else if(Array.isArray(item) || typeof item === 'object'){
-                return await filterProfanity(item, profanityFilterEnabled);
-            }
-            
-            return item;
-        }))
-    }
-    else if(typeof json === 'object'){
-        const filteredJson = {};
-        for(const key in json){
-            if(key === "source" || key === "path" || key === "username" || key === "email"){
-                filteredJson[key] = json[key]
-            }
-            else if(typeof json[key] === 'string'){
-                filteredJson[key] = await applyProfFilter(json[key]);
-            }
-            else if(Array.isArray(json[key]) || typeof json[key] === 'object'){
-                filteredJson[key] = await filterProfanity(json[key], profanityFilterEnabled);
-            }
-        
-        }
-        return filteredJson;
-    }
-    else{
-        return applyProfFilter(JSON.stringify(json));
-    }
-    return JSON.stringify(json);
+
+    return json;
 }
+
+async function replaceAuthor(json) {
+    // If the object contains label "Author" or "author", replace the value
+    if ((json.hasOwnProperty("label") && (json.label === "Author" || json.label === "author")) || json.hasOwnProperty("author") || json.hasOwnProperty("Author")) {
+        const username = json.value || json.author; // Assuming the username is stored in value or author
+        const res = await fetch(`/api/user/any?username=${encodeURIComponent(username)}`, {
+            method: `GET`,
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        json.value = data.displayname; // Replace the value with the display name
+
+    }
+
+    // If the JSON is an array or an object, recurse into it
+    if (Array.isArray(json)) {
+        await Promise.all(json.map(async (item, idx) => {
+            json[idx] = await replaceAuthor(item); // Recurse into array items
+        }));
+    } else if (typeof json === 'object') {
+        for (const key in json) {
+            if (json.hasOwnProperty(key)) {
+                json[key] = await replaceAuthor(json[key]); // Recurse into object keys
+            }
+        }
+    }
+    
+    return json;
+}
+
+async function applyProfanityToJson(json) {
+    // Clone the JSON to avoid modifying the original object
+    const filteredJson = Array.isArray(json) ? [] : {};
+
+    for (const key in json) {
+        if (json.hasOwnProperty(key)) {
+            if (typeof json[key] === 'string') {
+                filteredJson[key] = await applyProfFilter(json[key]); // Apply profanity filter for strings
+            } else if (Array.isArray(json[key]) || typeof json[key] === 'object') {
+                filteredJson[key] = await applyProfanityToJson(json[key]); // Recurse for nested objects/arrays
+            } else {
+                filteredJson[key] = json[key]; // Keep other types as is
+            }
+        }
+    }
+
+    return filteredJson;
+}
+
+
+
 async function applyProfFilter(text){
     try {
         const response = await fetch(`https://www.purgomalum.com/service/plain?text=${encodeURIComponent(text)}`);

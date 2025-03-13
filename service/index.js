@@ -286,14 +286,12 @@ app.get(`/api/auth`, async (req, res) => {
     }
 })
 app.get('/api/user/any', async (req, res) => {
-    const username = req.body.username
+    const username = req.query.username
     const user = await getUser('username', username);
-    if(user){
-        res.send({displayname:user.displayname});
-    }
-    else{
-        res.status(404).send({displayname:username, msg: 'User not found'});
-    }
+    res.send({
+        displayname: user ? user.displayname : username,
+
+    })
 
 });
 // getMe

@@ -19,19 +19,6 @@ const Heading = ({ level, children, ...props }) => {
   };
 
 function generateRows(data){
-    async function profanityFilter(){
-        try{
-            const res = await fetch('/api/user/prof', {
-                method: 'GET',
-                
-            });
-            return res.body.profanityFilter;
-        }
-        catch{
-            return true
-        }
-    }
-    const profanity = profanityFilter();
     return data.map((entry, index) => {
         if (!entry) return null;
         if(Array.isArray(entry.value)){
