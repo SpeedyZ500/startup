@@ -231,6 +231,9 @@ export async function filterProfanity(json, profanityFilterEnabled){
     if(profanityFilterEnabled === false){
         return json
     }
+    if(typeof filteredJson === "string"){
+        return applyProfFilter(json);
+    }
     // Clone the JSON to avoid modifying the original object
     const filteredJson = Array.isArray(json) ? [...json] : { ...json };
     if(Array.isArray(filteredJson)){
