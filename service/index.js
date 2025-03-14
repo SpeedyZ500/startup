@@ -13,7 +13,9 @@ const authCookieName = 'token';
 
 let users = [];
 let races = [];
-let worlds = [];
+let worlds = [
+    
+];
 let characters = [
     {
         "id":1,
@@ -103,58 +105,126 @@ let biomes = [];
 let magicsystems = [];
 let organizations = [];
 let stories = [
-    [
-        {
-            "name":"The Moonlit Alchemist",
-            "id":1,
-            "details":[
-                {
-                    "label":"name",
-                    "value":"The Moonlit Alchemist",
-                    "path":"/stories/the_moonlit_alchemist_spencer_zaugg",
-                    "location":"head",
-                    "filter":false
-                },
-                {
-                    "label":"author",
-                    "value":"Spencer Zaugg"
-                },
-                {
-                    "label":"Genre",
-                    "value":[
-                        "Example",
-                        "Fantasy"
-                    ],
-                    "location":"footer"
-                },
-                {
-                    "label":"Content Warnings",
-                    "value":[
-                        "Fallen Universe"
-                    ],
-                    "location":"footer"
-    
-                },
-                {
-                    "label":"created",
-                    "value":"2025-02-23T20:10:43.930Z",
-                    "display":false,
-                    "filter":false
-                },
-                {
-                    "label":"expanded",
-                    "value":"2025-02-23T20:10:43.930Z",
-                    "display":false,
-                    "filter":false
-                }
-            ],
-    
-            "description":"The story of a mysterious Alchemist who's alchemy is enhanced by moonlight, displaced from his world"
-        }
-    ]
+    {
+        "name":"The Moonlit Alchemist",
+        "id":1,
+        "details":[
+            {
+                "label":"name",
+                "value":"The Moonlit Alchemist",
+                "path":"/stories/the_moonlit_alchemist_spencer_zaugg",
+                "location":"head",
+                "filter":false
+            },
+            {
+                "label":"author",
+                "value":"Spencer Zaugg"
+            },
+            {
+                "label":"Genre",
+                "value":[
+                    "Example",
+                    "Fantasy"
+                ],
+                "location":"footer"
+            },
+            {
+                "label":"Content Warnings",
+                "value":[
+                    "Fallen Universe"
+                ],
+                "location":"footer"
+
+            },
+            {
+                "label":"created",
+                "value":"2025-02-23T20:10:43.930Z",
+                "display":false,
+                "filter":false
+            },
+            {
+                "label":"expanded",
+                "value":"2025-02-23T20:10:43.930Z",
+                "display":false,
+                "filter":false
+            }
+        ],
+
+        "description":"The story of a mysterious Alchemist who's alchemy is enhanced by moonlight, displaced from his world"
+    }
 ];
-let writingadvice = [];
-let writingprompts = [];
+let writingadvice = [
+    {
+        "description": "It doesn't matter what it is you write, just start writing, getting ideas on a page is more important than if it looks good.",
+        "details":[
+            {
+                "label":"Author",
+                "value":"Spencer Zaugg",
+                "display":false
+            }
+        ],
+        "id":"1"
+    },
+    {
+        "description": "Write down random questions",
+        "details":[
+            {
+                "label":"Author",
+                "value":"Spencer Zaugg",
+                "display":false
+            }
+        ],
+        "id":"2"
+    },
+    {
+        "description": "Write down story ideas, and character concepts.",
+        "details":[
+            {
+                "label":"Author",
+                "value":"Spencer Zaugg",
+                "display":false
+            }
+        ],
+        "id":"3"
+    }
+];
+let writingprompts = [
+    {
+        "description": "What if werewoves were real, but they aren't around today because they colonized the moon?",
+        "details":[
+            {
+                "label":"Author",
+                "display":false,
+
+                "value":"Spencer Zaugg"
+            }
+        ],
+        "id":"1"
+    },
+    {
+        "description": "What if I was actually good at writing?",
+        "details":[
+            {
+                "label":"Author",
+                "display":false,
+                "value":"Spencer Zaugg"
+            }
+        ],
+        "id":"2"
+    },
+    {
+        "description": "What if I was actually good at programming?",
+        "details":[
+            {
+                "label":"Author",
+                "display":false,
+
+                "value":"Spencer Zaugg"
+            }
+        ],
+        "id":"3"
+    }
+];
 let wildlife = [];
 let flora = [];
 let countries = [];
@@ -342,7 +412,31 @@ let characterBios =[
     }
 ]
 let raceBios = [];
-let worldBios = [];
+let worldBios = [
+    {
+        "id":"the_void_spencer_zaugg",
+        "infoCard":{
+            "name":"The Void",
+            "cardData":[
+                {
+                    "label":"Author",
+                    "value":"Spencer Zaugg"
+                }
+            ],
+            "created":"2025-02-20T21:56:41Z",
+            "modified":"2025-02-20T21:56:41Z"
+    
+        },
+        "description":"The World Between Worlds",
+        "sections":[
+            {
+                "section":"Please be Patient",
+                "text":"I haven't finished it yet this is a test"
+            }
+        ]
+    
+    }
+];
 let floraBios = []
 let magicsystemBios = [];
 let organizationBios = [];
@@ -394,25 +488,19 @@ app.get('/api/characters/:id?', async (req, res) => {
     }
 });
 
-app.post('/api/characters/', verifyAuth, async (req, res) => {
 
+
+app.get('/api/writingadvice/', async (_req, res) => {
+    res.send(writingadvice);
 });
 
-app.get('/api/writingadvice/', async (req, res) => {
-    res.send(writingadvice)
-});
 
-app.post('/api/writingadvice/', verifyAuth, async (req, res) => {
-    res.send(writingadvice)
-});
 
-app.get('/api/writingprompts/', async (req, res) => {
+app.get('/api/writingprompts/', async (_req, res) => {
     res.send(writingprompts)
 });
 
-app.post('/api/writingprompts/', verifyAuth, async (req, res) => {
-    res.send(writingprompts)
-});
+
 
 app.get('/api/worldbuilding/races/:id?', async (req, res) => {
     const { id } = req.params;
@@ -541,6 +629,7 @@ app.get('/api/worldbuilding/countries/:id?', async (req, res) => {
     }
 });
 
+
 app.get('/api/stories/:storyID?/:chapterID?', async (req, res) => {
     const {storyID, chapterID} = req.params;
     if(!storyID){
@@ -568,6 +657,7 @@ app.get('/api/stories/:storyID?/:chapterID?', async (req, res) => {
         }
     }
 });
+
 
 //registration
 app.post('/api/auth', async (req, res) => {
@@ -637,30 +727,37 @@ const verifyAuth = async (req, res, next) => {
     }
   };
 app.get('/api/user/any', async (req, res) => {
-    const username = req.query.username
-    const user = await getUser('username', username);
-    res.send({
-        displayname: user ? user.displayname : username,
-
-    })
+    try{
+        const username = req.query.username
+        const user = await getUser('username', username);
+        if(user){
+            res.send({displayname:user.displayname});
+        }
+        else{
+            res.send({displayname:username});
+        }
+    }
+    catch(error){
+        res.send({displayname:username});
+    }
 });
 // getMe
-app.get('/api/user/me', verifyAuth, async (req, res) => {
+app.get('/api/user/me', async (req, res) => {
     const token = req.cookies[authCookieName];
     const user = await getUser('token', token);
     if (user){
-        res.send({email:user.email, username:user.username, displayname:user.displayname});
+        res.send({email:user.email, username:user.username, displayname:user.displayname, profanityFilter:user.profanityFilter});
     }
     else{
-        res.status(401).send({msg: 'Unauthorized'});
+        res.status(401).send({msg:"Not Logged in"});
     }
 });
-app.put('/api/user/prof', verifyAuth, async(req, res) => {
+app.put('/api/user/prof', async(req, res) => {
     try {
         const token = req.cookies[authCookieName];
         const user = await getUser('token', token);
 
-        const { profanityFilter } = req.body;
+        const profanityFilter  = req.body.profanityFilter;
 
         // Ensure profanityFilter is a boolean
         if (typeof profanityFilter !== 'boolean') {
@@ -670,14 +767,14 @@ app.put('/api/user/prof', verifyAuth, async(req, res) => {
         // Update user settings in memory (replace with MongoDB update later)
         user.profanityFilter = profanityFilter;
         await updateUser(user); // Replace with actual DB update logic when using MongoDB
-
-        res.send({ msg: 'Profanity filter updated', profanityFilter });
+        res.send({email:user.email, username:user.username, displayname:user.displayname, profanityFilter:user.profanityFilter});
+    
     } catch (error) {
         console.error('Error updating profanity filter:', error);
         res.status(500).send({ msg: 'Internal server error' });
     }
 });
-app.get('/api/user/prof', async(req, res) => {
+app.get('/api/user/prof',  async(req, res) => {
     const token = req.cookies[authCookieName];
     const user = await getUser('token', token);
     if (user){

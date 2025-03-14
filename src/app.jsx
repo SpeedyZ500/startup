@@ -67,24 +67,39 @@ export default function App() {
 
     
 
-    useEffect(() => {
-        async function fetchUser() {
-            try {
-                const res = await fetch('/api/user/me', { credentials: 'include' }); 
-                if (res.status === 401) {
-                    console.warn("User not authenticated.");
-                    return null; // 
-                }
-                const data = await res.json();
-                localStorage.setItem("user", JSON.stringify(data));
-                onAuthChange(data, AuthState.Authenticated)
-            } catch (error) {
-                console.error("Error fetching user:", error);
-                return null;
-            }
-        }        
-        fetchUser();
-    }, []);
+    // useEffect(() => {
+    //     async function fetchUser() {
+    //         try {
+    //             const res = await fetch('/api/user/me', { credentials: 'include' }); 
+    //             if (res.status === 401) {
+    //                 console.warn("User not authenticated.");
+    //                 localStorage.removeItem("user");
+    //                 setUser(null);
+    //                 setAuthState(AuthState.Unauthenticated);
+    //                 return;
+    //             }
+    //             else if(res.ok){
+    //                 const data = await res.json();
+    //                 localStorage.setItem("user", JSON.stringify(data));
+    //                 onAuthChange(data, AuthState.Authenticated)
+    //             }
+    //             else{
+    //                 console.error(`Failed to fetch user. Status: ${res.status}`);
+    //                 setError(`Failed to load user data. Status: ${res.status}`);
+    //             }
+
+                
+                
+    //         } catch (error) {
+    //             console.error("Error fetching user:", error);
+    //             setAuthState(AuthState.Unauthenticated);
+    //             setUser(null);
+
+    //             return null;
+    //         }
+    //     }        
+    //     fetchUser();
+    // }, []);
 
 
     const [show, setShow] = useState(false);
@@ -113,11 +128,9 @@ export default function App() {
                 props.onLogout();
             });
     }
-    function updateProfanityFilter(profanityFilter){
-        user.profanityFilter = profanityFilter;
-        fetch(`/api/user/settings`, {
-            method: 'PUT'
-        })
+    function updateProfanityFilter(updateUser){
+        localStorage.setItem("user", updateUser);
+        setUser(updateUser);
     }
  
   return (
@@ -164,7 +177,7 @@ export default function App() {
                                                 <NavLink className="nav-link" onClick={handleHide} to="/characters">Characters</NavLink>
                                             </li>
                                             <NavDropdown title="World Building" id="collapsible-nav-dropdown">
-                                                <NavDropdown.Item><NavLink onClick={handleHide} className="dropdown-item" to="/worldbuilding/">Overview</NavLink></NavDropdown.Item>
+                                                <NavDropdown.Item><NavLink onClick={handleHide} className="dropdown-item" to="/worldbuilding">Overview</NavLink></NavDropdown.Item>
                                                 <NavDropdown.Divider/>
                                                 <NavDropdown.Item><NavLink onClick={handleHide} className="dropdown-item" to="/worldbuilding/magicsystems">Magic Systems</NavLink></NavDropdown.Item>
                                                 <NavDropdown.Item><NavLink onClick={handleHide} className="dropdown-item" to="/worldbuilding/races">Races</NavLink></NavDropdown.Item>
@@ -261,7 +274,7 @@ export default function App() {
                         <Route path=''element={<CategoryPage authState={authState} user={user}/>}/>
                         <Route path=':id' element={<BioPage authState={authState} user={user}/>}/>
                     </Route>
-                    <Route path='settings' element={<Settings user={user}/>} />
+                    <Route path='settings' element={<Settings user={user} onFilterUpdate={(updateUser) => updateProfanityFilter(updateUser)}/>} />
                     <Route path='*' element={<NotFound/>} />
                     
 

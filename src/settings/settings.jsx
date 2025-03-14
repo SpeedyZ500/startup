@@ -17,6 +17,22 @@ export function Settings(props) {
     const [filterProf, setFilterProf] = useState(props.user.profanityFilter || true);
     useEffect(() => {
         //will update the user's Profanity filter properties
+        '/api/user/prof'
+        async function updateProf(){
+            const res = await fetch('/api/auth', {
+                method: method,
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({profanityFilter:filterProf}),
+            });
+            if(res.ok){
+                const data = await res.json(); 
+                props.onFilterUpdate(data)
+            }
+            
+
+        }
+        
+        
         
     },[filterProf])
     const handleSubmit = (e) => {

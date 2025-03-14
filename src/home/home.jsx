@@ -20,25 +20,17 @@ export function Home() {
 
     
     useEffect(() => {
-        fetchStoriesList()
-            .then((data => {
-                const storedData = JSON.parse(localStorage.getItem('stories/list') ?? '[]');
-                data.push(...storedData);
-                setStories(data);
-                setError(null);
-        }))
+        fetch('/api/stories', {
+            method:"GET",             
+            headers: {'Content-Type': 'application/json'},
+        }).then((res) => res.json()).then((data) => setStories(data))
         
-        .catch((err) => setError(err.message))
-        fetchListByPath('./data/writingprompts').then((data => {
-            const storedData = JSON.parse(localStorage.getItem('writingprompts/list') ?? '[]');
-            data.push(...storedData);
-
-            setPrompts(data);
-            setError(null);
-        }))
-        .catch((err) => setError(err.message))
-        .finally(() => setLoading(false));
-    }, [path])
+        .catch((err) => setError(err.message));
+        fetch('/api/writingprompts/', {
+            method:"GET",             
+            headers: {'Content-Type': 'application/json'},
+        }).then((res) => res.json()).then((data) => setPrompts(data));
+    }, [])
     return (
     <main>
         <h1 className="page-title theme-h adaptive expanded">Home</h1>

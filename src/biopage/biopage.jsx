@@ -222,7 +222,7 @@ export function BioPage(){
         async function fetchProfanitySetting() {
             try {
                 const res = await fetch('/api/user/prof', { method: 'GET' });
-                const data = await res.json(); // Ensure it's parsed correctly
+                const data = await res.json(); 
                 setProfanity(data.profanityFilter);
             } catch {
                 setProfanity(true);

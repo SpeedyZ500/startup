@@ -191,17 +191,24 @@ function FormGenerator({form, sections, setSections, onCategoriesChange, onSelec
                 form.map(async (data) => {
                     if (data.source && ["select", "multi-select", "creatable", "super-select"].includes(data.type)) {
                         try {
-                            const optionsList = await fetchListByPath(data.source);
-                            newOptionsMap[data.source] = await Promise.all(
-                                optionsList.map(async (item) => {
-                                    const option = item.details.find(detail => detail.label === "name");
-                                    const filteredLabel = await filterProfanity(option.value, profanity);
-    
-                                    return !option.path
-                                        ? { value: { value: option.value }, label: filteredLabel }
-                                        : { value: { value: option.value, path: option.path }, label: filteredLabel };
-                                })
-                            );
+                            const listData = await fetch(`/auth${data.source}`, {
+                                method:"GET",             
+                                headers: {'Content-Type': 'application/json'},
+                            });
+                            if(listData.ok){
+                                const optionsList = await listData.json()
+                                newOptionsMap[data.source] = await Promise.all(
+                                    optionsList.map(async (item) => {
+                                        const option = item.details.find(detail => detail.label === "name");
+                                        const filteredLabel = await filterProfanity(option.value, profanity);
+        
+                                        return !option.path
+                                            ? { value: { value: option.value }, label: filteredLabel }
+                                            : { value: { value: option.value, path: option.path }, label: filteredLabel };
+                                    })
+                                );
+                            }
+                            
                         } catch (error) {
                             console.error(`Error fetching options for ${data.source}:`, error);
                             newOptionsMap[data.source] = [];
@@ -489,25 +496,28 @@ export function CategoryPage(props) {
     
         // Use async function to handle multiple async calls sequentially
         const fetchData = async () => {
+            setLoading(true);
             try {
                 // Fetch the page data
                 const pageData = await fetchJSONByPath(`${jsonPath}.json`);
                 setPage(pageData);
-                setSortOptions(pageData.sort[0]);
+                setSortOptions(pageData.sort?.[0] || null);
                 setError(null);
-    
-                // Fetch list data
-                const listData = await fetchListByPath(jsonPath);
-                const storedData = JSON.parse(localStorage.getItem(`${paths}/list`) ?? '[]');
-                listData.push(...storedData); // Merge fetched data with localStorage data
-                setList(listData);
-                setError(null);
-    
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false); // Make sure loading state is reset
             }
+            catch (err){
+                setError(`Page Data Error: ${err.message}`);
+
+            }
+            fetch(`/api${paths}`)
+            .then((response) => response.json())
+            .then((data) => {
+                setList(data);
+                setError(null);
+            }).catch ((err) => {
+                setError(err.message);
+            }).finally (() => {
+                setLoading(false); // Make sure loading state is reset
+            })
         };
     
         fetchData(); // Call the async function
