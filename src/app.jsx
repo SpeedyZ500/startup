@@ -97,18 +97,13 @@ export default function App() {
     
     function logout(){
         fetch(`/api/auth/logout`, {
-            method: 'delete',
+            method: 'DELETE',
           })
-            .catch(() => {
-              // Logout failed. Assuming offline
-            })
-            .finally(() => {
-                onAuthChange(user, AuthState.Unauthenticated);
-                props.onLogout();
-            });
+          onAuthChange(user, AuthState.Unauthenticated);
+
     }
     function updateProfanityFilter(updateUser){
-        localStorage.setItem("user", updateUser);
+        localStorage.setItem("user", JSON.stringify(updateUser));
         setUser(updateUser);
     }
  
@@ -253,7 +248,7 @@ export default function App() {
                         <Route path=''element={<CategoryPage authState={authState} user={user}/>}/>
                         <Route path=':id' element={<BioPage authState={authState} user={user}/>}/>
                     </Route>
-                    <Route path='settings' element={<Settings user={user} onFilterUpdate={(updateUser) => updateProfanityFilter(updateUser)}/>} />
+                    <Route path='settings' element={<Settings user={user} onFilterUpdate={ updateProfanityFilter}/>} />
                     <Route path='*' element={<NotFound/>} />
                     
 

@@ -139,7 +139,7 @@ export function CardsRenderer({cards, filters, sort}){
     useEffect(() => {
         async function fetchProfanitySetting() {
             try {
-                const res = await fetch('/api/user/prof', { method: 'GET' });
+                const res = await fetch('/api/user/prof', { method: 'GET', credentials:'include'} );
                 const data = await res.json(); // Ensure it's parsed correctly
                 setProfanity(data.profanityFilter);
             } catch {

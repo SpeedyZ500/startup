@@ -17,7 +17,7 @@ export function Chapter() {
         }
         const jsonPath = `/data${path}.json`
         console.log("Fetching from:", jsonPath);
-        fetchJSONByPath(jsonPath).then((data) => {
+        fetch(`/auth/fetch${path}`).then((data) => {
             setChapter(data);
             setError(null);
         }).catch((err) => {

@@ -3,6 +3,8 @@ const bcrypt = require('bcryptjs');
 const uuid = require('uuid');
 const express = require('express');
 const app = express();
+const authCookieName = 'token';
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -16,7 +18,6 @@ const port = process.argv.length > 2 ? process.argv[2] : 4000;
 
 
 
-const authCookieName = 'token';
 
 // Middleware to verify that the user is authorized to call an endpoint
 const verifyAuth = async (req, res, next) => {
@@ -608,17 +609,20 @@ function createAdvice(description, author, created){
     return advice;
     
 }
+
 apiRouter.post('/writingadvice', verifyAuth, (req, res) => {
     const description = req.body.description;
     const author = req.body.author;
     const created = new Date().toJSON();
     const advice = createAdvice(description, author,created )
-    return advice;
+    res.status(201).send(advice);
 });
-
+function getResourcebyId(resource, id){
+    return resource.find(item => item.id === id);
+}
 apiRouter.post('/writingprompts', verifyAuth, (req, res) => {
     try{
-        const description = req.body.description;
+        const description = req.body.Description;
         if (!description){
             return res.status(400).json({ error: 'text is required' });
 
@@ -640,7 +644,7 @@ apiRouter.post('/writingprompts', verifyAuth, (req, res) => {
             }
         ]}
         writingprompts.push(output)
-        res.status(201).send(JSON.stringify(output));
+        res.status(201).json(JSON.stringify(output));
     }
     catch(err){
         console.error("Error handling writing prompt submission:", err);
@@ -854,7 +858,7 @@ apiRouter.put('/auth/login', async (req, res) => {
         res.send({email:user.email, username:user.username, displayname:user.displayname, profanityFilter:user.profanityFilter});
     }
     else{
-        req.status(401).send({msg: 'Unauthorized'});
+        res.status(401).send({msg: 'Unauthorized'});
     }
 });
 
@@ -879,6 +883,11 @@ apiRouter.get(`/auth`, async (req, res) => {
     }
 })
 
+const fs = require('fs');
+const path = require('path');
+
+
+  
 
 apiRouter.get('/user/any', async (req, res) => {
     try{
@@ -897,7 +906,6 @@ apiRouter.get('/user/any', async (req, res) => {
 });
 // getMe
 apiRouter.get('/user/me', async (req, res) => {
-        try{
             const token = req.cookies[authCookieName];
         if(token){
             const user = await getUser('token', token);
@@ -910,11 +918,6 @@ apiRouter.get('/user/me', async (req, res) => {
         else {
         res.status(401).send({ msg: 'Unauthorized' });
         }
-    }
-    catch(error){
-        res.status(401).send({ msg: 'Unauthorized' });
-
-    }
   });
 apiRouter.put('/user/prof', async(req, res) => {
     try {
@@ -938,6 +941,64 @@ apiRouter.put('/user/prof', async(req, res) => {
         res.status(500).send({ msg: 'Internal server error' });
     }
 });
+apiRouter.put('/user/pass', verifyAuth, async(req, res) => {
+    try {
+        const { oldPassword, newPassword, confirmPassword } = req.body;
+        if (!oldPassword || !newPassword || !confirmPassword) {
+            return res.status(400).send({ msg: 'All password fields are required' });
+        }
+        if (newPassword !== confirmPassword) {
+            return res.status(400).send({ msg: 'New password and confirmation do not match' });
+        }
+
+        if (oldPassword === newPassword) {
+            return res.status(400).send({ msg: 'New password cannot be the same as the old password' });
+        }
+
+        const token = req.cookies[authCookieName];
+        const user = await getUser('token', token);
+        
+        if (user && (await bcrypt.compare(req.body.oldPassword, user.password))){
+            // Update user settings in memory (replace with MongoDB update later)
+            
+            user.password = await bcrypt.hash(req.body.newPassword, 10);
+            await updateUser(user); // Replace with actual DB update logic when using MongoDB
+            res.send({msg:"User successfully updated "});
+        }
+        else{
+            res.status(401).send({msg: "Password is incorrect"})
+        }
+
+    } catch (error) {
+        console.error('Error updating password:', error);
+        res.status(500).send({ msg: 'Internal server error' });
+    }
+});
+
+apiRouter.put('/user/displayname', verifyAuth, async (req, res) =>{
+    try {
+        const token = req.cookies[authCookieName];
+        const user = await getUser('token', token);
+
+        const displayname  = req.body.displayname;
+
+        // Ensure profanityFilter is a boolean
+        if (typeof displayname !== 'string') {
+            return res.status(400).send({ msg: 'Invalid input' });
+        }
+
+
+        // Update user settings in memory (replace with MongoDB update later)
+        user.displayname = displayname;
+        await updateUser(user); // Replace with actual DB update logic when using MongoDB
+        res.send({email:user.email, username:user.username, displayname:user.displayname, profanityFilter:user.profanityFilter});
+    
+    } catch (error) {
+        console.error('Error updating display name:', error);
+        res.status(500).send({ msg: 'Internal server error' });
+    }
+});
+
 apiRouter.get('/user/prof',  async(req, res) => {
     const token = req.cookies[authCookieName];
     const user = await getUser('token', token);
@@ -948,9 +1009,8 @@ apiRouter.get('/user/prof',  async(req, res) => {
         res.send({profanityFilter:true});
     }
 })
-// apiRouter.put('/user/setting/prof', async(req, res) => {
 
-// })
+ 
 app.listen(port, function () {
   console.log(`Listening on port ${port}`);
 });
@@ -988,7 +1048,7 @@ function setAuthCookie(res, user){
     res.cookie('token', user.token, {
         secure: false,
         httpOnly: true,
-        sameSite: 'strict',
+        sameSite: 'Strict',
     });
 }
 

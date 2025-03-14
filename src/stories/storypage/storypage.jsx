@@ -12,7 +12,7 @@ import { OffcanvasBody, OffcanvasHeader } from 'react-bootstrap';
 import "../../app.css"
 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {sanitizeId, fetchJSONByPath, fetchListByPath, formatJSONDate} from'../../utility/utility.js';
+import {sanitizeId, formatJSONDate} from'../../utility/utility.js';
 
 const NavLinkNode = ({ data, id }) => {
     return (

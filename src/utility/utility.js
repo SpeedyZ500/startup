@@ -9,62 +9,6 @@ function sanitizeId(id){
         .replace(/[^\w-]/g, "");
 }
 
-async function fetchJSONByPath(path){
-    try{
-        const response = await fetch(path);
-        if(!response.ok){
-            throw new Error(`HTTP error! status: ${response.status}`);
-
-        }
-        const contentType = response.headers.get("content-type");
-        if (!contentType || !contentType.includes("application/json")) {
-            throw new Error(`Expected JSON but got ${contentType} page not found: ${path}`);
-        }
-        return await response.json();
-    }
-    catch (error){
-        console.error("Error fetching JSON from path:", path, error);
-        throw error;
-    }
-}
-
-
-
-function fetchStoriesList(){
-    return fetchJSONByPath("/data/stories/list.json");
-}
-
-
-async function fetchListByPath(path){
-    try{
-        return await fetchJSONByPath(`${path}/list.json`);
-    }
-    catch(error){
-        throw new Error(`Unable to fetch list from: ${path}: ${error.message}`)
-    }
-}
-
-function fetchChapterList(story, author){
-    const serialized = serializedId(`${story}_${author}`);
-    return fetchListByPath(`/data/stories/${serialized}`);
-}
-
- function fetchChapter(story, storyAuthor, id, title){
-    const serializedStory = serializedId(`${story}_${storyAuthor}`);
-    const serializedChapter = serializedId(`${id}_${title}`);
-    return fetchJSONByPath(`/data/stories/${serializedStory}/${serializedChapter}.json`);
-
-}
-
-
-async function loadBioDetail(path){
-    try {
-        return await fetchJSONByPath(path);
-    } catch(error){
-        console.error(`Unable to load bio details from ${path}: ${error.message}`);
-        throw error;
-    }
-}
 
 
 function filterList(list, filters){
@@ -305,10 +249,5 @@ export {
     genFilter,
     filterItem,
     filterList,
-    fetchChapter,
-    fetchChapterList,
-    fetchListByPath,
-    fetchStoriesList,
-    fetchJSONByPath,
     sanitizeId
 };

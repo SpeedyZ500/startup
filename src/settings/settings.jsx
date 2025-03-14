@@ -15,26 +15,29 @@ export function Settings(props) {
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [filterProf, setFilterProf] = useState(props.user.profanityFilter || true);
-    useEffect(() => {
-        //will update the user's Profanity filter properties
-        '/api/user/prof'
-        async function updateProf(){
-            const res = await fetch('/api/auth', {
-                method: method,
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({profanityFilter:filterProf}),
+    const handleProfanityToggle = async (e) => {
+        const newFilterState = e.target.checked; // Get updated value
+    
+        setFilterProf(newFilterState); // Update local state immediately
+    
+        try {
+            const res = await fetch('/api/user/prof', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ profanityFilter: newFilterState }),
             });
-            if(res.ok){
-                const data = await res.json(); 
-                props.onFilterUpdate(data)
+    
+            if (res.ok) {
+                const data = await res.json();
+                props.onFilterUpdate(data); // Update parent component state if needed
+            } else {
+                console.error("Failed to update profanity filter:", res.statusText);
             }
-            
-
+        } catch (err) {
+            console.error("Error updating profanity filter:", err);
         }
-        
-        
-        
-    },[filterProf])
+    };
+    
     const handleSubmit = (e) => {
         e.preventDefault();
         setSavedName(displayName)
@@ -68,9 +71,9 @@ export function Settings(props) {
 
                 </form>
                 <div className="form-check form-switch">
-                    <input className="form-check-input" type="checkbox" role="switch" id="profanityFilter" checked={filterProf} onChange={(e) => setFilterProf(e.target.checked)}/>
-                    <label htmlFor="ProfanityFilter">Profanity Filter</label>
-                    </div>
+                    <input className="form-check-input" type="checkbox" role="switch" id="profanityFilter" checked={filterProf} onChange={handleProfanityToggle}/>
+                    <label htmlFor="profanityFilter">Profanity Filter</label>
+                </div>
                 
                 <hr />
                 <h6 className="theme-h adaptive" >Reset Password</h6>

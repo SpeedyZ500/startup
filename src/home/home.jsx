@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
 import { useState, useEffect, Fragment } from 'react';
 import { CardsRenderer } from '../utility/utility.jsx';
-import { fetchStoriesList, fetchListByPath, SortOptions, FilterOptions} from '../utility/utility';
+import { SortOptions, FilterOptions} from '../utility/utility';
 
 import Button from 'react-bootstrap/Button';
 

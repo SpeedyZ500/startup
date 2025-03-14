@@ -10,7 +10,7 @@ import "./biopage.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import Accordion from 'react-bootstrap/Accordion';
-import {sanitizeId, fetchJSONByPath, formatJSONDate, filterProfanity} from'../utility/utility.js';
+import {sanitizeId, formatJSONDate, filterProfanity} from'../utility/utility.js';
 
 
 const Heading = ({ level, children, ...props }) => {
@@ -185,11 +185,10 @@ export function BioPage(){
         if(!path.startsWith("/")){
             path = "/" + path;
         }
-        const jsonPath = `/data${path}.json`
-        console.log("Fetching from:", jsonPath);
-        fetchJSONByPath(jsonPath).then((data) => {
-            setBio(data);
-            setError(null);
+            
+        fetch(`/auth${data.source}`, {
+            method:"GET",             
+            headers: {'Content-Type': 'application/json'},
         })
         .catch((err) => {
             console.warn("Fetch failed, checking local storage:", err.message);
@@ -221,7 +220,7 @@ export function BioPage(){
     useEffect(() => {
         async function fetchProfanitySetting() {
             try {
-                const res = await fetch('/api/user/prof', { method: 'GET' });
+                const res = await fetch('/api/user/prof', { method: 'GET',  });
                 const data = await res.json(); 
                 setProfanity(data.profanityFilter);
             } catch {

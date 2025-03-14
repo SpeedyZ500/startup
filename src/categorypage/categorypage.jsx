@@ -5,7 +5,7 @@ import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { OffcanvasBody, OffcanvasHeader } from 'react-bootstrap';
 import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
-import {genFilter, updateFilter, sortList, SortOptions, fetchListByPath, FilterOptions, fetchJSONByPath, FilterItem, sanitizeId, filterProfanity} from '../utility/utility.js'
+import {genFilter, updateFilter, sortList, SortOptions, FilterOptions, FilterItem, sanitizeId, filterProfanity} from '../utility/utility.js'
 import {CardsRenderer} from '../utility/utility.jsx'
 import Select from 'react-select'
 import Creatable from 'react-select/creatable';
@@ -335,7 +335,7 @@ export function CategoryPage(props) {
     const [selections, onSelectionChange] = useState([]);
     const handleSubmit = async (event) =>{
 
-        //event.preventDefault();
+        event.preventDefault();
         const formData = new FormData(event.target);
         const dataToSend = {author:props.user.username};
         formData.forEach((value, key) => {
@@ -374,23 +374,25 @@ export function CategoryPage(props) {
         
         selections.forEach(selection => {dataToSend[selection.label] = selection.value})
         console.log(paths);
-        await fetch(`/api${paths}`, {
+        console.log((dataToSend))
+       
+        try {
+
+            const response =  await fetch(`/api${paths}`, {
             method:"POST",
             headers: {"content-type": "application/json"},
             body: JSON.stringify(dataToSend),
         });
-        // try {
-        //     const response = 
 
-        //     if (!response.ok) {
-        //         throw new Error(`Failed to submit data: ${response.statusText}`);
-        //     }
+            if (!response.ok) {
+                throw new Error(`Failed to submit data: ${response.statusText}`);
+            }
 
-        //     const responseData = await response.json();
-        //     console.log("Data submitted successfully:", responseData);
-        // } catch (err) {
-        //     console.error("Error submitting data:", err);
-        // }
+            const responseData = await response.json();
+            console.log("Data submitted successfully:", responseData);
+        } catch (err) {
+            console.error("Error submitting data:", err);
+        }
     }
          
     const handleClose = () => setVisibility(false);
@@ -430,7 +432,13 @@ export function CategoryPage(props) {
             setLoading(true);
             try {
                 // Fetch the page data
-                const pageData = await fetchJSONByPath(`${jsonPath}.json`);
+                const res = await fetch(`${jsonPath}.json`);
+                if(!res.ok){
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+
+                }
+                const pageData = await res.json();
+                console.log(JSON.stringify(pageData));
                 setPage(pageData);
                 setSortOptions(pageData.sort?.[0] || null);
                 setError(null);
