@@ -107,7 +107,7 @@ let organizations = [];
 let stories = [
     {
         "name":"The Moonlit Alchemist",
-        "id":1,
+        "id":"the_moonlit_alchemist_spencer_zaugg",
         "details":[
             {
                 "label":"name",
@@ -149,8 +149,76 @@ let stories = [
                 "filter":false
             }
         ],
+        "info":[
+            {
+                "label":"Genre",
+                "value":[
+                    "Example",
+                    "Fantasy"
+                ],
+            },
+            {
+                "label":"Content Warnings",
+                "value":[
+                    "Fallen Universe"
+                ]
+            }
+        ],
 
-        "description":"The story of a mysterious Alchemist who's alchemy is enhanced by moonlight, displaced from his world"
+        "description":"The story of a mysterious Alchemist who's alchemy is enhanced by moonlight, displaced from his world",
+        "chapters":[
+            {
+                "chapterId":1,
+                "chapterNumber":1,
+                "title":"The End and a Beginning",
+                "contentwarning":[
+                    "Fallen Universe"
+                ],
+                "genre":[
+                    "Example",
+                    "Fantasy"
+                ],
+                "author":"Spencer Zaugg",
+                "previous":[],
+                "branches": [2,3],
+                "path":"/stories/the_moonlit_alchemist_spencer_zaugg/1_the_end_and_a_beginning_spencer_zaugg",
+                "content":"The beginning"
+            },
+            {
+                "chapterId":2,
+                "chapterNumber":2,
+                "title":"Seeking a New Home",
+                "contentwarning":[
+                    "Fallen Universe"
+                ],
+                "genre":[
+                    "Example",
+                    "Fantasy"
+                ],
+                "author":"Spencer Zaugg",
+                "previous":[1],
+                "branches": [],
+                "path":"/stories/the_moonlit_alchemist_spencer_zaugg/2_seeking_a_new_home",
+                "content":"The beginning"
+            },
+            {
+                "chapterId":3,
+                "chapterNumber":2,
+                "title":"A new Friend",
+                "contentwarning":[
+                    "Fallen Universe"
+                ],
+                "genre":[
+                    "Example",
+                    "Fantasy"
+                ],
+                "author":"Spencer Zaugg",
+                "previous":[1],
+                "branches": [],
+                "path":"/stories/the_moonlit_alchemist_spencer_zaugg/3_a_new_friend",
+                "content":"The beginning"
+            }
+        ]
     }
 ];
 let writingadvice = [

@@ -39,9 +39,9 @@ const CustomNode = ({data}) => {
 }
 const generateGraph = (chapters) => {
     const nodes = chapters.map((chapter) => ({
-      id: chapter.id.toString(),
+      id: chapter.chapterId.toString(),
       type:"custom",
-      position: { x: chapter.chapterId * 200, y: chapter.chapterNumber * 100 },
+      position: { x: chapter.chapterId * 200, y: (chapter.chapterNumber - 1) * 100 },
       data: { label: `${chapter.chapterNumber}: ${chapter.title}`, path: chapter.path },
     }));
   
@@ -159,34 +159,18 @@ export function StoryPage(props) {
         if(!paths.startsWith("/")){
             paths = "/" + paths;
         }
-        const jsonPath = `/data${paths}.json`
-        console.log("Fetching from:", jsonPath);
-        fetchJSONByPath(jsonPath).then((data) => {
-            setStory(data);
-            setError(null);
-        })
-        .catch((err) => {
-            console.warn("Fetch failed, checking local storage:", err.message);
-            const localData = localStorage.getItem(`${paths}`);
-            if (localData){
-                setStory(JSON.parse(localData));
-                setError(null)
-            }
-            else{
-                setError(err.message)
-            }
-        }
-            
-        )
-        fetchListByPath(`/data${paths}`).then((data => {
-            const storedData = JSON.parse(localStorage.getItem(`${paths}/list`) ?? '[]');
-            data.push(...storedData);
-            setList(data);
-            setChaptersError(null);
-
-        }))
-        .catch((err) => setChaptersError(err.message))
-        .finally(() => setLoading(false));
+        
+        fetch(`/api${paths}`)
+            .then((response) => response.json())
+            .then((data) => {
+                setStory(data);
+                setList(data.chapters);
+                setError(null);
+            }).catch ((err) => {
+                setError(err.message);
+            }).finally (() => {
+                setLoading(false); // Make sure loading state is reset
+            })
 
     }, [storyId]);
 
@@ -297,19 +281,19 @@ export function StoryPage(props) {
                     </OffcanvasHeader>
                     <OffcanvasBody className="new">
                         <form onSubmit={handleSubmit} className="form-container">
-                            <div className="input-group" key={index}>
+                            <div className="input-group" >
                                 <label className="input-group-text" htmlFor="title">
                                     Title
                                 </label>
                                 <input className="form-control" placeholder="Title" type="text" name="title" required/> 
                             </div>
-                            <div className="input-group" key={index}>
+                            <div className="input-group" >
                                 <label className="input-group-text" htmlFor="genre">
                                     Genres
                                 </label>
                                 <input className="form-control" placeholder="a list of genres separated by semicolons ;" type="text" name="genre"/> 
                             </div>
-                            <div className="input-group" key={index}>
+                            <div className="input-group" >
                                 <label className="input-group-text" htmlFor="contentwarning">
                                     Content Warnings
                                 </label>
