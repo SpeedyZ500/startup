@@ -6,10 +6,29 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
+app.use(express.static('public'));
+
+var apiRouter = express.Router();
+app.use(`/api`, apiRouter);
+
+const port = process.argv.length > 2 ? process.argv[2] : 4000;
+
 
 
 
 const authCookieName = 'token';
+
+// Middleware to verify that the user is authorized to call an endpoint
+const verifyAuth = async (req, res, next) => {
+    const token = req.cookies[authCookieName];
+
+    const user = await getUser('token', token);
+    if (user) {
+      next();
+    } else {
+      res.status(401).send({ msg: 'Unauthorized' });
+    }
+  };
 
 let users = [];
 let races = [];
@@ -228,6 +247,7 @@ let writingadvice = [
             {
                 "label":"Author",
                 "value":"Spencer Zaugg",
+                "filter":false,
                 "display":false
             }
         ],
@@ -239,6 +259,7 @@ let writingadvice = [
             {
                 "label":"Author",
                 "value":"Spencer Zaugg",
+                "filter":false,
                 "display":false
             }
         ],
@@ -250,7 +271,9 @@ let writingadvice = [
             {
                 "label":"Author",
                 "value":"Spencer Zaugg",
+                "filter":false,
                 "display":false
+                
             }
         ],
         "id":"3"
@@ -263,7 +286,7 @@ let writingprompts = [
             {
                 "label":"Author",
                 "display":false,
-
+                "filter":false,
                 "value":"Spencer Zaugg"
             }
         ],
@@ -275,6 +298,7 @@ let writingprompts = [
             {
                 "label":"Author",
                 "display":false,
+                "filter":false,
                 "value":"Spencer Zaugg"
             }
         ],
@@ -519,7 +543,8 @@ async function createUser(email, username, password, displayname) {
         email: email,
         username:username,
         password: passwordHash,
-        profanityFilter:true
+        profanityFilter:true,
+
     };
     if(displayname && displayname !== ''){
         user.displayname = displayname;
@@ -549,7 +574,7 @@ function getCharacter(id){
     }
 
 }
-app.get('/api/characters/:id?', async (req, res) => {
+apiRouter.get('/characters/:id?', async (req, res) => {
     const { id } = req.params;
     if(!id){
         res.send(characters)
@@ -565,26 +590,79 @@ app.get('/api/characters/:id?', async (req, res) => {
         }
     }
 });
+function createAdvice(description, author, created){
+    const advice = {description: description, details:[{
+            label:"Author",
+            value:author,
+            display:false,
+            filter:false
+        },
+        {
+            label:"created",
+            value:created,
+            display:false,
+            filter:false
+        }]
+    }
+    writingadvice.push(advice);
+    return advice;
+    
+}
+apiRouter.post('/writingadvice', verifyAuth, (req, res) => {
+    const description = req.body.description;
+    const author = req.body.author;
+    const created = new Date().toJSON();
+    const advice = createAdvice(description, author,created )
+    return advice;
+});
 
-app.post('/api/writingadvice', verifyAuth, (req, res) => {
+apiRouter.post('/writingprompts', verifyAuth, (req, res) => {
+    try{
+        const description = req.body.description;
+        if (!description){
+            return res.status(400).json({ error: 'text is required' });
 
+        }
+        const author = req.body.author;
+        const created = new Date().toJSON();
+        const output = {description:description, details:[
+            {
+                label:"Author",
+                value:author,
+                display:false,
+                filter:false
+            },
+            {
+                label:"created",
+                value:created,
+                display:false,
+                filter:false
+            }
+        ]}
+        writingprompts.push(output)
+        res.status(201).send(JSON.stringify(output));
+    }
+    catch(err){
+        console.error("Error handling writing prompt submission:", err);
+        res.status(500).send({ error: 'An error occurred while submitting the writing prompt' });
+    }
 })
 
 
 
-app.get('/api/writingadvice/', async (_req, res) => {
+apiRouter.get('/writingadvice', async (_req, res) => {
     res.send(writingadvice);
 });
 
 
 
-app.get('/api/writingprompts/', async (_req, res) => {
+apiRouter.get('/writingprompts', async (_req, res) => {
     res.send(writingprompts)
 });
 
 
 
-app.get('/api/worldbuilding/races/:id?', async (req, res) => {
+apiRouter.get('/worldbuilding/races/:id?', async (req, res) => {
     const { id } = req.params;
     if(!id){
         res.send(races)
@@ -599,7 +677,7 @@ app.get('/api/worldbuilding/races/:id?', async (req, res) => {
         }
     }
 });
-app.get('/api/worldbuilding/worlds/:id?', async (req, res) => {
+apiRouter.get('/worldbuilding/worlds/:id?', async (req, res) => {
     const { id } = req.params;
     if(!id){
         res.send(worlds)
@@ -615,7 +693,7 @@ app.get('/api/worldbuilding/worlds/:id?', async (req, res) => {
     }
 });
 
-app.get('/api/worldbuilding/wildlife/:id?', async (req, res) => {
+apiRouter.get('/worldbuilding/wildlife/:id?', async (req, res) => {
     const { id } = req.params;
     if(!id){
         res.send(wildlife)
@@ -631,7 +709,7 @@ app.get('/api/worldbuilding/wildlife/:id?', async (req, res) => {
     }
 });
 
-app.get('/api/worldbuilding/flora/:id?', async (req, res) => {
+apiRouter.get('/worldbuilding/flora/:id?', async (req, res) => {
     const { id } = req.params;
     if(!id){
         res.send(flora)
@@ -647,7 +725,7 @@ app.get('/api/worldbuilding/flora/:id?', async (req, res) => {
     }
 });
 
-app.get('/api/worldbuilding/magicsystems/:id?', async (req, res) => {
+apiRouter.get('/worldbuilding/magicsystems/:id?', async (req, res) => {
     const { id } = req.params;
     if(!id){
         res.send(magicsystems)
@@ -663,7 +741,7 @@ app.get('/api/worldbuilding/magicsystems/:id?', async (req, res) => {
     }
 });
 
-app.get('/api/worldbuilding/organizations/:id?', async (req, res) => {
+apiRouter.get('/worldbuilding/organizations/:id?', async (req, res) => {
     const { id } = req.params;
     if(!id){
         res.send(organizations)
@@ -679,7 +757,7 @@ app.get('/api/worldbuilding/organizations/:id?', async (req, res) => {
     }
 });
 
-app.get('/api/worldbuilding/biomes/:id?', async (req, res) => {
+apiRouter.get('/worldbuilding/biomes/:id?', async (req, res) => {
     const { id } = req.params;
     if(!id){
         res.send(biomes)
@@ -695,7 +773,7 @@ app.get('/api/worldbuilding/biomes/:id?', async (req, res) => {
     }
 });
 
-app.get('/api/worldbuilding/countries/:id?', async (req, res) => {
+apiRouter.get('/worldbuilding/countries/:id?', async (req, res) => {
     const { id } = req.params;
     if(!id){
         res.send(countries)
@@ -712,7 +790,7 @@ app.get('/api/worldbuilding/countries/:id?', async (req, res) => {
 });
 
 
-app.get('/api/stories/:storyID?/:chapterID?', async (req, res) => {
+apiRouter.get('/stories/:storyID?/:chapterID?', async (req, res) => {
     const {storyID, chapterID} = req.params;
     if(!storyID){
         res.send(stories);
@@ -742,7 +820,7 @@ app.get('/api/stories/:storyID?/:chapterID?', async (req, res) => {
 
 
 //registration
-app.post('/api/auth', async (req, res) => {
+apiRouter.post('/auth/register', async (req, res) => {
     if(await getUser('email', req.body.email)){
         res.status(409).send({msg:"Email already registered to a user"})
     }
@@ -763,14 +841,16 @@ app.post('/api/auth', async (req, res) => {
 });
 
 // login
-app.put('/api/auth', async (req, res) => {
+apiRouter.put('/auth/login', async (req, res) => {
     const identifier = req.body.username;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const isEmail = emailRegex.test(identifier);
 
     const user = await getUser(isEmail ? "email" : "username", identifier);
     if (user && (await bcrypt.compare(req.body.password, user.password))){
-        setAuthCookie(res, user);
+
+        setAuthCookie(res, user);  
+
         res.send({email:user.email, username:user.username, displayname:user.displayname, profanityFilter:user.profanityFilter});
     }
     else{
@@ -779,8 +859,8 @@ app.put('/api/auth', async (req, res) => {
 });
 
 // logout
-app.delete('/api/auth', async (req, res) => {
-    const token = req.cookies['token'];
+apiRouter.delete('/auth/logout', verifyAuth, async (req, res) => {
+    const token = req.cookies[authCookieName];
     const user = await getUser('token', token);
     if(user){
         clearAuthCookie(res, user);
@@ -788,8 +868,8 @@ app.delete('/api/auth', async (req, res) => {
     res.send({});
 });
 
-app.get(`/api/auth`, async (req, res) => {
-    const token = req.cookies['token'];
+apiRouter.get(`/auth`, async (req, res) => {
+    const token = req.cookies[authCookieName];
     const user = await getUser('token', token);
     if(user){
         res.send({authenticated:true});
@@ -799,16 +879,8 @@ app.get(`/api/auth`, async (req, res) => {
     }
 })
 
-// Middleware to verify that the user is authorized to call an endpoint
-const verifyAuth = async (req, res, next) => {
-    const user = await findUser('token', req.cookies[authCookieName]);
-    if (user) {
-      next();
-    } else {
-      res.status(401).send({ msg: 'Unauthorized' });
-    }
-  };
-app.get('/api/user/any', async (req, res) => {
+
+apiRouter.get('/user/any', async (req, res) => {
     try{
         const username = req.query.username
         const user = await getUser('username', username);
@@ -824,17 +896,27 @@ app.get('/api/user/any', async (req, res) => {
     }
 });
 // getMe
-app.get('/api/user/me', async (req, res) => {
-    const token = req.cookies[authCookieName];
-    const user = await getUser('token', token);
-    if (user){
-        res.send({email:user.email, username:user.username, displayname:user.displayname, profanityFilter:user.profanityFilter});
+apiRouter.get('/user/me', async (req, res) => {
+        try{
+            const token = req.cookies[authCookieName];
+        if(token){
+            const user = await getUser('token', token);
+            if (user) {
+                res.send({email:user.email, username:user.username, displayname:user.displayname, profanityFilter:user.profanityFilter});
+            } else {
+            res.status(401).send({ msg: 'Unauthorized' });
+            } 
+        }
+        else {
+        res.status(401).send({ msg: 'Unauthorized' });
+        }
     }
-    else{
-        res.status(401).send({msg:"Not Logged in"});
+    catch(error){
+        res.status(401).send({ msg: 'Unauthorized' });
+
     }
-});
-app.put('/api/user/prof', async(req, res) => {
+  });
+apiRouter.put('/user/prof', async(req, res) => {
     try {
         const token = req.cookies[authCookieName];
         const user = await getUser('token', token);
@@ -856,7 +938,7 @@ app.put('/api/user/prof', async(req, res) => {
         res.status(500).send({ msg: 'Internal server error' });
     }
 });
-app.get('/api/user/prof',  async(req, res) => {
+apiRouter.get('/user/prof',  async(req, res) => {
     const token = req.cookies[authCookieName];
     const user = await getUser('token', token);
     if (user){
@@ -866,10 +948,9 @@ app.get('/api/user/prof',  async(req, res) => {
         res.send({profanityFilter:true});
     }
 })
-// app.put('/api/user/setting/prof', async(req, res) => {
+// apiRouter.put('/user/setting/prof', async(req, res) => {
 
 // })
-const port = 4000;
 app.listen(port, function () {
   console.log(`Listening on port ${port}`);
 });
@@ -888,11 +969,11 @@ async function updateUser(user){
 
 
 
-// app.get('/cookie', (req, res) => {
+// apiRouter.get('/cookie', (req, res) => {
 //     const token = uuid.v4();
 // })
 
-// app.get('*', (req, res) =>{
+// apiRouter.get('*', (req, res) =>{
 //     const token = req.cookies?.token;
 //     if(!token){
 //         return res.status(401).send({msg: 'unauthorized'});
@@ -905,11 +986,15 @@ async function updateUser(user){
 function setAuthCookie(res, user){
     user.token = uuid.v4();
     res.cookie('token', user.token, {
-        secure: true,
+        secure: false,
         httpOnly: true,
         sameSite: 'strict',
     });
 }
+
+apiRouter.use(function (err, req, res, next) {
+    res.status(500).send({ type: err.name, message: err.message });
+  });
 
 function clearAuthCookie(res, user){
     delete user.token;

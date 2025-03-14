@@ -337,7 +337,7 @@ export function CategoryPage(props) {
 
         //event.preventDefault();
         const formData = new FormData(event.target);
-        const dataToSend = {};
+        const dataToSend = {author:props.user.username};
         formData.forEach((value, key) => {
             // Skip fields we don't need to send (like select/multi-select/etc.)
             const requirements = page.form.fields.find(item => item.label === key);
@@ -366,10 +366,6 @@ export function CategoryPage(props) {
             bioOutput[findSuperSelect.label] = superOut;
             
         }
-        const findModified = page.form.fields.find(item => item.label === "modified");
-        if(findModified.inList === true){
-            listOutput.push({label:findModified.label, value:created, hidden:findModified.hidden, filter:findModified.filter})
-        }
         let paths = path;
         if (!paths.startsWith("/")) {
             paths = "/" + paths;
@@ -377,23 +373,24 @@ export function CategoryPage(props) {
         
         
         selections.forEach(selection => {dataToSend[selection.label] = selection.value})
+        console.log(paths);
+        await fetch(`/api${paths}`, {
+            method:"POST",
+            headers: {"content-type": "application/json"},
+            body: JSON.stringify(dataToSend),
+        });
+        // try {
+        //     const response = 
 
-        try {
-            const response = await fetch(`/api${paths}`, {
-                method:"POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify(dataToSend),
-            });
+        //     if (!response.ok) {
+        //         throw new Error(`Failed to submit data: ${response.statusText}`);
+        //     }
 
-            if (!response.ok) {
-                throw new Error(`Failed to submit data: ${response.statusText}`);
-            }
-
-            const responseData = await response.json();
-            console.log("Data submitted successfully:", responseData);
-        } catch (err) {
-            console.error("Error submitting data:", err);
-        }
+        //     const responseData = await response.json();
+        //     console.log("Data submitted successfully:", responseData);
+        // } catch (err) {
+        //     console.error("Error submitting data:", err);
+        // }
     }
          
     const handleClose = () => setVisibility(false);

@@ -18,7 +18,7 @@ export function Login(props) {
 
     function handleLogin() {
         const json = ({username:username, password:password});
-        createAuth('PUT', json, setDisplayError, navigate, props.onLogin);
+        createAuth('PUT', json, "login", setDisplayError, navigate, props.onLogin);
     }
 
     
@@ -56,10 +56,10 @@ export function Login(props) {
 }
 
 
-async function createAuth(method, json, setDisplayError, navigate, onLogin){
+async function createAuth(method, json, path, setDisplayError, navigate, onLogin){
     
     try{
-        const res = await fetch('/api/auth', {
+        const res = await fetch(`/api/auth/${path}`, {
             method: method,
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(json),
@@ -104,7 +104,7 @@ export function Register(props){
     async function handleRegister() {
         if(password === confirm){
             const json = ({email:email, username:username, password:password, displayname:displayname});
-            createAuth('POST', json, setDisplayError, navigate, props.onLogin);    
+            createAuth('POST', json, "register", setDisplayError, navigate, props.onLogin);    
         }
     }
 

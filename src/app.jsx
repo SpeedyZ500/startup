@@ -67,39 +67,21 @@ export default function App() {
 
     
 
-    // useEffect(() => {
-    //     async function fetchUser() {
-    //         try {
-    //             const res = await fetch('/api/user/me', { credentials: 'include' }); 
-    //             if (res.status === 401) {
-    //                 console.warn("User not authenticated.");
-    //                 localStorage.removeItem("user");
-    //                 setUser(null);
-    //                 setAuthState(AuthState.Unauthenticated);
-    //                 return;
-    //             }
-    //             else if(res.ok){
-    //                 const data = await res.json();
-    //                 localStorage.setItem("user", JSON.stringify(data));
-    //                 onAuthChange(data, AuthState.Authenticated)
-    //             }
-    //             else{
-    //                 console.error(`Failed to fetch user. Status: ${res.status}`);
-    //                 setError(`Failed to load user data. Status: ${res.status}`);
-    //             }
-
-                
-                
-    //         } catch (error) {
-    //             console.error("Error fetching user:", error);
-    //             setAuthState(AuthState.Unauthenticated);
-    //             setUser(null);
-
-    //             return null;
-    //         }
-    //     }        
-    //     fetchUser();
-    // }, []);
+    // React.useEffect(() => {
+    //     (async () => {
+    //       const res = await fetch('api/user/me', {credentials:'include'});
+    //       if(res.status === 401){
+    //         localStorage.removeItem("user");
+    //         onAuthChange(user, AuthState.Unauthenticated)
+    //       }
+    //       else if (res.ok) {
+    //         const data = await res.json();
+    //         setUser(data);
+    //         localStorage.setItem("user", JSON.stringify(data));
+    //         setAuthState(AuthState.Authenticated);
+    //       }
+    //     })();
+    //   }, []);
 
 
     const [show, setShow] = useState(false);
@@ -112,13 +94,10 @@ export default function App() {
         setAuthState(authState);
         setUser(user);
     }
-    function logout(){
-        localStorage.removeItem('user');
-        onAuthChange(user, AuthState.Unauthenticated);
-    }
+    
     function logout(){
         fetch(`/api/auth/logout`, {
-            method: 'DELETE',
+            method: 'delete',
           })
             .catch(() => {
               // Logout failed. Assuming offline
