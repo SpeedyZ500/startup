@@ -539,14 +539,24 @@ function getUser(field, value){
     }
     return null;
 }
+function getCharacter(id){
+    const character = characterBios.find(char => char.id === id);
+    if(character){
+        return character
+    }
+    else{
+        return null
+    }
 
+}
 app.get('/api/characters/:id?', async (req, res) => {
     const { id } = req.params;
     if(!id){
         res.send(characters)
+
     }
     else{
-        const character = characterBios.find(char => char.id === id);
+        const character = getCharacter(id)
         if(character){
             res.send({character});
         }
@@ -555,6 +565,10 @@ app.get('/api/characters/:id?', async (req, res) => {
         }
     }
 });
+
+app.post('/api/writingadvice', verifyAuth, (req, res) => {
+
+})
 
 
 

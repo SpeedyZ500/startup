@@ -334,132 +334,66 @@ export function CategoryPage(props) {
     const [visible, setVisibility] = useState(false);
     const [selections, onSelectionChange] = useState([]);
     const handleSubmit = async (event) =>{
+
         //event.preventDefault();
         const formData = new FormData(event.target);
-        
-        const keys = formData.keys();
-        
-        const authorRequirements = page.form.fields.find(item => item.label === "Author");
-        const created = new Date().toJSON();
+        const dataToSend = {};
+        formData.forEach((value, key) => {
+            // Skip fields we don't need to send (like select/multi-select/etc.)
+            const requirements = page.form.fields.find(item => item.label === key);
+            if (["select", "multi-select", "creatable", "super-select"].includes(requirements.type)) {
+                return;
+            }
+    
+            // Add only the raw value to the data object, using the form field key as the label
+            dataToSend[key] = requirements.split
+                ? value.split(requirements.split).map(item => item.trim()).filter(item => item !== '')
+                : value;
+        });
 
-        const listOutput = {id:created, author:props.user.username, details:[
-            {label:"Author", value:props.user.username, hidden:authorRequirements.hidden, filter:authorRequirements.filter},
-            {label:"created", hidden:true, filter:false, value:created}]};
-        const bioOutput = {id:created, infoCard:{cardData:[{label:"Author", value:props.user.username}], created: created, modified:created}};
+        if (page.form.fields.some(item => item.type === "section-adder")) {
+            dataToSend.sections = sections;
+        }        
 
+        
         const findSuperSelect = page.form.fields.find(item => item.type === "super-select");
         if(findSuperSelect){
             const superOut = {label:findSuperSelect.label, type:findSuperSelect.type, source:findSuperSelect.source, value:[]}
             superOut.value = categories.map(item => {
                 return {label:item.label, value:item.selections}
             });
-            if(findSuperSelect.onCard === true){
-                bioOutput.infoCard.cardData.push(superOut);
-            }
-            else{
-                bioOutput[findSuperSelect.label] = superOut;
-            }
-            if(findSuperSelect.inList === true){
-                listOutput.push(superOut);
-            }
+            
+            bioOutput[findSuperSelect.label] = superOut;
+            
         }
         const findModified = page.form.fields.find(item => item.label === "modified");
         if(findModified.inList === true){
             listOutput.push({label:findModified.label, value:created, hidden:findModified.hidden, filter:findModified.filter})
         }
-        const findAddPath = page.form.fields.find(item => item.addPath === true);
-        let fileName =  null;
-        let filePath = `${path}/`;
-        const findSectionAdder = page.form.fields.find(item => item.type === "section-adder");
+        let paths = path;
+        if (!paths.startsWith("/")) {
+            paths = "/" + paths;
+        }        
         
-        if(findSectionAdder){
-            bioOutput.sections= sections;
+        
+        selections.forEach(selection => {dataToSend[selection.label] = selection.value})
+
+        try {
+            const response = await fetch(`/api${paths}`, {
+                method:"POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(dataToSend),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to submit data: ${response.statusText}`);
+            }
+
+            const responseData = await response.json();
+            console.log("Data submitted successfully:", responseData);
+        } catch (err) {
+            console.error("Error submitting data:", err);
         }
-        formData.forEach((value, key) => {
-            const requirements = page.form.fields.find(item => item.label === key);
-            const data = {label: key,
-                type:requirements.type,
-                location:requirements.location, 
-                filter:requirements.filter,
-                hidden:requirements.hidden,
-            }
-            if(["select", "multi-select", "creatable", "super-select"].includes(requirements.type)){
-                return;
-            }
-        
-            data.value = requirements.split ? 
-            value.split(requirements.split).map(item => item.trim()).filter(item => item !== ''):value;
-            
-            if(page.form.createBioPage !== false){
-                if(requirements.onCard === true){
-                    if(location === "head"){
-                        bioOutput.infoCard[key] = value;
-                    }
-                    bioOutput.infoCard.cardData.push(data);
-                }
-                else if(requirements.location === "body"){
-                    bioOutput[key] = value;
-                }
-                else{
-                    bioOutput[key] = data;
-                }
-            }
-            if(requirements.inList === true){
-                if(requirements.location === "body"){
-                    listOutput[key] = value;
-                }
-                else{       
-                    if(requirements.addPath === true){
-                        fileName = sanitizeId(`${value}_${props.user.username}`);
-                        filePath = `${filePath}${fileName}`
-                        data.path = filePath;
-                    }
-                    listOutput.details.push(data);
-                }
-
-            }
-        });
-        selections.forEach(selection => {
-            const requirements = page.form.fields.find(item => item.label === selection.label);
-            const data = {label: selection.label,
-                type:requirements.type,
-                location:requirements.location, 
-                filter:requirements.filter,
-                hidden:requirements.hidden,
-                source:requirements.source,
-                value:selection.value
-            }
-            if(page.form.createBioPage !== false){
-                if(requirements.onCard === true){
-                    bioOutput.infoCard.cardData.push(data);
-                }
-            }
-            else if(requirements.location === "body"){
-                bioOutput[selection.label] = value;
-            }
-            else{
-                bioOutput[selection.label] = data;
-            }
-        })
-
-         
-        
-
-       
-
-
-        
-        const localListData = localStorage.getItem(`${path}/list`) ?? '[]';
-        const localList = JSON.parse(localListData);
-
-        
-       
-        localList.push(listOutput);
-        localStorage.setItem(`${path}/list`, JSON.stringify(localList));
-        if(page.form.createBioPage !== false){
-            localStorage.setItem(filePath, JSON.stringify(bioOutput));
-        }
-        
     }
          
     const handleClose = () => setVisibility(false);
