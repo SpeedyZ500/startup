@@ -535,6 +535,14 @@ let magicsystemBios = [];
 let organizationBios = [];
 let biomeBios = [];
 let countryBios = [];
+let organizationTypes = ["Religion"]
+let magicTypes = [
+    "Alchemical", 
+    "Dimensional", 
+    "Technological", 
+    "Elemental",
+    "Transformational"
+]
 
 
 async function createUser(email, username, password, displayname) {
@@ -558,6 +566,7 @@ async function createUser(email, username, password, displayname) {
 
     return user;
 }
+
 
 function getUser(field, value){
     if (value) {
@@ -747,13 +756,21 @@ apiRouter.get('/worldbuilding/magicsystems/:id?', async (req, res) => {
 
 apiRouter.get('/worldbuilding/organizations/:id?', async (req, res) => {
     const { id } = req.params;
+    const filter = req.body.filter;
     if(!id){
-        res.send(organizations)
+        if(!filter){
+            res.send(organizations)
+        }
+        else{
+            const organization = organizations.filter(item => item.type === filter);
+            res.send(organization);
+        }
     }
     else{
         const organization = organizationBios.find(bio => bio.id === id);
+        res.send(organization);
         if(organization){
-            res.send(organization);
+            
         }
         else{
             res.status(404).json({ error: "Organization not found" });
@@ -1046,7 +1063,7 @@ async function updateUser(user){
 function setAuthCookie(res, user){
     user.token = uuid.v4();
     res.cookie('token', user.token, {
-        secure: false,
+        secure: true,
         httpOnly: true,
         sameSite: 'Strict',
     });

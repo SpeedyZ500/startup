@@ -166,6 +166,9 @@ const SuperSelect = ({data, options, onCategoriesChange}) => {
 function FormGenerator({form, sections, setSections, onCategoriesChange, onSelectionChange, profanity}){
     const [optionsMap, setOptionsMap] = useState({});
     const [selections, setSelections] = useState([]);
+    const getKey = (data) => {
+        return data.category ? sanitizeId(`${data.source}_${data.category}`) : data.source;
+    }
     useEffect(() => {
         onSelectionChange(selections);
     }, [selections, onSelectionChange]);
@@ -190,28 +193,35 @@ function FormGenerator({form, sections, setSections, onCategoriesChange, onSelec
             await Promise.all(
                 form.map(async (data) => {
                     if (data.source && ["select", "multi-select", "creatable", "super-select"].includes(data.type)) {
-                        try {
-                            const listData = await fetch(`/auth${data.source}`, {
-                                method:"GET",             
-                                headers: {'Content-Type': 'application/json'},
-                            });
-                            if(listData.ok){
-                                const optionsList = await listData.json()
-                                newOptionsMap[data.source] = await Promise.all(
-                                    optionsList.map(async (item) => {
-                                        const option = item.details.find(detail => detail.label === "name");
-                                        const filteredLabel = await filterProfanity(option.value, profanity);
-        
-                                        return !option.path
-                                            ? { value: { value: option.value }, label: filteredLabel }
-                                            : { value: { value: option.value, path: option.path }, label: filteredLabel };
-                                    })
-                                );
+                        if(data.values){
+                            newOptionsMap[data.source] = data.values;
+                        }
+                        else{
+                            try {
+                                const listData = await fetch(`/auth${data.source}`, {
+                                    method:"GET",             
+                                    headers: {'Content-Type': 'application/json'},
+                                    body: JSON.stringify({filter:data.category})
+                                });
+                                if(listData.ok){
+                                    const optionsList = await listData.json()
+                                    const key = getKey(data);
+                                    newOptionsMap[key] = await Promise.all(
+                                        optionsList.map(async (item) => {
+                                            const option = item.details && item.details.find(detail => detail.label === "name") || item;
+                                            const filteredLabel = await filterProfanity(option.value || option, profanity);
+            
+                                            return !option.path
+                                                ? { value: (typeof value === "string" ? option : { value: option.value }), label: filteredLabel }
+                                                : { value: { value: option.value, path: option.path }, label: filteredLabel };
+                                        })
+                                    );
+                                }
+                                
+                            } catch (error) {
+                                console.error(`Error fetching options for ${data.source}:`, error);
+                                newOptionsMap[data.source] = [];
                             }
-                            
-                        } catch (error) {
-                            console.error(`Error fetching options for ${data.source}:`, error);
-                            newOptionsMap[data.source] = [];
                         }
                     }
                 })
@@ -228,8 +238,8 @@ function FormGenerator({form, sections, setSections, onCategoriesChange, onSelec
             return;
         }
         if(data.source &&   ["select", "multi-select", "creatable", "super-select"].includes(data.type)){
-            
-            const options = optionsMap[data.source] || []; 
+            const key = getKey(data);
+            const options = optionsMap[key] || []; 
             const SelectComponent = data.type === "creatable" ? Creatable : Select;
             const isMulti = data.type === "multi-select";
             if(data.type === "super-select"){

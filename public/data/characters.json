@@ -45,6 +45,14 @@
                 "inList":false
             },
             {
+                "label":"Born",
+                "type":"text"
+            },
+            {
+                "label":"Died",
+                "type":"text"
+            },
+            {
                 "label":"World",
                 "type":"select",
                 "source":"/worldbuilding/worlds",
@@ -78,6 +86,17 @@
                 "source":"/characters",
                 "onCard":true,
                 "inList":false
+            },
+            {
+                "label":"Organizations",
+                "type":"multi-select",
+                "source":"/worldbuilding/organizations"
+            },
+            {
+                "label":"Religion",
+                "type":"select",
+                "source":"/worldbuilding/organizations",
+                "category":"Religion"
             },
             {
                 "label":"Family",

@@ -37,6 +37,50 @@ export function Settings(props) {
             console.error("Error updating profanity filter:", err);
         }
     };
+
+    const handleUpdatePassword = async (e) => {
+        const newFilterState = e.target.checked; // Get updated value
+    
+        setFilterProf(newFilterState); // Update local state immediately
+    
+        try {
+            const res = await fetch('/api/user/pass', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ oldPassword: oldPassword, newPassword:newPassword, confirmPassword:confirmPassword}),
+            });
+    
+            if (res.ok) {
+            } else {
+                console.error("Failed to change password:", res.statusText);
+            }
+        } catch (err) {
+            console.error("Error updating changing password:", err);
+        }
+    };
+
+    const changeDisplayName = async (e) => {
+        const newFilterState = e.target.checked; // Get updated value
+    
+        setFilterProf(newFilterState); // Update local state immediately
+    
+        try {
+            const res = await fetch('/api/user/pass', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ displayname:displayName}),
+            });
+    
+            if (res.ok) {
+                const data = await res.json();
+                props.onFilterUpdate(data); // Update parent component state if needed
+            } else {
+                console.error("Failed to change password:", res.statusText);
+            }
+        } catch (err) {
+            console.error("Error updating changing password:", err);
+        }
+    };
     
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -56,7 +100,7 @@ export function Settings(props) {
         <div className="settings">
             <h1>Username:{props.user.username}</h1>
                 
-                <form className="theme-h adaptive" onSubmit={handleSubmit} method="post">
+                <form className="theme-h adaptive" onSubmit={changeDisplayName} method="post">
                     <label htmlFor="username">Display Name:</label>
                     <input type="text" id="username" name="username" value={displayName} placeholder="your Display Name"/>
                     <br />
@@ -77,7 +121,7 @@ export function Settings(props) {
                 
                 <hr />
                 <h6 className="theme-h adaptive" >Reset Password</h6>
-                <form className="theme-h adaptive" onSubmit={changePassword} method="post">
+                <form className="theme-h adaptive" onSubmit={handleUpdatePassword} method="post">
                         <div className="input-group mp-3">
                             <span className="input-group-text">Old Password:</span>
                             <input className="form-control" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} type="password" placeholder="password"/>

@@ -20,7 +20,7 @@ const Heading = ({ level, children, ...props }) => {
 
 function generateRows(data){
     return data.map((entry, index) => {
-        if (!entry) return null;
+        if (!entry || !entry.value) return null;
         if(Array.isArray(entry.value)){
             const isSubTable = entry.value.every(
                 (item) => typeof item === "object" && Object.values(item).some(Array.isArray)
