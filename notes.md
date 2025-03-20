@@ -88,3 +88,11 @@ Each page may need to have a function that gets the list or the .json file, so t
 ## Service
 Must send cookies Securely; HttpOnly; SameSite=Strict
 HttpOnly means no js
+
+
+## Testing
+Jest, testing program, 
+Testing helps us test regression
+Write Better Code
+Think like a user
+Jest allows us to skip over the  tests

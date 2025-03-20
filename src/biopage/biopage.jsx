@@ -252,7 +252,7 @@ export function BioPage(){
     
     if (loading) return <main><p>Loading...</p></main>;
     if (error) return <main><p style={{color:"red"}}>{error}</p></main>
-    if (!cleanBio || !cleanBio.infoCard || !cleanBio.sections) {
+    if (!cleanBio || !cleanBio.infoCard) {
         return <p>Error: Missing or invalid data.</p>;
     }
     return(

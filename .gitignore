@@ -3,3 +3,11 @@
 
 node_modules/
 dbConfig.json
+test.txt
+cookie.txt
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
