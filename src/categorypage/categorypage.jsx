@@ -198,7 +198,8 @@ function FormGenerator({form, sections, setSections, onCategoriesChange, onSelec
                         }
                         else{
                             try {
-                                const listData = await fetch(`/auth${data.source}`, {
+                                const url = `/auth${data.source}`+(data.category ? `?${data.category}` : '')
+                                const listData = await fetch(url, {
                                     method:"GET",             
                                     headers: {'Content-Type': 'application/json'},
                                     body: JSON.stringify({filter:data.category})

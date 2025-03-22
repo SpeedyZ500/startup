@@ -96,3 +96,4 @@ Testing helps us test regression
 Write Better Code
 Think like a user
 Jest allows us to skip over the  tests
+Playwright

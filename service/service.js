@@ -557,6 +557,12 @@ function sanitizeId(id){
         .replace(/\s+/g, "-")
         .replace(/[^\w-]/g, "");
 }
+async function createID(name, author){
+
+}
+async function createCharacter(characterData){
+
+}
 
 async function createUser(email, username, password, displayname) {
     const passwordHash = await bcrypt.hash(password, 10);
@@ -760,7 +766,7 @@ apiRouter.get('/worldbuilding/magicsystems/:id?', async (req, res) => {
 
 apiRouter.get('/worldbuilding/organizations/:id?', async (req, res) => {
     const { id } = req.params;
-    const filter = req.body.filter;
+    const filter = req.query.type;
     if(!id){
         if(!filter){
             res.send(organizations)
@@ -772,9 +778,8 @@ apiRouter.get('/worldbuilding/organizations/:id?', async (req, res) => {
     }
     else{
         const organization = organizationBios.find(bio => bio.id === id);
-        res.send(organization);
         if(organization){
-            
+            res.send(organization);
         }
         else{
             res.status(404).json({ error: "Organization not found" });
