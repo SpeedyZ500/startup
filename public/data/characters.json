@@ -60,6 +60,11 @@
                 "inList":true
             },
             {
+                "label":"Country",
+                "type":"select",
+                "source":"/worldbuilding/countries"
+            },
+            {
                 "label":"Race",
                 "type":"select",
                 "source":"/worldbuilding/races",
@@ -96,7 +101,7 @@
                 "label":"Religion",
                 "type":"select",
                 "source":"/worldbuilding/organizations",
-                "category":"Religion"
+                "category":"type=religion"
             },
             {
                 "label":"Family",
