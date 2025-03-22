@@ -212,9 +212,12 @@ function FormGenerator({form, sections, setSections, onCategoriesChange, onSelec
                                             const option = item.details && item.details.find(detail => detail.label === "name") || item;
                                             const filteredLabel = await filterProfanity(option.value || option, profanity);
             
-                                            return !option.path
-                                                ? { value: (typeof value === "string" ? option : { value: option.value }), label: filteredLabel }
-                                                : { value: { value: option.value, path: option.path }, label: filteredLabel };
+                                            return { 
+                                                value: typeof option === "string" 
+                                                    ? option 
+                                                    : { value: option.value, path: option.path, id: item.id }, 
+                                                label: filteredLabel 
+                                            };
                                         })
                                     );
                                 }

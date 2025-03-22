@@ -6,7 +6,7 @@ const characterRouter = express.Router();
 
 let characters = [
     {
-        "id":1,
+        "id":"alastor_moonblaze_spencer_zaugg",
         "details":[
             {
                 "label":"name",
@@ -48,7 +48,7 @@ let characters = [
         "description":"A mysterious Alchemist who seeks to restore his world"
     },
     {
-        "id":2,
+        "id":"the_curator_spencer_zaugg",
         "details":[
             {
                 "label":"name",
@@ -272,6 +272,21 @@ let characterBios =[
         "":"The Curator may be a representation of how we are giving away or free will and the ability to choose to curate our own experiences"
     }
 ]
+let characterTypes = []
+
+async function getCharacter(field, value){
+    if (value) {
+        return character.find((character) => character[field] === value);
+    }
+    return null;
+}
+async function getCharacterBio(field, value){
+    if (value) {
+        return characterBios.find((character) => character[field] === value);
+    }
+    return null;
+}
+
 
 characterRouter.get(`${urlPrefix}:id?`, async (req, res) => {
     const { id } = req.params;
@@ -280,7 +295,10 @@ characterRouter.get(`${urlPrefix}:id?`, async (req, res) => {
 
     }
     else{
-        const character = characterBios.find(bio => bio.id === id);
+        if(id == "types"){
+            res.send(characterTypes);
+        }
+        const character = await getCharacterBio("id", id);
         if(character){
             res.send({character});
         }
@@ -290,4 +308,196 @@ characterRouter.get(`${urlPrefix}:id?`, async (req, res) => {
     }
 });
 
+characterRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
+    const name = req.body.name;
+    const author = req.body.author;
+    const description = req.body.description;
+    if(!name || !author || !description){
+        res.status(409).send({msg:"Required fields not filled out"});
+
+    }
+    const id = createID(req.body.name, req.body.author);
+    if(await getCharacter("id", id)){
+        res.status(409).send({msg:"A Character by you and by that name already exists"});
+    }else{
+        const character = await createCharacter(req.body, id);
+        if(character){
+            res.send({name:character.name, url:character.url, id:character.id})
+        }
+    }
+});
+
+
+async function createCharacter(characterData, id){
+    const characterURL = prefixURL + id;
+    
+    const created = new Date().toJSON();
+    const characterBio = {
+        id:id,
+        url:characterURL,
+        author:characterData.author,
+        infoCard:{
+            name:characterData.name,
+            cardData:[
+                {
+                    label:"Author",
+                    value:characterData.author
+                },
+                {
+                    label:"World",
+                    value:characterData.World,
+                    source:"/worldbuilding/worlds"
+                },
+                {
+                    label:"Country",
+                    value:characterData.Country,
+                    source:"/worldbuilding/countries"
+                },
+                {
+                    label:"Family",
+                    value:characterData.Family,
+                    source:"/characters"
+                },
+                {
+                    label:"Titles",
+                    value:characterData.Titles
+                },
+                {
+                    label:"Born",
+                    value:characterData.Born
+                },
+                {
+                    label:"Died",
+                    value:characterData.Died
+                },
+                {
+                    label:"Race",
+                    value:characterData.Race,
+                    source:"/wordbuilding/races",
+                },
+                {
+                    label:"Abilities",
+                    value:characterData.Abilities
+                },
+                {
+                    label:"Type",
+                    value:characterData.Type,
+                    source:"/characters/types"
+                },
+                {
+                    label:"Allies",
+                    value:characterData.Allies,
+                    source:"/characters"
+                },
+                {
+                    label:"Enemies",
+                    value:characterData.Enemies,
+                    source:"/characters"
+                },
+                {
+                    label:"Organizations",
+                    value:characterData.Organizations,
+                    source:"/worldbuilding/organizations",
+                },
+                {
+                    label:"Religion",
+                    value:characterData.Religion,
+                    source:"/worldbuilding/organizations",
+                    type:"Religion"
+                }
+            ],
+            created:created,
+            modified:created
+        },
+        description:characterData.description,
+        sections:characterData.sections
+    };
+    await addTypes(characterData.Type);
+    characterBios.push(characterBio);
+    const worldName = typeof characterData.World === 'object' && characterData.World !== null 
+    ? characterData.World.value 
+    : characterData.World;
+
+    const worldPath = typeof characterData.World === 'object' && characterData.World !== null 
+        ? characterData.World.path 
+        : null;
+
+    const raceName = typeof characterData.Race === 'object' && characterData.Race !== null 
+    ? characterData.Race.value 
+    : characterData.Race;
+
+    const racePath = typeof characterData.Race === 'object' && characterData.Race !== null 
+        ? characterData.Race.path 
+        : null;
+
+    const character = {
+        id:id,
+        url:characterURL,
+        author:characterData.author,
+        description:characterData.description,
+        organizations:characterData.Organizations,
+        belief:characterData.Religion,
+        abilities:characterData.Abilities,
+        world:characterData.World,
+        country:characterData.Country,
+        types:characterData.Type,
+        race:characterData.Race,
+        details:[
+            {
+                label:"name",
+                value:characterData.name,
+                path:characterURL,
+                location:"head",
+                filter:false
+            },
+            {
+                label:"author",
+                value:characterData.author,
+            },
+            {
+                label:"World",
+                value:worldName,
+                path:worldPath
+            },
+            {
+                label:"Race",
+                value:raceName,
+                path:racePath
+            },
+            {
+                label:"Type",
+                value:characterData.Type,
+                display:false
+            },
+            {
+                label:"Created",
+                value:created,
+                "display":false,
+                "filter":false
+            }
+
+
+        ]
+    }
+    characters.push(character)
+
+    return character
+
+}
+
+async function addTypes(type){
+    if(Array.isArray(type)){
+        type.forEach((item) => {
+            if(!characterTypes.includes(item)){
+                characterTypes.push(item);
+            }
+        })
+    }
+    else{
+        if(!characterTypes.includes(type)){
+            characterTypes.push(type)
+        }
+    }
+    return "done"
+}
 module.exports = characterRouter

@@ -24,6 +24,11 @@
                 "inList":false
             },
             {
+                "label":"Type",
+                "type":"creatable",
+                "source":"/characters/types"
+            },
+            {
                 "label":"description",
                 "type":"text-area",
                 "placeholder":"A short description/summary of your character",

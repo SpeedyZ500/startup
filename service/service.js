@@ -14,10 +14,6 @@ var apiRouter = express.Router();
 app.use(`/api`, apiRouter);
 
 
-
-
-
-
 // Middleware to verify that the user is authorized to call an endpoint
 const verifyAuth = async (req, res, next) => {
     const token = req.cookies[authCookieName];
@@ -238,48 +234,6 @@ apiRouter.get('/writingprompts', async (_req, res) => {
     res.send(writingprompts)
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-apiRouter.get('/stories/:storyID?/:chapterID?', async (req, res) => {
-    const {storyID, chapterID} = req.params;
-    if(!storyID){
-        res.send(stories);
-    }
-    else{
-        const story = stories.find(story => story.id === storyID);
-        if(story){
-            if(!chapterID){
-                res.send(story);
-            }
-            else{
-                const chapter = story.chapters.find(chapter => chapter.id === chapterID);
-                if(chapter){
-                    res.send(chapter);
-                }
-                else{
-                    res.status(404).send({ error: "Chapter not found" });
-                }
-            }
-
-        }
-        else{
-            res.status(404).send({ error: "Story not found" });
-        }
-    }
-});
 
 
 //registration
@@ -522,6 +476,7 @@ module.exports = {
     app,
     verifyAuth,
     sanitizeId,
-    createID
+    createID,
+    getUser
 
 };
