@@ -207,8 +207,10 @@ function FormGenerator({form, sections, setSections, onCategoriesChange, onSelec
                                     const optionsList = await listData.json()
                                     const key = getKey(data);
                                     newOptionsMap[key] = await Promise.all(
-                                        optionsList.map(async (item) => {
-                                            const option = item.details && item.details.find(detail => detail.label === "name") || item;
+                                        optionsList.filter(item => item).map(async (item) => {
+                                            const option = typeof item === "object" && item.details ? 
+                                            item.details.find(detail => detail.label === "name") || item : 
+                                            item;
                                             const filteredLabel = await filterProfanity(option.value || option, profanity);
             
                                             return { 
@@ -394,8 +396,7 @@ export function CategoryPage(props) {
         
         const findSuperSelect = page.form.fields.find(item => item.type === "super-select");
         if(findSuperSelect){
-            const superOut = {label:findSuperSelect.label, type:findSuperSelect.type, source:findSuperSelect.source, value:[]}
-            superOut.value = categories.map(item => {
+            const superOut = categories.map(item => {
                 return {label:item.label, value:item.selections}
             });
             
@@ -408,7 +409,13 @@ export function CategoryPage(props) {
         }        
         
         
-        selections.forEach(selection => {dataToSend[selection.label] = selection.value})
+        selections.forEach((selection) => {
+            const requirements = page.form.fields.find(item => item.label === selection.label);
+
+            dataToSend[selection.label] = requirements.type === "select" && Array.isArray(selection.value) ? 
+            selection.value[0] :
+            selection.value
+        })
         console.log(paths);
         console.log((dataToSend))
        

@@ -20,8 +20,11 @@ const Heading = ({ level, children, ...props }) => {
 
 function generateRows(data){
     return data.map((entry, index) => {
-        if (!entry || !entry.value) return null;
+        if (!entry || !entry.value || entry.value === "No Input" ) return null;
         if(Array.isArray(entry.value)){
+            if(entry.value.length < 1){
+                return
+            }
             const isSubTable = entry.value.every(
                 (item) => typeof item === "object" && Object.values(item).some(Array.isArray)
             );
@@ -54,10 +57,11 @@ function generateRows(data){
                             <Fragment>
                                 {entry.value.map((item,subIndex) =>(
                                     <Fragment key={subIndex}>
-                                        {typeof item === "object" && item.value ? (
+                                        {typeof item === "object" && item.value !== null & item.value !== "" ? (
                                         item.path ? (
                                             <NavLink to={item.path}>{item.value}</NavLink>
                                         ) : (
+                                            
                                             <span>{item.value}</span>
                                         ) ) : (
                                             <span>{item}</span>
@@ -92,7 +96,7 @@ function generateRows(data){
         return (
             <tr key={index}>
                 <th>{entry.label}</th>
-                <td>{typeof entry.value === "object" && entry.value.value ? (
+                <td>{typeof entry.value === "object" && entry.value !== undefined && entry.value.value !== null && entry.value.value !== "" ? (
                             entry.value.path ? (<NavLink to={entry.value.path}>{entry.value.value}</NavLink>
                         ): (
                             <span>{entry.value.value}</span>
@@ -131,6 +135,7 @@ function InfoCard({name, cardData, created, modified}) {
 
 };
 function NavGen({data, sectionPref=""}){
+
     if (!data || data.length === 0) return null;
     return data.map((entry, index) =>{
         return(
@@ -140,7 +145,7 @@ function NavGen({data, sectionPref=""}){
                         {`${sectionPref}${index}-${entry.section}`}
                     </NavLink>
                 </li>
-                {entry.subSections &&(
+                {entry.subSections && Array.isArray(entry.subSections) && entry.subSections.length > 0&&(
                     <ul>
                         <NavGen data= {entry.subSections} sectionPref={`${sectionPref}${index}.`} />
                     </ul>
@@ -191,6 +196,7 @@ export function BioPage(){
             headers: {'Content-Type': 'application/json'},
         }).then(rsp => rsp.json())
         .then((data) => {
+            console.log(JSON.stringify(data));
             setBio(data);
             setError(null);
         })
@@ -210,7 +216,6 @@ export function BioPage(){
         
         .finally(() => {
             setLoading(false);
-            console.log(JSON.stringify(bio))
         });
 
 
@@ -279,7 +284,7 @@ export function BioPage(){
                         <nav>
 
                             <menu className="internal-menu">
-                                {BioPage.sections && <MemoizedNavGen data={cleanBio.sections}/>}
+                                {cleanBio.sections && <MemoizedNavGen data={cleanBio.sections}/>}
                                 
                             </menu>
                         </nav>
@@ -287,7 +292,7 @@ export function BioPage(){
                 </Accordion.Item>
                         
             </Accordion>
-            {BioPage.sections && <MemoizedSectionsParse data={cleanBio.sections}/>}
+            {cleanBio.sections && <MemoizedSectionsParse data={cleanBio.sections}/>}
         </main>
     )
 }
