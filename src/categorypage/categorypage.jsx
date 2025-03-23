@@ -198,11 +198,10 @@ function FormGenerator({form, sections, setSections, onCategoriesChange, onSelec
                         }
                         else{
                             try {
-                                const url = `/auth${data.source}`+(data.category ? `?${data.category}` : '')
+                                const url = `/api${data.source}` + (data.category ? `?${data.category}` : "")
                                 const listData = await fetch(url, {
                                     method:"GET",             
                                     headers: {'Content-Type': 'application/json'},
-                                    body: JSON.stringify({filter:data.category})
                                 });
                                 if(listData.ok){
                                     const optionsList = await listData.json()
@@ -237,6 +236,21 @@ function FormGenerator({form, sections, setSections, onCategoriesChange, onSelec
         fetchOptions();
     }, [form, profanity]);
 
+    // Function to handle adding a new created option to the optionsMap
+    const handleCreateOption = (data, newOption) => {
+        setOptionsMap((prevOptionsMap) => {
+            const updatedMap = { ...prevOptionsMap };
+
+            // Find the relevant key in the map
+            const key = getKey(data)
+
+            // Add the new option to the existing options
+            const existingOptions = updatedMap[key] || [];
+            updatedMap[key] = [...existingOptions, newOption];
+            return updatedMap;
+        });    
+    };
+
     return form.map((data, index) => {
         if(data.hidden === true){
             return;
@@ -245,7 +259,7 @@ function FormGenerator({form, sections, setSections, onCategoriesChange, onSelec
             const key = getKey(data);
             const options = optionsMap[key] || []; 
             const SelectComponent = data.type === "creatable" ? Creatable : Select;
-            const isMulti = data.type === "multi-select";
+            const isMulti = data.type === "multi-select" || data.type === "creatable";
             if(data.type === "super-select"){
                 return <SuperSelect key={index} data={data} options={options} onCategoriesChange={onCategoriesChange}/>
             }
@@ -256,7 +270,15 @@ function FormGenerator({form, sections, setSections, onCategoriesChange, onSelec
                             {data.label}
                         </label>
                         <SelectComponent isMulti={isMulti} options={options} className="form-control" name={data.label}
-                        onChange={(selected) => updateSelections(data.label, selected)}
+                        onChange={(selected) => updateSelections(data.label, selected)
+                            
+                        }
+                        onCreateOption={(inputValue) => {
+                            const newOption = { label: inputValue, value: inputValue };
+                            // Add new option to options array
+                            handleCreateOption(data, newOption)
+                          }}
+                        
                         />
                     </div>
                 );
@@ -377,7 +399,7 @@ export function CategoryPage(props) {
                 return {label:item.label, value:item.selections}
             });
             
-            bioOutput[findSuperSelect.label] = superOut;
+            dataToSend[findSuperSelect.label] = superOut;
             
         }
         let paths = path;

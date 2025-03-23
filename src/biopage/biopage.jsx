@@ -186,9 +186,13 @@ export function BioPage(){
             path = "/" + path;
         }
             
-        fetch(`/auth${data.source}`, {
+        fetch(`/api${path}`, {
             method:"GET",             
             headers: {'Content-Type': 'application/json'},
+        }).then(rsp => rsp.json())
+        .then((data) => {
+            setBio(data);
+            setError(null);
         })
         .catch((err) => {
             console.warn("Fetch failed, checking local storage:", err.message);
@@ -203,9 +207,13 @@ export function BioPage(){
         }
             
         )
+        
         .finally(() => {
             setLoading(false);
+            console.log(JSON.stringify(bio))
         });
+
+
 
         
 

@@ -183,9 +183,9 @@ export async function filterProfanity(json, profanityFilterEnabled){
             return item;
         }))
     }
-    else if(typeof json === 'object'){
+    else if(typeof json === 'object' && json){
         const updatedJson = {};
-        if(json.hasOwnProperty("label")){
+        if(json.label){
             Object.assign(updatedJson, json);
             if(json.label.toLowerCase() === "author"){
                 updatedJson.value = await replaceAuthor(json.value);

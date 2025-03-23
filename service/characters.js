@@ -92,7 +92,7 @@ let characters = [
 
 let characterBios =[
     {
-        "id":"alator_moonblaze_spencer_zaugg",
+        "id":"alastor_moonblaze_spencer_zaugg",
         "infoCard":{
             "name":"Alastor Moonblaze",
             "cardData":[
@@ -276,7 +276,7 @@ let characterTypes = []
 
 async function getCharacter(field, value){
     if (value) {
-        return character.find((character) => character[field] === value);
+        return characters.find((character) => character[field] === value);
     }
     return null;
 }
@@ -290,20 +290,22 @@ async function getCharacterBio(field, value){
 
 characterRouter.get(`${urlPrefix}:id?`, async (req, res) => {
     const { id } = req.params;
-    if(!id){
+    //const { } = req.query;
+    if(!id || id === "undefined" || id.trim() === ""){
         res.send(characters)
-
     }
     else{
         if(id == "types"){
             res.send(characterTypes);
         }
-        const character = await getCharacterBio("id", id);
-        if(character){
-            res.send({character});
-        }
         else{
-            res.status(404).json({ error: "Character not found" });
+            const character = await getCharacterBio("id", id);
+            if(character){
+                res.send(character);
+            }
+            else{
+                res.status(404).json({ error: "Character not found" });
+            }
         }
     }
 });
@@ -316,7 +318,7 @@ characterRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
         res.status(409).send({msg:"Required fields not filled out"});
 
     }
-    const id = createID(req.body.name, req.body.author);
+    const id = await createID(req.body.name, req.body.author);
     if(await getCharacter("id", id)){
         res.status(409).send({msg:"A Character by you and by that name already exists"});
     }else{
@@ -329,7 +331,7 @@ characterRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
 
 
 async function createCharacter(characterData, id){
-    const characterURL = prefixURL + id;
+    const characterURL = urlPrefix + id;
     
     const created = new Date().toJSON();
     const characterBio = {

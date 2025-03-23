@@ -1,5 +1,6 @@
 const request = require('supertest');
 const app = require('./service');
+const character = require("./characters");
 
 
 function getRandomName(prefix) {
@@ -22,4 +23,6 @@ test('register', async () => {
     expect(register.headers['content-type']).toMatch('application/json; charset=utf-8');
     expect(register.body).toMatchObject({ email, username, displayname, profanityFilter });
 });
+
+
 
