@@ -216,7 +216,7 @@ function FormGenerator({form, sections, setSections, onCategoriesChange, onSelec
                                             return { 
                                                 value: typeof option === "string" 
                                                     ? option 
-                                                    : { value: option.value, path: option.path, id: item.id }, 
+                                                    : { value: option.value, path: option.path, type:item.type, id: item.id }, 
                                                 label: filteredLabel 
                                             };
                                         })
@@ -257,11 +257,16 @@ function FormGenerator({form, sections, setSections, onCategoriesChange, onSelec
         if(data.hidden === true){
             return;
         }
-        if(data.source &&   ["select", "multi-select", "creatable", "super-select"].includes(data.type)){
+        if(data.source &&   ["select", "multi-select", "creatable", "super-select", "special-select"].includes(data.type)){
             const key = getKey(data);
             const options = optionsMap[key] || []; 
             const SelectComponent = data.type === "creatable" ? Creatable : Select;
-            const isMulti = data.type === "multi-select" || data.type === "creatable";
+            const isMulti = data.type === "multi-select" || data.type === "creatable" ||
+            selections.find(item => item.label === data.label)
+            ?.value.some(val => 
+                Array.isArray(val) 
+                ? val.some(typ => data.qualifier.includes(typ))
+                : (typeof val === "object" && data.qualifier.includes(val.value)));
             if(data.type === "super-select"){
                 return <SuperSelect key={index} data={data} options={options} onCategoriesChange={onCategoriesChange}/>
             }
@@ -412,7 +417,10 @@ export function CategoryPage(props) {
         selections.forEach((selection) => {
             const requirements = page.form.fields.find(item => item.label === selection.label);
 
-            dataToSend[selection.label] = requirements.type === "select" && Array.isArray(selection.value) ? 
+            dataToSend[selection.label] = requirements.type === "select" && 
+            Array.isArray(selection.value) &&  
+            selection.value.some((val) => typeof val === "object" && val.value !== "Remgulus")? 
+            
             selection.value[0] :
             selection.value
         })

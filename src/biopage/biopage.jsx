@@ -11,6 +11,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import Accordion from 'react-bootstrap/Accordion';
 import {sanitizeId, formatJSONDate, filterProfanity} from'../utility/utility.js';
+import { ButtonGroup } from "react-bootstrap";
+import Button from 'react-bootstrap/Button';
+
 
 
 const Heading = ({ level, children, ...props }) => {
@@ -183,6 +186,38 @@ export function BioPage(){
     const [bio, setBio] = useState(null);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [isAuthor, setIsAuthor] = useState(false); // Track if the logged-in user is the author
+
+    const [editing, setEditing] = useState(false);
+
+    function toggleEditing(){
+        setEditing(prevEditing => !prevEditing);
+    }
+    function reloadPage(){
+        window.location.reload;
+    }
+    function handleSave(){
+        let path = window.location.pathname;
+        if(!path.startsWith("/")){
+            path = "/" + path;
+        }
+
+        fetch(`/api${path}`,{
+            method:"PUT",
+            headers:{'Content-Type': 'application/json'},
+            body:JSON.stringify(bio)
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log("Save successful:", JSON.stringify(data, null, 2)); // Pretty print response data
+        })
+        .catch(error => {
+            console.error("Error during save operation:", error); // Log full error
+        })
+        .finally(reloadPage());
+    }
+
+    
     
     useEffect(() => {
         //Get full path
@@ -217,16 +252,23 @@ export function BioPage(){
         .finally(() => {
             setLoading(false);
         });
-
-
-
-        
-
+        fetch(`/api/user/me`, {
+            method:"GET",             
+            headers: {'Content-Type': 'application/json'},
+        })
+        .then(res => res.json())
+        .then((userData) => {
+            fetch(`/api${path}?author=${userData.username}`)
+            .then(resp => resp.json())
+            .then(bool => setIsAuthor(bool.isAuthor))
+            .catch(setIsAuthor(false))
+        })
+        .catch(setIsAuthor(false));
     }, [id]);
 
     const [cleanBio, setCleanBio] = useState(bio);
 
-    const prevBio = useRef(bio);
+    const previBio = useRef(bio);
 
     const [profanity, setProfanity] = useState(true);
 
@@ -247,10 +289,10 @@ export function BioPage(){
 
 
     useEffect(() => {
-        if (prevBio.current === bio && prevProfanity.current === profanity) {
+        if (previBio.current === bio && prevProfanity.current === profanity) {
             return; // No changes, avoid unnecessary updates
         }
-        prevBio.current = bio;
+        previBio.current = bio;
         prevProfanity.current = profanity;
 
         async function cleanData() {
@@ -261,6 +303,17 @@ export function BioPage(){
         cleanData();
     }, [bio, profanity]);
     
+    const updateDescription = (e) => {
+        setBio(prevBio => ({
+            ...prevBio, description: e.target.value
+        }));
+    }
+
+    const updateSections = (e) => {
+        setBio(prevBio => ({
+            ...prevBio, sections: e.target.value
+        }));
+    }
 
     
     if (loading) return <main><p>Loading...</p></main>;
@@ -268,8 +321,41 @@ export function BioPage(){
     if (!cleanBio || !cleanBio.infoCard) {
         return <p>Error: Missing or invalid data.</p>;
     }
+    if(editing){
+        <main className="bio">
+            <ButtonGroup>
+                <Button variant="primary" onClick={handleSave}>
+                    Save
+                </Button>
+                <Button variant="secondary" onClick={toggleEditing}>
+                    Preview
+                </Button>
+                <Button variant="danger" onClick={reloadPage}>
+                    Cancel
+                </Button>
+            </ButtonGroup>
+
+            <textarea value={bio.description} onChange={updateDescription}/>
+            <ButtonGroup>
+                <Button variant="primary" onClick={handleSave}>
+                    Save
+                </Button>
+                <Button variant="secondary" onClick={toggleEditing}>
+                    Preview
+                </Button>
+                <Button variant="danger" onClick={reloadPage}>
+                    Cancel
+                </Button>
+            </ButtonGroup>
+        </main>
+    }
     return(
         <main className="bio">
+            {isAuthor && (
+                <Button variant ="primary" onClick={toggleEditing}>
+                    Edit
+                </Button>
+            )}
             <MemoizedInfoCard {...cleanBio.infoCard} />
             <div>
                 <h2>Description</h2>

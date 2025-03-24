@@ -1,5 +1,5 @@
 const express = require('express');
-const { verifyAuth, createID} = require('./service.js');  
+const { verifyAuth, createID, getUser} = require('./service.js');  
 const urlPrefix = "/characters/"
 
 const characterRouter = express.Router();
@@ -290,7 +290,7 @@ async function getCharacterBio(field, value){
 
 characterRouter.get(`${urlPrefix}:id?`, async (req, res) => {
     const { id } = req.params;
-    //const { } = req.query;
+    const { author } = req.query;
     if(!id || id === "undefined" || id.trim() === ""){
         res.send(characters)
     }
@@ -301,7 +301,13 @@ characterRouter.get(`${urlPrefix}:id?`, async (req, res) => {
         else{
             const character = await getCharacterBio("id", id);
             if(character){
-                res.send(character);
+                if(author){
+                    const isAuthor = author === character.author;
+                    res.send({isAuthor})
+                }
+                else{
+                    res.send(character);
+                }
             }
             else{
                 res.status(404).json({ error: "Character not found" });
@@ -330,6 +336,29 @@ characterRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
 });
 
 
+
+characterRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
+    const character = await getCharacter("id", id);
+    if(character){
+        const token = req.cookies[authCookieName];
+        const currUser = await getUser('token', token);
+        if(currUser.username === character.author){
+            const updateData = req.body;
+            const updated = await updateCharacter(id, updateData)
+            res.send({name:updated.name, url:updated.url, id:updated.id})
+        }
+        else{
+            res.status(401).send({msg:`${currUser.displayname} is not the author`});
+        }
+    }
+    else{
+        res.status(404).send({msg:`Character ${id}, not found`});
+    }
+})
+
+
+
+
 async function createCharacter(characterData, id){
     const characterURL = urlPrefix + id;
     
@@ -348,64 +377,79 @@ async function createCharacter(characterData, id){
                 {
                     label:"World",
                     value:characterData.World,
-                    source:"/worldbuilding/worlds"
+                    source:"/worldbuilding/worlds",
+                    edit:"select"
                 },
                 {
                     label:"Country",
                     value:characterData.Country,
-                    source:"/worldbuilding/countries"
+                    source:"/worldbuilding/countries",
+                    edit:"select"
                 },
                 {
                     label:"Family",
                     value:characterData.Family,
-                    source:"/characters"
+                    source:"/characters",
+                    edit:"super-select"
                 },
                 {
                     label:"Titles",
-                    value:characterData.Titles
+                    value:characterData.Titles,
+                    edit:"text-creatable"
                 },
                 {
                     label:"Born",
-                    value:characterData.Born
+                    value:characterData.Born,
+                    edit:"text"
                 },
                 {
                     label:"Died",
-                    value:characterData.Died
+                    value:characterData.Died,
+                    edit:"text"
                 },
                 {
                     label:"Race",
                     value:characterData.Race,
                     source:"/wordbuilding/races",
+                    edit:"special-select",
+                    condition:["Remgulus"],
                 },
                 {
                     label:"Abilities",
-                    value:characterData.Abilities
+                    value:characterData.Abilities,
+                    source:"/worldbuilding/magicsystems",
+                    edit:"multi-select"
                 },
                 {
                     label:"Type",
                     value:characterData.Type,
-                    source:"/characters/types"
+                    source:"/characters/types",
+                    edit:"creatable"
                 },
                 {
                     label:"Allies",
                     value:characterData.Allies,
-                    source:"/characters"
+                    source:"/characters",
+                    edit:"multi-select"
                 },
                 {
                     label:"Enemies",
                     value:characterData.Enemies,
-                    source:"/characters"
+                    source:"/characters",
+                    edit:"multi-select"
                 },
                 {
                     label:"Organizations",
                     value:characterData.Organizations,
                     source:"/worldbuilding/organizations",
+                    edit:"multi-select"
                 },
                 {
                     label:"Religion",
                     value:characterData.Religion,
                     source:"/worldbuilding/organizations",
-                    type:"Religion"
+                    type:"Religion",
+                    edit:"select"
                 }
             ],
             created:created,
@@ -416,34 +460,24 @@ async function createCharacter(characterData, id){
     };
     await addTypes(characterData.Type);
     characterBios.push(characterBio);
-    const worldName = typeof characterData.World === 'object' && characterData.World !== null 
-    ? characterData.World.value 
-    : characterData.World;
-
-    const worldPath = typeof characterData.World === 'object' && characterData.World !== null 
-        ? characterData.World.path 
-        : null;
-
-    const raceName = typeof characterData.Race === 'object' && characterData.Race !== null 
-    ? characterData.Race.value 
-    : characterData.Race;
-
-    const racePath = typeof characterData.Race === 'object' && characterData.Race !== null 
-        ? characterData.Race.path 
-        : null;
+    const race = characterData.Race.find(item => 
+        (Array.isArray(item.type) ? 
+        item.type.includes("sudo-shape-shifter") : item.type === "sudo-shape-shifter"
+    )
+    ) || characterData.Race[0];
 
     const character = {
         id:id,
         url:characterURL,
         author:characterData.author,
         description:characterData.description,
-        organizations:characterData.Organizations,
-        belief:characterData.Religion,
-        abilities:characterData.Abilities,
-        world:characterData.World,
-        country:characterData.Country,
+        organizations:characterData.Organizations.map(org => org.id),
+        belief:characterData.Religion.map(rel => rel.id),
+        abilities:characterData.Abilities.map(abil => abil.id),
+        world:characterData.characterData.World[0]?.id,
+        country:characterData.Country[0]?.id,
         types:characterData.Type,
-        race:characterData.Race,
+        race:characterData.Race.map(abil => abil.id),
         details:[
             {
                 label:"name",
@@ -458,13 +492,13 @@ async function createCharacter(characterData, id){
             },
             {
                 label:"World",
-                value:worldName,
-                path:worldPath
+                value:characterData.characterData.World[0]?.value,
+                path:characterData.characterData.World[0]?.path
             },
             {
                 label:"Race",
-                value:raceName,
-                path:racePath
+                value: race?.value,
+                path: race?.path,
             },
             {
                 label:"Type",
@@ -485,6 +519,89 @@ async function createCharacter(characterData, id){
 
     return character
 
+}
+const onCard = ["Type", "Race", "World", "Abilities", "Religion", "Organizations"];
+async function updateCharacter(id, updateData){
+    const {description, infoCard, sections} = updateData
+    const characterBio = await getCharacterBio("id", id);
+    const character = await getCharacter("id", id);
+    if(infoCard && infoCard !== characterBio.infoCard){
+        if(infoCard.name !== characterBio.infoCard.name){
+            characterBio.infoCard.name = infoCard.name;
+            character.name = infoCard.name;
+        }
+        if(infoCard.cardData && JSON.stringify(infoCard.cardData) !== JSON.stringify(characterBio.infoCard.cardData)){
+            const cardData = characterBio.infoCard.cardData;
+            const customData = characterBio.infoCard.cardData.filter(item => item.custom);
+            for(const item of customData){
+                const customInstance = infoCard.cardData.find(data => data.id === item.id);
+                if(customInstance){
+                    if(JSON.stringify(item) !== JSON.stringify(customInstance)){
+                        const updateIndex = cardData.findIndex(data => data.id === item.id);
+                        characterBio.infoCard.cardData[updateIndex] = customInstance;
+                    }
+                }
+                else{
+                    characterBio.infoCard.cardData = characterBio.infoCard.cardData.filter(data => data.id !== item.id);
+                }
+            }
+            for (const item of infoCard.cardData){
+                const existingIndex = cardData.findIndex(value => value.label === item.label)
+                if(existingIndex != -1){
+                    if(JSON.stringify(item) !== JSON.stringify(cardData[existingIndex])){
+                        characterBio.infoCard.cardData[existingIndex].value = item.value;
+                        if(onCard.includes(item.label)){
+                            if(item.label === "Type"){
+                                await addTypes(item.value);
+                                character[item.label.toLowerCase()] = item.value;
+
+                            }
+                            else if(["World", "Country"].includes(item.label)){
+                                character[item.label.toLowerCase()] = item.value[0]?.id;
+                                const detailIndex = character.details.findIndex(detail => detail.label === item.label);
+                                if (detailIndex !== -1) {
+                                    character.details[detailIndex].value = item.value[0]?.value;
+                                    character.details[detailIndex].path = item.value[0]?.path;
+                                }
+                            }
+                            else{
+                                character[item.label.toLowerCase()] = item.value.map(abil => abil.id);
+                                if(item.label === "Race"){
+                                    const race = item.value.find(val => 
+                                        (Array.isArray(val.type) ? 
+                                        val.type.includes("sudo-shape-shifter") : val.type === "sudo-shape-shifter"
+                                    )
+                                    ) || item.value[0];
+                                    const detailIndex = character.details.findIndex(detail => detail.label === "Race");
+                                    character.details[detailIndex].value = race?.value
+                                    character.details[detailIndex].path = race?.path
+                                }
+                            }
+                            
+                            
+                        }
+                    }
+                }
+                else{
+                    characterBio.infoCard.cardData.push(item);
+                }
+            }
+                
+        }
+    }
+    if(description && description !== characterBio.description){
+        characterBio.description = description;
+        character.description = description;
+    }
+    if(sections && JSON.stringify(sections) !== JSON.stringify(characterBio.sections)){
+        characterBio.sections = sections;
+    }
+    characterBio.infoCard.modified = new Date().toJSON()
+    const bioIndex = characterBios.findIndex(bio => bio.id === id);
+    const characterIndex = characters.findIndex(bio => bio.id === id);
+    characterBios[bioIndex] = characterBio;
+    characters[characterIndex] = character;
+    return character;
 }
 
 async function addTypes(type){

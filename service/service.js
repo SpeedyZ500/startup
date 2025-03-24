@@ -238,13 +238,16 @@ apiRouter.get('/writingprompts', async (_req, res) => {
 
 //registration
 apiRouter.post('/auth/register', async (req, res) => {
-    if(await getUser('email', req.body.email)){
-        res.status(409).send({msg:"Email already registered to a user"})
+    if(req.body.username !== await sanitizeId(req.body.username)){
+        return res.status(400).send({ msg: "Your username has invalid characters"});
+    }
+    else if(await getUser('email', req.body.email)){
+        return res.status(409).send({msg:"Email already registered to a user"})
     }
     else if(await getUser('username', req.body.username)){
-        res.status(409).send({msg:"Username already taken"})
+        return res.status(409).send({msg:"Username already taken"})
     } else{
-
+        
         const user = await createUser(req.body.email, req.body.username, req.body.password, req.body.displayname);
         if(user){
             setAuthCookie(res, user);
@@ -262,6 +265,7 @@ apiRouter.put('/auth/login', async (req, res) => {
     const identifier = req.body.username;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const isEmail = emailRegex.test(identifier);
+
 
     const user = await getUser(isEmail ? "email" : "username", identifier);
     if (user && (await bcrypt.compare(req.body.password, user.password))){
@@ -331,7 +335,7 @@ apiRouter.get('/user/me', async (req, res) => {
         else {
         res.status(401).send({ msg: 'Unauthorized' });
         }
-  });
+});
 apiRouter.put('/user/prof', async(req, res) => {
     try {
         const token = req.cookies[authCookieName];

@@ -71,10 +71,11 @@
             },
             {
                 "label":"Race",
-                "type":"select",
+                "type":"special-select",
                 "source":"/worldbuilding/races",
                 "onCard":true,
-                "inList":true
+                "inList":true,
+                "qualifier":["sudo-shape-shifter"]
             },
             {
                 "label":"Abilities",
