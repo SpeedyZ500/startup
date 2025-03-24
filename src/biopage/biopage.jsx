@@ -13,6 +13,8 @@ import Accordion from 'react-bootstrap/Accordion';
 import {sanitizeId, formatJSONDate, filterProfanity} from'../utility/utility.js';
 import { ButtonGroup } from "react-bootstrap";
 import Button from 'react-bootstrap/Button';
+import Select from 'react-select'
+import Creatable from 'react-select/creatable';
 
 
 
@@ -137,6 +139,7 @@ function InfoCard({name, cardData, created, modified}) {
     );
 
 };
+
 function NavGen({data, sectionPref=""}){
 
     if (!data || data.length === 0) return null;
@@ -178,6 +181,495 @@ const MemoizedNavGen = React.memo(NavGen);
 const MemoizedSectionsParse = React.memo(SectionsParse);
 const MemoizedInfoCard = React.memo(InfoCard);
 
+const Section = ({ section, updateSection, removeSection }) => {
+    const handleChange = (key, value) => {
+        updateSection({ ...section, [key]: value });
+    };
+
+    const addSubsection = () => {
+        const newSubsection = {
+            id: Date.now(),
+            section: "",
+            text: "",
+            subsections: []
+        };
+        handleChange("subsections", [...section.subsections, newSubsection]);
+    };
+
+    const updateSubsection = (index, updatedSubsection) => {
+        const newSubsections = [...section.subsections];
+        newSubsections[index] = updatedSubsection;
+        handleChange("subsections", newSubsections);
+    };
+
+    const removeSubsection = (index) => {
+        const newSubsections = section.subsections.filter((_, i) => i !== index);
+        handleChange("subsections", newSubsections);
+    };
+
+    return (
+        <div className="container">
+            <input
+                type="text"
+                value={section.section}
+                onChange={(e) => handleChange("section", e.target.value)}
+                placeholder="Section Header"
+                className="form-control"
+            />
+            <textarea
+                value={section.text}
+                onChange={(e) => handleChange("text", e.target.value)}
+                placeholder="Enter section content..."
+                className="form-control"
+            />
+            <div>
+                <Button onClick={addSubsection} className="btn btn-primary">Add Subsection</Button>
+            </div>
+            <div>
+                {section.subsections.map((sub, index) => (
+                    <Section
+                        key={sub.id}
+                        section={sub}
+                        updateSection={(updatedSub) => updateSubsection(index, updatedSub)}
+                        removeSection={() => removeSubsection(index)}
+                    />
+                ))}
+            </div>
+            <Button onClick={removeSection} className="btn btn-danger">Remove Subsection</Button>
+        </div>
+    );
+};
+
+
+function SectionsEditor({bio, updateBio}){
+    const [sections, setSections] = useState(bio.sections || []);
+    const addSection = () => {
+        const newSection = { id: Date.now(), section: "", text: "", subsections: [] };
+        setSections([...sections, newSection]);
+    };
+
+    const updateSection = (index, updatedSection) => {
+        const newSections = [...sections];
+        newSections[index] = updatedSection;
+        setSections(newSections);
+    };
+
+    const removeSection = (index) => {
+        const newSections = sections.length > 1 ? sections.filter((_, i) => i !== index) : [];
+        setSections(newSections);
+    };
+
+    // When sections change, update bio.sections in the parent component
+    const saveSections = () => {
+        updateBio({ ...bio, sections });
+    };
+    return (
+        <div className="bio-editor">
+            <label className="input-group-text">Bio Sections</label>
+            <Button onClick={addSection} className="btn btn-primary">Add Section</Button>
+            {sections.map((section, i) => (
+                <Section
+                    key={section.id}
+                    section={section}
+                    updateSection={(updated) => updateSection(i, updated)}
+                    removeSection={() => removeSection(i)}
+                />
+            ))}
+            <Button onClick={saveSections} className="btn btn-success">Save Sections</Button>
+        </div>
+    );
+
+}
+
+
+
+// ✅ SuperUpdater Component
+function SuperUpdater({ value, valueUpdater, options }) {
+    const [categories, setCategories] = useState(value || []);
+
+    useEffect(() => {
+        valueUpdater(categories);
+    }, [categories, valueUpdater]);
+
+    const handleAddCategory = () => {
+        setCategories([...categories, { label: "", value: [] }]);
+    };
+
+    const handleUpdateCategory = (index, updatedCategory) => {
+        const updatedCategories = [...categories];
+        updatedCategories[index] = updatedCategory;
+        setCategories(updatedCategories);
+    };
+
+    const handleRemoveCategory = (index) => {
+        const updatedCategories = categories.filter((_, i) => i !== index);
+        setCategories(updatedCategories);
+    };
+
+    return (
+        <div>
+            {categories.map((category, index) => (
+                <div key={index} className="category-container">
+                    <div>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={category.label}
+                            onChange={(e) => handleCategoryNameChange(index, e.target.value)}
+                            placeholder="Category Name"
+                        />
+                    </div>
+                    <div>
+                        <Select
+                            isMulti
+                            options={options}
+                            value={category.value.map(value => ({ value, label: value }))}
+                            onChange={(selected) => handleCategorySelectionsChange(index, selected)}
+                            className="form-control"
+                        />
+                    </div>
+                    <button
+                        onClick={() => handleRemoveCategory(index)}
+                        className="btn btn-danger"
+                    >
+                        Remove Category
+                    </button>
+                </div>
+            ))}
+            <button onClick={handleAddCategory} className="btn btn-primary">
+                Add Category
+            </button>
+        </div>
+    );
+}
+
+
+
+function CardDataEditor({ bio, updateBio }) {
+    const [cardData, setCardData] = useState(bio.infoCard.cardData || []);
+    const [sources, setSources] = useState([]);
+    const [optionsMap, setOptionsMap] = useState({});
+
+    useEffect(() => {
+        fetch("/api/sources/bio",{
+            method:"GET",
+            headers:{'Content-Type': 'application/json'},
+        })
+        .then(res => res.json())
+        .then((data) => {
+            setSources(data);
+            const newOptionsMap = {};
+            Promise.all(data.map(async (source) => {
+                return fetch(`/api${source}`, {
+                    method:"GET",
+                    headers: { 'Content-Type': 'application/json' },
+                })
+                .then(resp => resp.json())
+                .then((options) => {
+                    newOptionsMap[source] = options.map(item => ({
+                        label: item.name || item.label || item.value || item,  // Use flexible labels
+                        value: {
+                            value: item.value || item.id || item.name || item,  // Store unique identifiers
+                            path: item.path || null,
+                            type: item.type || null,
+                            id: item.id || null
+                        }
+                    }));
+                }).catch((error) => {
+                    console.error(`Error fetching ${source}:`, error);
+                    newOptionsMap[source] = [];
+                })
+
+            }))
+            
+            setOptionsMap(newOptionsMap);
+        })
+        .catch((error) => {                
+            console.error("Error loading sources or options:", error);
+        })
+    }, [bio])
+
+    // ✅ Updates standard fields by label
+    const dataUpdater = (label, value) => {
+        const dataIndex = cardData.findIndex(data => data.label === label);
+        if (dataIndex !== -1) {
+            const tempData = [...cardData];
+            tempData[dataIndex].value = value;
+            setCardData(tempData);
+        }
+    };
+
+    // ✅ Updates custom fields
+    const customUpdater = (id, label, value, edit, source, type, qualifier) => {
+        const dataIndex = cardData.findIndex(data => data.id === id);
+        const tempData = [...cardData];
+        tempData[dataIndex] = { id, label, value, edit, source, type, qualifier, custom: true };
+        setCardData(tempData);
+    };
+
+    // ✅ Add a new custom field
+    const addCustom = () => {
+        const newCustom = { id: Date.now(), label: "", value: "", edit: "text", custom: true };
+        setCardData([...cardData, newCustom]);
+    };
+
+    // ✅ Handles changing the edit type
+    const changeCustomEdit = (id, edit) => {
+        const customIndex = cardData.findIndex(data => data.id === id);
+        if (customIndex === -1) return;
+
+        const custom = { ...cardData[customIndex] };
+
+        if (custom.edit === edit) return;  // Skip if no change
+
+        // Handle reset logic when switching types
+        switch (edit) {
+            case "text":
+                custom.value = typeof custom.value === "string" ? custom.value : "";
+                custom.source = undefined;
+                custom.type = undefined;
+                custom.qualifier = undefined;
+                break;
+
+            case "super-select":
+                custom.value = [{
+                    label: "",
+                    value: Array.isArray(custom.value) ? custom.value : []
+                }];
+                custom.source = custom.source ?? "";
+                custom.type = custom.type ?? "";
+                custom.qualifier = undefined;
+                break;
+
+            case "multi-select":
+            case "creatable":
+                custom.value = Array.isArray(custom.value) ? custom.value : [custom.value].filter(Boolean);
+                custom.qualifier = undefined;
+                custom.source = custom.source ?? "";
+                custom.type = custom.type ?? "";
+                break;
+
+            case "select":
+                if (custom.qualifier) {
+                    custom.value = Array.isArray(custom.value)
+                        ? [custom.value.find(val =>
+                            Array.isArray(custom.qualifier)
+                                ? custom.qualifier.includes(val?.type)
+                                : custom.qualifier === val?.type
+                        ) ?? custom.value[0]].filter(Boolean)
+                        : [];
+                } else {
+                    custom.value = Array.isArray(custom.value) ? [custom.value[0]].filter(Boolean) : [];
+                }
+                custom.qualifier = undefined;
+                custom.source = custom.source ?? "";
+                custom.type = custom.type ?? "";
+                break;
+
+            case "special-select":
+                if (!custom.qualifier) {
+                    custom.value = Array.isArray(custom.value) ? [custom.value[0]] : [];
+                    custom.qualifier = "";
+                }
+                custom.source = custom.source ?? "";
+                custom.type = custom.type ?? "";
+                break;
+            case "text-creatable":
+                custom.value = [];
+                custom.source = undefined;
+                custom.type = undefined;
+                custom.qualifier = undefined;
+
+            default:
+                console.warn(`Unhandled edit type: ${edit}`);
+                break;
+        }
+
+        const tempData = [...cardData];
+        tempData[customIndex] = custom;
+        setCardData(tempData);
+    };
+
+    const handleFieldChange = (index, field, value) => {
+
+        const updatedCardData = [...cardData];
+        if (field === "edit") {
+            // Use `changeCustomEdit` for complex logic
+            if(updatedCardData[index].custom){
+                changeCustomEdit(updatedCardData[index].id, value);
+            }
+            else{
+                console.warn("You cannot change the edit field of a non custom item");
+            }
+        } else {
+            if(field === "value"){
+                updatedCardData[index][field] = value;
+            }
+            else if (updatedCardData[index].custom){
+                updatedCardData[index][field] = value;
+                // Reset value if type changes
+                if (["source", "type"].includes(field)) {
+                    updatedCardData[index].value = [];  // Clear selections on type change
+                }
+            }
+            else{
+                console.warn(`You cannot edit the ${field} of a non custom object`);
+            }
+            setCardData(updatedCardData);
+        }
+    };
+
+    // ✅ Handle Save and Update
+    const handleSave = () => {
+        updateBio({
+            ...bio,
+            infoCard: {
+                ...bio.infoCard,
+                cardData: cardData
+            }
+        });
+    };
+
+    const getFilteredOptions = (item, optionsMap) => {
+        if (!item.source || !optionsMap[item.source]) {
+            return [];
+        }
+    
+        let options = optionsMap[item.source] || [];
+    
+        // Apply type filtering
+        if (item.type) {
+            const types = Array.isArray(item.type) ? item.type : [item.type];
+            options = options.filter(option =>
+                types.includes(option.value.type)
+            );
+        }
+    
+        return options;
+    };
+
+    return (
+        <div>
+            <h3>Card Data Editor</h3>
+            <div>
+                {cardData.map((item, index) => (
+                    <div key={index} className="card border p-2 mb-2">
+                        {item.custom ? (
+                            <>
+                                <div className="mb-2">
+                                    <label>Label:</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        value={item.label}
+                                        onChange={(e) => handleFieldChange(index, "label", e.target.value)}
+                                        placeholder="Label"
+                                    />
+                                </div>
+                    
+                                {/* Edit Type Selector */}
+                                <div className="mb-2">
+                                    <label>Edit Type:</label>
+                                    <select
+                                        className="form-control"
+                                        value={item.edit}
+                                        onChange={(e) => handleFieldChange(index, "edit", e.target.value)}
+                                    >
+                                        <option value="text">Text</option>
+                                        <option value="select">Select</option>
+                                        <option value="multi-select">Multi-Select</option>
+                                        <option value="creatable">Creatable</option>
+                                        <option value="special-select">Special-Select</option>
+                                        <option value="super-select">Super-Select</option>
+                                        <option value="text-creatable">Text-Creatable (for when you need a list of plaintext)</option>
+
+                                    </select>
+                                </div>
+                    
+                                {/* Source Selector (Only if source exists) */}
+                                {item.source !== undefined && (
+                                    <div className="mb-2">
+                                        <label>Source:</label>
+                                        <select
+                                            className="form-control"
+                                            value={item.source || ""}
+                                            onChange={(e) => handleFieldChange(index, "source", e.target.value)}
+                                        >
+                                            <option value="">None</option>
+                                            {sources.map((src) => (
+                                                <option key={src} value={src}>
+                                                    {src}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                )}
+
+                                {/* Type Requirement Selector (Only if type exists) */}
+                                {item.type !== undefined && (
+                                    <div className="mb-2">
+                                        <label>Type Requirement:</label>
+                                        <select
+                                            className="form-control"
+                                            value={item.type || ""}
+                                            onChange={(e) => handleFieldChange(index, "type", e.target.value)}
+                                        >
+                                            <option value="">None</option>
+                                            {optionsMap["/worldbuilding/races/types"]?.map((opt) => (
+                                                <option key={opt.value} value={opt.value}>
+                                                    {opt.label}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                )}
+
+                                {/* Qualifier Selector (Only for Special-Select if qualifier exists) */}
+                                {item.qualifier !== undefined && (
+                                    <div className="mb-2">
+                                        <label>Qualifier:</label>
+                                        <select
+                                            className="form-control"
+                                            value={item.qualifier || ""}
+                                            onChange={(e) => handleFieldChange(index, "qualifier", e.target.value)}
+                                        >
+                                            <option value="">None</option>
+                                            {optionsMap[item.source]?.map((opt) => (
+                                                <option key={opt.value} value={opt.value}>
+                                                    {opt.label}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                )}
+                    
+                                {/* Remove Custom Button */}
+                                <div className="mt-2">
+                                    <button
+                                        className="btn btn-danger"
+                                        onClick={() => handleRemoveCustom(index)}
+                                    >
+                                        Remove Custom
+                                    </button>
+                                </div>
+                            </>
+                        ) : (
+                            <div className="mb-2">
+                                <label>Label:</label>
+                                <p className="form-control-plaintext">{item.label}</p>
+                            </div>
+                        )}
+                    </div>
+                ))}
+            </div>
+
+            <div className="mt-3">
+                <Button onClick={addCustom} className="btn btn-primary">Add Custom Field</Button>
+                <Button onClick={handleSave} className="btn btn-success ml-2">Save Changes</Button>
+            </div>
+        </div>
+    );
+}
 
 
 export function BioPage(){
@@ -189,6 +681,10 @@ export function BioPage(){
     const [isAuthor, setIsAuthor] = useState(false); // Track if the logged-in user is the author
 
     const [editing, setEditing] = useState(false);
+
+    const updateBio = (updatedBio) => {
+        setBio(updatedBio);
+    };
 
     function toggleEditing(){
         setEditing(prevEditing => !prevEditing);
@@ -309,11 +805,7 @@ export function BioPage(){
         }));
     }
 
-    const updateSections = (e) => {
-        setBio(prevBio => ({
-            ...prevBio, sections: e.target.value
-        }));
-    }
+    
 
     
     if (loading) return <main><p>Loading...</p></main>;
@@ -334,8 +826,9 @@ export function BioPage(){
                     Cancel
                 </Button>
             </ButtonGroup>
-
+            <h1>{bio.infoCard.name}</h1>
             <textarea value={bio.description} onChange={updateDescription}/>
+            <SectionsEditor bio={bio} updateBio={updateBio} />
             <ButtonGroup>
                 <Button variant="primary" onClick={handleSave}>
                     Save

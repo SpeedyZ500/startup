@@ -412,7 +412,7 @@ async function createCharacter(characterData, id){
                     value:characterData.Race,
                     source:"/wordbuilding/races",
                     edit:"special-select",
-                    condition:["Remgulus"],
+                    qualifier:["sudo-shape-shifter"],
                 },
                 {
                     label:"Abilities",
