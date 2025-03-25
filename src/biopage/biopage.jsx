@@ -141,7 +141,6 @@ function InfoCard({name, cardData, created, modified}) {
 };
 
 function NavGen({data, sectionPref=""}){
-
     if (!data || data.length === 0) return null;
     return data.map((entry, index) =>{
         return(
@@ -151,9 +150,9 @@ function NavGen({data, sectionPref=""}){
                         {`${sectionPref}${index}-${entry.section}`}
                     </NavLink>
                 </li>
-                {entry.subSections && Array.isArray(entry.subSections) && entry.subSections.length > 0&&(
+                {entry.subsections && Array.isArray(entry.subsections) && entry.subsections.length > 0&&(
                     <ul>
-                        <NavGen data= {entry.subSections} sectionPref={`${sectionPref}${index}.`} />
+                        <NavGen data= {entry.subsections} sectionPref={`${sectionPref}${index}.`} />
                     </ul>
                 )}
             </Fragment>
@@ -169,8 +168,8 @@ function SectionsParse({data, level=2, sectionPref=""}){
             <Fragment key={index}>
                 <Heading level={level} id={`${sectionPref}${index}-${sanitizeId(entry.section)}`}>{entry.section}</Heading>
                 {entry.text && <p>{entry.text}</p>}
-                {entry.subSections && 
-                    <SectionsParse data={entry.subSections} level={level + 1} sectionPref={`${sectionPref}${index}.`}/>
+                {entry.subsections && 
+                    <SectionsParse data={entry.subsections} level={level + 1} sectionPref={`${sectionPref}${index}.`}/>
                 }
             </Fragment>
         )
@@ -295,9 +294,17 @@ function SuperUpdater({ value, valueUpdater, options }) {
         setCategories([...categories, { label: "", value: [] }]);
     };
 
-    const handleUpdateCategory = (index, updatedCategory) => {
+    
+
+    const handleCategoryNameChange = (index, value) => {
         const updatedCategories = [...categories];
-        updatedCategories[index] = updatedCategory;
+        updatedCategories[index].label = value;
+        setCategories(updatedCategories);
+    };
+    
+    const handleCategorySelectionsChange = (index, selected) => {
+        const updatedCategories = [...categories];
+        updatedCategories[index].value = selected.map(option => option.value);
         setCategories(updatedCategories);
     };
 
@@ -323,7 +330,7 @@ function SuperUpdater({ value, valueUpdater, options }) {
                         <Select
                             isMulti
                             options={options}
-                            value={category.value.map(value => ({ value, label: value }))}
+                            value={category.value.map(value => ({ value, label: value.value || value.label || value }))}
                             onChange={(selected) => handleCategorySelectionsChange(index, selected)}
                             className="form-control"
                         />
@@ -346,7 +353,7 @@ function SuperUpdater({ value, valueUpdater, options }) {
 
 
 function CardDataEditor({ bio, updateBio }) {
-    const [cardData, setCardData] = useState(bio.infoCard.cardData || []);
+    const [cardData, setCardData] = useState(bio.infoCard.cardData ? [...bio.infoCard.cardData] : []);
     const [sources, setSources] = useState([]);
     const [optionsMap, setOptionsMap] = useState({});
 
@@ -367,10 +374,10 @@ function CardDataEditor({ bio, updateBio }) {
                 .then(resp => resp.json())
                 .then((options) => {
                     newOptionsMap[source] = options.map(item => ({
-                        label: item.name || item.label || item.value || item,  // Use flexible labels
+                        label: item.name || item.label || item.value || item.id || item,  // Use flexible labels
                         value: {
-                            value: item.value || item.id || item.name || item,  // Store unique identifiers
-                            path: item.path || null,
+                            value: item.value || item.label || item.name || item.id  || item,  // Store unique identifiers
+                            path: item.path || item.url ||  null,
                             type: item.type || null,
                             id: item.id || null
                         }
@@ -413,6 +420,19 @@ function CardDataEditor({ bio, updateBio }) {
         setCardData([...cardData, newCustom]);
     };
 
+    const handleRemoveCustom = (index) => {
+        if(cardData[index].custom){
+            const updatedCardData = cardData.filter((_, i) => i !== index);
+            setCardData(updatedCardData);
+        }
+        {
+            console.warn("Cant remove a non custom field")
+        }
+
+
+
+    }
+
     // ✅ Handles changing the edit type
     const changeCustomEdit = (id, edit) => {
         const customIndex = cardData.findIndex(data => data.id === id);
@@ -421,7 +441,7 @@ function CardDataEditor({ bio, updateBio }) {
         const custom = { ...cardData[customIndex] };
 
         if (custom.edit === edit) return;  // Skip if no change
-
+        custom.edit = edit;
         // Handle reset logic when switching types
         switch (edit) {
             case "text":
@@ -490,32 +510,56 @@ function CardDataEditor({ bio, updateBio }) {
         setCardData(tempData);
     };
 
-    const handleFieldChange = (index, field, value) => {
+    const handleSelectionChange = (index, selected) => {
+        let processedValue;
+    
+        // Multi-value selection
+        if (Array.isArray(selected)) {
+            processedValue = selected.map(item => 
+                typeof item === "object" && item !== null ? item.value : item
+            );
+        }
+        // Single-value selection
+        else if (typeof selected === "object" && selected !== null) {
+            processedValue = selected.value || selected;
+        }
+        // Plain value
+        else {
+            processedValue = selected;
+        }
+    
+        handleFieldChange(index, "value", processedValue);
+    };
 
-        const updatedCardData = [...cardData];
-        if (field === "edit") {
-            // Use `changeCustomEdit` for complex logic
-            if(updatedCardData[index].custom){
-                changeCustomEdit(updatedCardData[index].id, value);
-            }
-            else{
-                console.warn("You cannot change the edit field of a non custom item");
-            }
-        } else {
-            if(field === "value"){
-                updatedCardData[index][field] = value;
-            }
-            else if (updatedCardData[index].custom){
-                updatedCardData[index][field] = value;
-                // Reset value if type changes
-                if (["source", "type"].includes(field)) {
-                    updatedCardData[index].value = [];  // Clear selections on type change
+    const handleFieldChange = (index, field, value) => {
+        const currentItem = cardData[index];
+        const currentFieldValue = currentItem[field];
+        if(value !== currentFieldValue){
+            const updatedCardData = [...cardData];
+            if (field === "edit") {
+                // Use `changeCustomEdit` for complex logic
+                if(updatedCardData[index].custom){
+                    changeCustomEdit(updatedCardData[index].id, value);
                 }
+                else{
+                    console.warn("You cannot change the edit field of a non custom item");
+                }
+            } else {
+                if(field === "value"){
+                    updatedCardData[index][field] = value;
+                }
+                else if (updatedCardData[index].custom){
+                    updatedCardData[index][field] = value;
+                    // Reset value if type changes
+                    if (["source", "type"].includes(field)) {
+                        updatedCardData[index].value = [];  // Clear selections on type change
+                    }
+                }
+                else{
+                    console.warn(`You cannot edit the ${field} of a non custom object`);
+                }
+                setCardData(updatedCardData);
             }
-            else{
-                console.warn(`You cannot edit the ${field} of a non custom object`);
-            }
-            setCardData(updatedCardData);
         }
     };
 
@@ -530,23 +574,184 @@ function CardDataEditor({ bio, updateBio }) {
         });
     };
 
-    const getFilteredOptions = (item, optionsMap) => {
-        if (!item.source || !optionsMap[item.source]) {
-            return [];
-        }
-    
-        let options = optionsMap[item.source] || [];
-    
-        // Apply type filtering
-        if (item.type) {
-            const types = Array.isArray(item.type) ? item.type : [item.type];
-            options = options.filter(option =>
-                types.includes(option.value.type)
-            );
-        }
-    
-        return options;
+    const getFilteredOptions = (options, type) => {
+        if (!type) return options;  // No filter applied if type is not specified
+        return options.filter(option => 
+            (Array.isArray(option.value.type) && option.value.type.includes(type) || option.value.type === type)
+        );
     };
+
+    const addOptionToMap = (newOptions, source) => {
+        if (!Array.isArray(newOptions) || newOptions.length === 0) return;
+   
+        setOptionsMap((prevMap) => {
+            const updatedMap = { ...prevMap };
+            
+            if (!updatedMap[source]) {
+                updatedMap[source] = [];
+            }
+   
+            newOptions.forEach((newOption) => {
+                if (!updatedMap[source].some(opt => opt.value === newOption.value)) {
+                    updatedMap[source].push(newOption);
+                }
+            });
+   
+            return updatedMap;
+        });
+    };
+   
+
+    const renderInput = (item, index) =>{
+        if(!item){
+            return;
+        }
+        const {edit, value, source, type, qualifier} = item;
+        switch(edit){
+            case "text":
+                return(
+                    <div key={index} className="mb-3">
+                        <input
+                        type="text"
+                        className="form-control"
+                        value={value}
+                        onChange={(e) => handleFieldChange(index, "value", e.target.value)}
+                        placeholder="Enter text"
+                    />
+                    </div>
+                )
+                break;
+            case "select":
+            case "multi-select":
+            case "special-select":
+                const options = optionsMap[source] || [];
+                const filteredOptions = getFilteredOptions(options, type)
+                const mappedValues = value ? Array.isArray(value) ? value.map(val => ({
+                    label: val.label || val.name || val.value || val,  // Fallback for label
+                    value: val        // Ensure the full value is preserved
+                })) : [{label:value.label || value.name || value.value || value, value: value}]: [];
+                const isMultiSelect = edit === "multi-select" || 
+                edit === "special-select" && Array.isArray(value) && value.some(val => 
+                    Array.isArray(val) 
+                    ? val.some(typ => qualifier.includes(typ))
+                    : (typeof val === "object" && qualifier.includes(val.value)));
+                    return (
+                        <div key={index} className="mb-3">
+                            <Select
+                                isMulti={isMultiSelect}
+                                options={filteredOptions}
+                                value={mappedValues}
+                                onChange={(selected) => handleSelectionChange(index, selected)} // Update value
+                                className="form-control"
+                            />
+                        </div>
+                    );
+                
+                break;
+            case "super-select":
+                const superOptions = optionsMap[source] || [];
+                const filteredSuperOptions = getFilteredOptions(superOptions, type)
+
+                return(<SuperUpdater 
+                    value={value} 
+                    options={filteredSuperOptions} 
+                    valueUpdater={(updatedValue) => handleFieldChange(index, "value", updatedValue)} 
+                    />)
+            case "creatable":
+                const creatableOptions = optionsMap[source] || [];
+                const creatableValues = value ? value.map(val => ({
+                    label: val.label || val.name || val.value || val,  // Fallback for label
+                    value: val        // Ensure the full value is preserved
+                })) : [];
+
+                const handleCreatableChange = (newValue) => {
+                    // Extract new options that aren't in the optionsMap
+                    const newOptions = newValue.filter((val) => 
+                        !(optionsMap[source] || []).some((opt) => opt.value === val.value)
+                    );
+    
+                    if (newOptions.length > 0) {
+                        // Add new options directly to the optionsMap
+                        addOptionToMap(newOptions, source);
+                    }
+    
+                    handleSelectionChange(index, newValue);
+                };
+                return (
+                    <div key={index} className="mb-3">
+                        <Creatable
+                            isMulti
+                            options={creatableOptions}
+                            value={creatableValues}
+                            onChange={handleCreatableChange} // Update value
+                            className="form-control"
+                        />
+                    </div>
+                );
+            case "text-creatable":
+                const textCreatableValues = value ? value.map(val => ({
+                        label: val.label || val.name || val.value || val,  // Fallback for label
+                        value: val        // Ensure the full value is preserved
+                    })) : [];
+                
+                // State for handling input and dynamic creation of options
+                const [inputValue, setInputValue] = useState('');
+                const [selectedValues, setSelectedValues] = useState(textCreatableValues);
+                
+                const handleInputChange = (newInputValue) => {
+                    setInputValue(newInputValue);
+                };
+    
+                const handleKeyDown = (event) => {
+                    if (!inputValue) return;
+                    switch (event.key) {
+                        case 'Enter':
+                        case 'Tab':
+                            const newOption = {
+                                label: inputValue,
+                                value: inputValue,
+                            };
+                            
+                            // Add new option to selected values
+                            setSelectedValues((prev) => [...prev, newOption]);
+                            const updatedValues = [...(value || []), inputValue];
+
+                            handleFieldChange(index, "value", updatedValues);
+                            setInputValue(''); // Clear input field
+                            event.preventDefault();
+                            break;
+                        default:
+                            break;
+                        }
+                };
+    
+                return (
+                    <div key={index} className="mb-3">
+                        <Creatable
+                            isMulti
+                            options={selectedValues} // Use selectedValues as options, so it contains both initial and dynamically added options
+                            value={selectedValues}
+                            onChange={(newValue) => {
+                                setSelectedValues(newValue) 
+                                const updatedValues = newValue.map(opt => opt.value);
+                                handleFieldChange(index, "value", updatedValues)
+                            }} // Update selected values
+                            onInputChange={handleInputChange}
+                            onKeyDown={handleKeyDown}
+                            inputValue={inputValue}
+                            placeholder="Type and press Enter to add new item..."
+                            className="form-control"
+                        />
+                    </div>
+                );
+
+            default:
+                return null;
+
+
+
+        }
+    }
 
     return (
         <div>
@@ -615,11 +820,14 @@ function CardDataEditor({ bio, updateBio }) {
                                             onChange={(e) => handleFieldChange(index, "type", e.target.value)}
                                         >
                                             <option value="">None</option>
-                                            {optionsMap["/worldbuilding/races/types"]?.map((opt) => (
-                                                <option key={opt.value} value={opt.value}>
-                                                    {opt.label}
-                                                </option>
-                                            ))}
+
+                                            {item.source && item.source !== "" && typeof item.source === "string" && !item.source.includes("types") && 
+                                                optionsMap[`${item.source}/types`]?.map((opt, index) => (
+                                                    <option key={ opt.label} value={opt.label}>
+                                                        {opt.label}
+                                                    </option>
+                                                ))
+                                            }
                                         </select>
                                     </div>
                                 )}
@@ -634,11 +842,13 @@ function CardDataEditor({ bio, updateBio }) {
                                             onChange={(e) => handleFieldChange(index, "qualifier", e.target.value)}
                                         >
                                             <option value="">None</option>
-                                            {optionsMap[item.source]?.map((opt) => (
-                                                <option key={opt.value} value={opt.value}>
-                                                    {opt.label}
-                                                </option>
-                                            ))}
+                                            {item.source && item.source !== "" && typeof item.source === "string" && !item.source.includes("types") && 
+                                                optionsMap[`${item.source}/types`]?.map((opt) => (
+                                                    <option key={opt.value} value={opt.value}>
+                                                        {opt.label}
+                                                    </option>
+                                                ))
+                                            }
                                         </select>
                                     </div>
                                 )}
@@ -659,6 +869,7 @@ function CardDataEditor({ bio, updateBio }) {
                                 <p className="form-control-plaintext">{item.label}</p>
                             </div>
                         )}
+                        {renderInput(item, index)}
                     </div>
                 ))}
             </div>
@@ -671,8 +882,11 @@ function CardDataEditor({ bio, updateBio }) {
     );
 }
 
+const MemoizedCardDataEditor = React.memo(CardDataEditor);
+const MemoizedSectionsEditor = React.memo(SectionsEditor);
 
-export function BioPage(){
+
+export function BioPage(props){
     const { id } = useParams(); 
     
     const [bio, setBio] = useState(null);
@@ -687,7 +901,10 @@ export function BioPage(){
     };
 
     function toggleEditing(){
+        console.log("toggling editing")
         setEditing(prevEditing => !prevEditing);
+        console.log(editing)
+
     }
     function reloadPage(){
         window.location.reload;
@@ -745,21 +962,23 @@ export function BioPage(){
             
         )
         
-        .finally(() => {
-            setLoading(false);
-        });
+        
         fetch(`/api/user/me`, {
             method:"GET",             
             headers: {'Content-Type': 'application/json'},
         })
         .then(res => res.json())
         .then((userData) => {
-            fetch(`/api${path}?author=${userData.username}`)
+            console.log(JSON.stringify(userData));
+            fetch(`/api${path}?author=${props.user.username}`)
             .then(resp => resp.json())
             .then(bool => setIsAuthor(bool.isAuthor))
             .catch(setIsAuthor(false))
         })
-        .catch(setIsAuthor(false));
+        .catch(setIsAuthor(false))
+        .finally(() => {
+            setLoading(false);
+        });
     }, [id]);
 
     const [cleanBio, setCleanBio] = useState(bio);
@@ -773,6 +992,7 @@ export function BioPage(){
             try {
                 const res = await fetch('/api/user/prof', { method: 'GET',  });
                 const data = await res.json(); 
+                console.log(JSON.stringify(data))
                 setProfanity(data.profanityFilter);
             } catch {
                 setProfanity(true);
@@ -814,7 +1034,7 @@ export function BioPage(){
         return <p>Error: Missing or invalid data.</p>;
     }
     if(editing){
-        <main className="bio">
+        return(<main className="bio">
             <ButtonGroup>
                 <Button variant="primary" onClick={handleSave}>
                     Save
@@ -827,8 +1047,9 @@ export function BioPage(){
                 </Button>
             </ButtonGroup>
             <h1>{bio.infoCard.name}</h1>
+            <MemoizedCardDataEditor bio={bio} updateBio={updateBio} />
             <textarea value={bio.description} onChange={updateDescription}/>
-            <SectionsEditor bio={bio} updateBio={updateBio} />
+            <MemoizedSectionsEditor bio={bio} updateBio={updateBio} />
             <ButtonGroup>
                 <Button variant="primary" onClick={handleSave}>
                     Save
@@ -840,16 +1061,17 @@ export function BioPage(){
                     Cancel
                 </Button>
             </ButtonGroup>
-        </main>
+        </main>)
     }
     return(
         <main className="bio">
+            
+            <MemoizedInfoCard {...cleanBio.infoCard} />
             {isAuthor && (
                 <Button variant ="primary" onClick={toggleEditing}>
                     Edit
                 </Button>
             )}
-            <MemoizedInfoCard {...cleanBio.infoCard} />
             <div>
                 <h2>Description</h2>
                 <p>{cleanBio.description}</p>

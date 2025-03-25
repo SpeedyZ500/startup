@@ -20,6 +20,7 @@ const verifyAuth = async (req, res, next) => {
 
     const user = await getUser('token', token);
     if (user) {
+        req.username = user.username;
       next();
     } else {
       res.status(401).send({ msg: 'Unauthorized' });
@@ -426,6 +427,29 @@ apiRouter.get('/user/prof',  async(req, res) => {
         res.send({profanityFilter:true});
     }
 })
+let bioSources = [
+    "/characters", 
+    "/characters/types", 
+    "/worldbuilding/races",
+    "/worldbuilding/races/types",
+    "/worldbuilding/biomes",
+    "/worldbuilding/biomes/types",
+    "/worldbuilding/countries",
+    "/worldbuilding/countries/types",
+    "/worldbuilding/worlds",
+    "/worldbuilding/worlds/types",
+    "/worldbuilding/magicsystems",
+    "/worldbuilding/magicsystems/types",
+    "/worldbuilding/flora",
+    "/worldbuilding/flora/types",
+    "/worldbuilding/wildlife",
+    "/worldbuilding/wildlife/types",
+    "/worldbuilding/organizations",
+    "/worldbuilding/organizations/types",
+]
+apiRouter.get('/sources/bio', async(req, res) => {
+    res.send(bioSources);
+})
 
  
 
@@ -481,6 +505,6 @@ module.exports = {
     verifyAuth,
     sanitizeId,
     createID,
-    getUser
+    getUser,
 
 };

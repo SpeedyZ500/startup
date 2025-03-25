@@ -1,5 +1,5 @@
 const express = require('express');
-const { verifyAuth, createID, getUser} = require('./service.js');  
+const { verifyAuth, createID, getUser, authCookieName} = require('./service.js');  
 const urlPrefix = "/characters/"
 
 const characterRouter = express.Router();
@@ -7,6 +7,7 @@ const characterRouter = express.Router();
 let characters = [
     {
         "id":"alastor_moonblaze_spencer_zaugg",
+        "name":"Alastor Moonblaze",
         "details":[
             {
                 "label":"name",
@@ -49,6 +50,7 @@ let characters = [
     },
     {
         "id":"the_curator_spencer_zaugg",
+        "name":"The Curator",
         "details":[
             {
                 "label":"name",
@@ -93,6 +95,7 @@ let characters = [
 let characterBios =[
     {
         "id":"alastor_moonblaze_spencer_zaugg",
+        
         "infoCard":{
             "name":"Alastor Moonblaze",
             "cardData":[
@@ -338,11 +341,11 @@ characterRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
 
 
 characterRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
+    const { id } = req.params;
+    const username  = req.username;
     const character = await getCharacter("id", id);
     if(character){
-        const token = req.cookies[authCookieName];
-        const currUser = await getUser('token', token);
-        if(currUser.username === character.author){
+        if(username === character.author){
             const updateData = req.body;
             const updated = await updateCharacter(id, updateData)
             res.send({name:updated.name, url:updated.url, id:updated.id})
@@ -365,6 +368,7 @@ async function createCharacter(characterData, id){
     const created = new Date().toJSON();
     const characterBio = {
         id:id,
+        name:characterData.name,
         url:characterURL,
         author:characterData.author,
         infoCard:{
@@ -460,24 +464,38 @@ async function createCharacter(characterData, id){
     };
     await addTypes(characterData.Type);
     characterBios.push(characterBio);
-    const race = characterData.Race.find(item => 
+    const race = (characterData.Race && characterData.Race.length > 0) 
+    ? characterData.Race.find(item => 
         (Array.isArray(item.type) ? 
-        item.type.includes("sudo-shape-shifter") : item.type === "sudo-shape-shifter"
-    )
-    ) || characterData.Race[0];
+            item.type.includes("sudo-shape-shifter") : item.type === "sudo-shape-shifter")
+        ) || characterData.Race[0] || {value:"", path:""}
+    : {value:"", path:""};
 
     const character = {
         id:id,
+        name:characterData.name,
         url:characterURL,
         author:characterData.author,
         description:characterData.description,
-        organizations:characterData.Organizations.map(org => org.id),
-        belief:characterData.Religion.map(rel => rel.id),
-        abilities:characterData.Abilities.map(abil => abil.id),
-        world:characterData.characterData.World[0]?.id,
-        country:characterData.Country[0]?.id,
-        types:characterData.Type,
-        race:characterData.Race.map(abil => abil.id),
+        organizations:(characterData.Organizations && characterData.Organizations.length > 0)
+        ? characterData.Organizations.map(org => org.id) 
+        : [],
+        belief:(characterData.Religion && characterData.Religion.length > 0)
+        ? characterData.Religion.map(rel => rel.id)
+        : [],
+        abilities:(characterData.Abilities && characterData.Abilities.length > 0)
+        ? characterData.Abilities.map(abil => abil.id)
+        : [],
+        world:(characterData.World && characterData.World.length > 0)
+        ? characterData.World[0]?.id 
+        : "",
+        country:(characterData.Country && characterData.Country.length > 0)
+        ? characterData.Country[0]?.id 
+        : "",
+        type:characterData.Type || [],
+        race:(characterData.Race && characterData.Race.length > 0)
+        ? characterData.Race.map(abil => abil.id) 
+        : [],
         details:[
             {
                 label:"name",
@@ -492,17 +510,21 @@ async function createCharacter(characterData, id){
             },
             {
                 label:"World",
-                value:characterData.characterData.World[0]?.value,
-                path:characterData.characterData.World[0]?.path
+                value:(characterData.World && characterData.World.length > 0)
+                ? characterData.World[0]?.value 
+                : "",
+                path:(characterData.World && characterData.World.length > 0)
+                ? characterData.World[0]?.path 
+                : ""
             },
             {
                 label:"Race",
-                value: race?.value,
-                path: race?.path,
+                value: race?.value || "",
+                path: race?.path || "",
             },
             {
                 label:"Type",
-                value:characterData.Type,
+                value:characterData.Type || [],
                 display:false
             },
             {
