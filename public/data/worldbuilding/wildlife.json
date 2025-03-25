@@ -1,0 +1,79 @@
+{
+    "title":"Wildlife",
+    "description":"This is all about the creatures, critters and monsters you create, their abilities and natural habitats.",
+    "buttonLabel":"New Wildlife",
+    "form":{
+        "title":"New Wildlife",
+        "fields":[
+            {
+                "label": "name",
+                "required": true,
+                "type": "text"
+            },
+            {
+                "label":"Type",
+                "type":"creatable",
+                "source":"/worldbuilding/wildlife/types"
+            },
+            {
+                "label":"Description",
+                "type":"text-area",
+                "placeholder":"Describe your Wildlife"
+            },
+            {
+                "label":"Origin_World",
+                "type":"select",
+                "source":"/worldbuilding/worlds",
+                "onCard":true,
+                "inList":true
+            },
+            {
+                "label":"Worlds",
+                "type":"multi-select",
+                "source":"/worldbuilding/worlds"
+            },
+            {
+                "label":"Abilities",
+                "type":"multi-select",
+                "source":"/worldbuilding/magicsystems"
+
+            },
+            {
+                "label":"Biomes",
+                "type":"multi-select"
+            },
+            {
+                "label":"Sections",
+                "type":"section-adder"
+            }
+        ]
+    },
+
+    "sort":[
+        {
+            "label":"New to Old",
+            "value":{"category":"created", "az":false}
+        },
+        {
+            "label":"Old to New",
+            "value":{"category":"created", "az":true}
+        },
+        {
+            "label":"A-Z Name",
+            "value":{"category":"Name", "az":true}
+        },
+        {
+            "label":"Z-A Name",
+            "value":{"category":"Name", "az":false}
+        },
+        {
+            "label":"A-Z Author",
+            "value":{"category":"Author", "az":true}
+        },
+        {
+            "label":"Z-A Author",
+            "value":{"category":"Author", "az":false}
+        }
+    ]
+
+}

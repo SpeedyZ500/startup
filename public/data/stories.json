@@ -24,15 +24,13 @@
             },
             {
                 "label":"Genre",
-                "type":"text",
-                "split":";",
-                "placeholder":"a list of genres separated by semicolons ;"
+                "type":"creatable",
+                "source":"/stories/genres"
             },
             {
                 "label":"Content Warnings",
-                "type":"text",
-                "split":";",
-                "placeholder":"a list of content warnings separated by semicolons ;"
+                "type":"creatable",
+                "source":"/stories/contentwarnings"
             },
             {
                 "label":"Author",

@@ -23,7 +23,7 @@
                 "filterable":false
             },
             {
-                "label":"World",
+                "label":"Worlds",
                 "type":"multi-select",
                 "source":"/api/worldbuilding/worlds"
             },
@@ -33,7 +33,7 @@
                 "source":"/api/worldbuilding/wildlife"
             },
             {
-                "label":"Abilities",
+                "label":"Flora",
                 "type":"multi-select",
                 "source":"/api/worldbuilding/flora"
             },

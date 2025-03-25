@@ -65,8 +65,8 @@
                 "inList":true
             },
             {
-                "label":"Country",
-                "type":"select",
+                "label":"Countries",
+                "type":"multi-select",
                 "source":"/worldbuilding/countries"
             },
             {

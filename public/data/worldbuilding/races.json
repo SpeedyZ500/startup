@@ -1,0 +1,67 @@
+{
+    "title":"Races",
+    "description":"This doesn't refer to skin color, it refers to Humans, Elves, Dwarvs, Orks and other fantasy races. Here is where you will put all your custom races, their cultures, histories, and abilities, as well as other stuff like that.",
+    "buttonLabel":"New Race",
+    "form":{
+        "title":"New Race",
+        "fields":[
+            {
+                "label": "name",
+                "required": true,
+                "type": "text"
+            },
+            {
+                "label":"Type",
+                "type":"creatable",
+                "source":"/worldbuilding/races/types"
+            },
+            {
+                "label":"Description",
+                "type":"text-area",
+                "placeholder":"Describe your Wildlife"
+            },
+            {
+                "label":"Worlds",
+                "type":"multi-select",
+                "source":"/worldbuilding/worlds"
+            },
+            {
+                "label":"Abilities",
+                "type":"multi-select",
+                "source":"/worldbuilding/magicsystems"
+
+            },
+            {
+                "label":"Sections",
+                "type":"section-adder"
+            }
+        ]
+    },
+
+    "sort":[
+        {
+            "label":"New to Old",
+            "value":{"category":"created", "az":false}
+        },
+        {
+            "label":"Old to New",
+            "value":{"category":"created", "az":true}
+        },
+        {
+            "label":"A-Z Name",
+            "value":{"category":"Name", "az":true}
+        },
+        {
+            "label":"Z-A Name",
+            "value":{"category":"Name", "az":false}
+        },
+        {
+            "label":"A-Z Author",
+            "value":{"category":"Author", "az":true}
+        },
+        {
+            "label":"Z-A Author",
+            "value":{"category":"Author", "az":false}
+        }
+    ]
+}

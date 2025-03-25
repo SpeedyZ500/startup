@@ -126,19 +126,33 @@ let stories = [
 let genres = [];
 let contentwarnings = [];
 
+async function getStory(field, value){
+    if (value) {
+        return stories.find((story) => story[field] === value);
+    }
+    return null;
+}
+async function getChapter(story, field, value){
+    if (value) {
+        return story.chapters.find((chapter) => chapter[field] === value);
+    }
+    return null;
+}
+
+
 storiesRouter.get(`${urlPrefix}:storyID?/:chapterID?`, async (req, res) => {
     const {storyID, chapterID} = req.params;
     if(!storyID){
         res.send(stories);
     }
     else{
-        const story = stories.find(story => story.id === storyID);
+        const story = await getStory("id", storyID);
         if(story){
             if(!chapterID){
                 res.send(story);
             }
             else{
-                const chapter = story.chapters.find(chapter => chapter.id === chapterID);
+                const chapter = await getChapter(story, field, value);
                 if(chapter){
                     res.send(chapter);
                 }

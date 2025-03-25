@@ -6,15 +6,63 @@
         "title":"New World",
         "fields":[
             {
-                
+                "label": "name",
+                "required": true,
+                "type": "text"
             },
             {
                 "label":"Description",
                 "type":"text-area",
-                "placeholder":"Your Prompt",
+                "placeholder":"Describe your world",
                 "onCard":false,
                 "inList":true,
                 "filterable":false
+            },
+            {
+                "label":"Magic Systems",
+                "type":"multi-select",
+                "source":"/worldbuilding/magicsystems"
+
+            },
+            {
+                "label":"Races",
+                "type":"multi-select",
+                "source":"/worldbuilding/races"
+            },
+            {
+                "label": "Flora",
+                "type": "multi-select",
+                "source":"/worldbuilding/flora"
+            },
+            {
+                "label": "Wildlife",
+                "type": "multi-select",
+                "source":"/worldbuilding/wildlife"
+            },
+            {
+                "label":"Biomes",
+                "type":"multi-select"
+            },
+            {
+                "label": "Continents",
+                "type":"super-select",
+                "source":"/worldbuilding/countries",
+                "categoryLabel":"Continent"
+            },
+            {
+                "label":"Religion",
+                "type":"multi-select",
+                "source":"/worldbuilding/organizations",
+                "category":"type=religion"
+            },
+            {
+                "label":"Organizations",
+                "type":"multi-select",
+                "source":"/worldbuilding/organizations"
+            },
+            {
+                "label":"Sections",
+                "type":"section-adder"
             }
         ]
 

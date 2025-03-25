@@ -1,9 +1,9 @@
 {
     "title":"Countries",
     "description":"The countries of your stories, contains information of what races are in them, their allies, their enemies. It also contains information on their culture, history, religions, and the lands within them, and the common creatures within, don't feel to be exhaustive, you will be able to add to your own countries and stuff later.",
-    "buttonLabel":"New Biome",
+    "buttonLabel":"New Country",
     "form":{
-        "title":"New Biome",
+        "title":"New Country",
         "fields":[
             {
                 "label":"Name",
@@ -21,6 +21,11 @@
                 "onCard":false,
                 "inList":true,
                 "filterable":false
+            },
+            {
+                "label":"Leaders",
+                "type":"multi-select",
+                "source":"/characters"
             },
             {
                 "label":"World",

@@ -5,47 +5,76 @@ const urlPrefix = "/worldbuilding/worlds/"
 const worldsRouter = express.Router();
 let worlds = [];
 
-let worldBios = [
-    {
-        "id":"the_void_spencer_zaugg",
-        "infoCard":{
-            "name":"The Void",
-            "cardData":[
-                {
-                    "label":"Author",
-                    "value":"Spencer Zaugg"
-                }
-            ],
-            "created":"2025-02-20T21:56:41Z",
-            "modified":"2025-02-20T21:56:41Z"
-    
-        },
-        "description":"The World Between Worlds",
-        "sections":[
-            {
-                "section":"Please be Patient",
-                "text":"I haven't finished it yet this is a test"
-            }
-        ]
-    
+let worldBios = [];
+
+async function getWorld(field, value) {
+    if (value) {
+        return worlds.find((world) => world[field] === value);
     }
-];
+    return null;
+}
+
+async function getWorldBio(field, value) {
+    if (value) {
+        return worldBios.find((world) => world[field] === value);
+    }
+    return null;
+}
+
+async function getWorlds(queries) {
+    if (typeof queries === "object") {
+        let filterWorlds = worlds;
+        for (const [key, value] of Object.entries(queries)) {
+            if (Array.isArray(value)) {
+                filterWorlds = filterWorlds.filter((world) =>
+                    Array.isArray(world[key])
+                        ? world[key].some(w => value.includes(w))
+                        : value.includes(world[key])
+                );
+            } else {
+                filterWorlds = filterWorlds.filter((world) =>
+                    Array.isArray(world[key])
+                        ? world[key].includes(value)
+                        : value === world[key]
+                );
+            }
+        }
+        return filterWorlds;
+    } else {
+        return worlds;
+    }
+}
 
 worldsRouter.get(`${urlPrefix}:id?`, async (req, res) => {
     const { id } = req.params;
-    if(!id){
-        res.send(worlds)
-    }
-    else{
-        const world = worldBios.find(bio => bio.id === id);
-        if(world){
-            res.send(world);
+    const {author} = req.query || "";
+    const queries = req.query || {};
+    if (!id || id === "undefined" || id.trim() === "") {
+        if (Object.keys(queries).length > 0) {
+            let worldsToSend = await getWorlds(queries);
+            res.send(worldsToSend);
+        } else {
+            res.send(worlds);
         }
-        else{
-            res.status(404).json({ error: "World not found" });
+    } else {
+        if (id === "types") {
+            res.send(worldTypes);
+        } else {
+            const world = await getWorldBio("id", id);
+            if (world) {
+                if (author) {
+                    const isAuthor = author === world.author;
+                    res.send({ isAuthor });
+                } else {
+                    res.send(world);
+                }
+            } else {
+                res.status(404).json({ error: "World not found" });
+            }
         }
     }
 });
+
 
 
 module.exports = worldsRouter;

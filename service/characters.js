@@ -290,12 +290,39 @@ async function getCharacterBio(field, value){
     return null;
 }
 
+async function getCharacters(queries){
+    if(typeof queries === "object"){
+        let filterCharacters = characters;
+        for(const [key, value] of Object.entries(queries)){
+            if(Array.isArray(value)){
+                filterCharacters = filterCharacters.filter(((character) => 
+                    Array.isArray(character[key]) ? character[key].some(char => value.includes(char)) : value.includes(character[key] )))
+            }
+            else{
+                filterCharacters = filterCharacters.filter(((character) => 
+                    Array.isArray(character[key]) ? character[key].includes(value) : value === character[key]))
+            }
+        }
+        return filterCharacters;
+    }
+    else{
+        return characters;
+    }
+}
+
 
 characterRouter.get(`${urlPrefix}:id?`, async (req, res) => {
     const { id } = req.params;
-    const { author } = req.query;
+    const queries = req.query || {};
+    const {author} = req.query || "";
     if(!id || id === "undefined" || id.trim() === ""){
-        res.send(characters)
+        if(Object.keys(queries).length > 0){
+            let charactersToSend = await getCharacters(queries);
+            res.send(charactersToSend)
+        }
+        else{
+            res.send(characters)
+        }
     }
     else{
         if(id == "types"){
@@ -386,9 +413,9 @@ async function createCharacter(characterData, id){
                 },
                 {
                     label:"Country",
-                    value:characterData.Country,
+                    value:characterData.Countries,
                     source:"/worldbuilding/countries",
-                    edit:"select"
+                    edit:"multi-select"
                 },
                 {
                     label:"Family",
@@ -489,9 +516,9 @@ async function createCharacter(characterData, id){
         world:(characterData.World && characterData.World.length > 0)
         ? characterData.World[0]?.id 
         : "",
-        country:(characterData.Country && characterData.Country.length > 0)
-        ? characterData.Country[0]?.id 
-        : "",
+        country:(characterData.Countries && characterData.Countries.length > 0)
+        ? characterData.Race.map(abil => abil.id)
+        : [],
         type:characterData.Type || [],
         race:(characterData.Race && characterData.Race.length > 0)
         ? characterData.Race.map(abil => abil.id) 
@@ -542,7 +569,7 @@ async function createCharacter(characterData, id){
     return character
 
 }
-const onCard = ["Type", "Race", "World", "Abilities", "Religion", "Organizations"];
+const onCard = ["Type", "Race", "World", "Abilities", "Religion", "Organizations", "Countries"];
 async function updateCharacter(id, updateData){
     const {description, infoCard, sections} = updateData
     const characterBio = await getCharacterBio("id", id);

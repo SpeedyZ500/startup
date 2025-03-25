@@ -9,18 +9,7 @@ import { BaseNav, WorldNav, SubNav } from './nav/nav';
 import { Home } from './home/home';
 import { About } from './about/about';
 import { Settings } from './settings/settings';
-import { Stories} from './stories/stories';
-import { WritingPrompts } from './writingprompts/writingprompts';
-import { WritingAdvice } from './writingadvice/writingadvice';
 import { WorldBuilding } from './worldbuilding/worldbuilding/worldbuilding';
-import { Worlds}  from './worldbuilding/worlds/worlds';
-import { Biomes}  from './worldbuilding/biomes/biomes';
-import { Countries}  from './worldbuilding/countries/countries';
-import { Flora}  from './worldbuilding/flora/flora';
-import { MagicSystems}  from './worldbuilding/magicsystems/magicsystems';
-import { Organizations}  from './worldbuilding/organizations/organizations';
-import { Races}  from './worldbuilding/races/races';
-import { Wildlife}  from './worldbuilding/wildlife/wildlife';
 import { StoryPage } from './stories/storypage/storypage';
 import { Chapter } from './stories/storypage/chapter/chapter';
 import NavDropdown from 'react-bootstrap/NavDropdown';
@@ -272,17 +261,4 @@ export default function App() {
 }
 function NotFound() {
     return <main className='container-fluid theme adaptive text-center' style={{padding:"20px", margin:"20px"}}>404: Return to sender. Address unknown.</main>;
-  }
-function getComponent(category) {
-    const components = {
-        magicsystems: MagicSystems,
-        races: Races,
-        countries: Countries,
-        wildlife: Wildlife,
-        flora: Flora,
-        worlds: Worlds,
-        organizations: Organizations,
-        biomes: Biomes
-    };
-    return components[category] || NotFound;
 }
