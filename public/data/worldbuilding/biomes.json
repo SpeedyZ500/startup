@@ -38,7 +38,7 @@
                 "source":"/api/worldbuilding/flora"
             },
             {
-                "label":"Full",
+                "label":"Sections",
                 "type":"section-adder"
             }
         ]

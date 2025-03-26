@@ -36,10 +36,6 @@
                 "type":"text"
             },
             {
-                "label":"Goals",
-                "type":"text"
-            },
-            {
                 "label":"Sections",
                 "type":"section-adder"
             }

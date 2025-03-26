@@ -26,6 +26,11 @@
                 "source":"/worldbuilding/worlds"
             },
             {
+                "label":"Countries",
+                "type":"multi-select",
+                "source":"/worldbuilding/countries"
+            },
+            {
                 "label":"Abilities",
                 "type":"multi-select",
                 "source":"/worldbuilding/magicsystems"

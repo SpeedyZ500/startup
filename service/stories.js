@@ -123,49 +123,44 @@ let stories = [
 ];
 
 
-let genres = [];
-let contentwarnings = [];
+// 🚀 Router: Fetch stories or individual story
+storiesRouter.get(`${urlPrefix}:storyID?`, async (req, res) => {
+    const { storyID } = req.params;
 
-async function getStory(field, value){
+    if (!storyID) {
+        res.send(stories);
+    } else {
+        const story = await getStory("id", storyID);
+        if (story) {
+            res.send(story);
+        } else {
+            res.status(404).send({ error: "Story not found" });
+        }
+    }
+});
+
+// 🚀 Router: Add a chapter to an existing story
+storiesRouter.patch(`${urlPrefix}:storyID`, verifyAuth, async (req, res) => {
+    const { storyID } = req.params;
+    const { data } = req.body; // Expect the chapter data to be in req.body.data
+
+    const story = await getStory("id", storyID);
+    if (!story) {
+        return res.status(404).json({ error: "Story not found" });
+    }
+
+    // Add the chapter to the story's chapters list
+    story.chapters.push(data);
+
+    res.status(200).json({ message: `Chapter added successfully to story ${storyID}` });
+});
+
+// Helper function to fetch a story by a field and value
+async function getStory(field, value) {
     if (value) {
         return stories.find((story) => story[field] === value);
     }
     return null;
 }
-async function getChapter(story, field, value){
-    if (value) {
-        return story.chapters.find((chapter) => chapter[field] === value);
-    }
-    return null;
-}
-
-
-storiesRouter.get(`${urlPrefix}:storyID?/:chapterID?`, async (req, res) => {
-    const {storyID, chapterID} = req.params;
-    if(!storyID){
-        res.send(stories);
-    }
-    else{
-        const story = await getStory("id", storyID);
-        if(story){
-            if(!chapterID){
-                res.send(story);
-            }
-            else{
-                const chapter = await getChapter(story, field, value);
-                if(chapter){
-                    res.send(chapter);
-                }
-                else{
-                    res.status(404).send({ error: "Chapter not found" });
-                }
-            }
-
-        }
-        else{
-            res.status(404).send({ error: "Story not found" });
-        }
-    }
-});
 
 module.exports = storiesRouter;

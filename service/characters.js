@@ -605,7 +605,7 @@ async function updateCharacter(id, updateData){
                                 character[item.label.toLowerCase()] = item.value;
 
                             }
-                            else if(["World", "Country"].includes(item.label)){
+                            else if(["World"].includes(item.label)){
                                 character[item.label.toLowerCase()] = item.value[0]?.id;
                                 const detailIndex = character.details.findIndex(detail => detail.label === item.label);
                                 if (detailIndex !== -1) {
@@ -668,4 +668,76 @@ async function addTypes(type){
     }
     return "done"
 }
-module.exports = characterRouter
+
+async function modifyCharacter(characterID, list, data, method) {
+    const { id, value, path } = data;
+
+    // Retrieve the character bio and main character data
+    const characterBio = await getCharacterBio("id", characterID);
+    const character = await getCharacter("id", characterID);
+
+    if (!characterBio || !character) {
+        console.error(`Character with ID '${characterID}' not found.`);
+        return { error: "Character not found" };
+    }
+
+    // Locate the relevant list in both characterBio and character
+    const bioList = characterBio.infoCard.cardData.find(item => item.label.toLowerCase() === list.toLowerCase());
+    const characterList = character[list.toLowerCase()];
+
+    if (!bioList || !characterList) {
+        console.error(`List '${list}' not found.`);
+        return { error: `List '${list}' not found.` };
+    }
+
+    // Create the item object (value, id, path)
+    const newItem = { value, id, path };
+
+    // Add or update references
+    if (method === 'add' || method === 'put') {
+        const existsInCharacter = characterList.some(item => item.id === id);
+        const existsInBio = bioList.value.some(item => item.id === id);
+
+        if (!existsInCharacter) {
+            characterList.push(newItem);  // Add to character object
+        }
+        if (!existsInBio) {
+            bioList.value.push(newItem);  // Add to character bio
+        }
+    } 
+    // Delete references
+    else if (method === 'delete') {
+        // Remove from character object
+        const characterListIndex = characterList.findIndex(item => item.id === id);
+        if (characterListIndex !== -1) {
+            characterList.splice(characterListIndex, 1);
+        }
+
+        // Remove from bio card data
+        const bioListIndex = bioList.value.findIndex(item => item.id === id);
+        if (bioListIndex !== -1) {
+            bioList.value.splice(bioListIndex, 1);
+        }
+    }
+
+    // Return updated character
+    return { message: `Character '${list}' modified successfully`, character };
+}
+
+// 🚀 Router: Modify a character field (add/put/delete references)
+characterRouter.patch(`${urlPrefix}:id/:list`, verifyAuth, async (req, res) => {
+    const { id, list } = req.params;
+    const { method, data } = req.body;
+
+    const result = await modifyCharacter(id, list, data, method);
+
+    if (result.error) {
+        res.status(404).json(result);
+    } else {
+        res.send(result);
+    }
+});
+
+
+
+module.exports = {characterRouter, modifyCharacter}

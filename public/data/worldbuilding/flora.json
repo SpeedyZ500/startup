@@ -21,6 +21,11 @@
                 "placeholder":"Describe your Flora"
             },
             {
+                "label":"Properties",
+                "type":"multi-select",
+                "source":"/worldbuilding/magicsystems"
+            },
+            {
                 "label":"Origin_World",
                 "type":"select",
                 "source":"/worldbuilding/worlds",
@@ -32,6 +37,17 @@
                 "type":"multi-select",
                 "source":"/worldbuilding/worlds"
             },
+            {
+                "label":"Biomes",
+                "type":"multi-select",
+                "source":"/worldbuilding/biomes"
+            },
+            {
+                "label":"Countries",
+                "type":"multi-select",
+                "source":"/worldbuilding/countries"
+            },
+
             {
                 "label":"Sections",
                 "type":"section-adder"

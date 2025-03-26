@@ -4,6 +4,10 @@ const uuid = require('uuid');
 const express = require('express');
 const app = express();
 const authCookieName = 'token';
+const { 
+    getUserByToken,
+    getUserByUsername,
+    getUserByEmail, createUser, updateUser } = require('./database');  // Import database functions
 
 app.use(express.json());
 app.use(cookieParser());
@@ -25,98 +29,11 @@ const verifyAuth = async (req, res, next) => {
     } else {
       res.status(401).send({ msg: 'Unauthorized' });
     }
-  };
+};
 
-let users = [];
-
-let writingadvice = [
-    {
-        "description": "It doesn't matter what it is you write, just start writing, getting ideas on a page is more important than if it looks good.",
-        "details":[
-            {
-                "label":"Author",
-                "value":"Spencer Zaugg",
-                "filter":false,
-                "display":false
-            }
-        ],
-        "id":"1"
-    },
-    {
-        "description": "Write down random questions",
-        "details":[
-            {
-                "label":"Author",
-                "value":"Spencer Zaugg",
-                "filter":false,
-                "display":false
-            }
-        ],
-        "id":"2"
-    },
-    {
-        "description": "Write down story ideas, and character concepts.",
-        "details":[
-            {
-                "label":"Author",
-                "value":"Spencer Zaugg",
-                "filter":false,
-                "display":false
-                
-            }
-        ],
-        "id":"3"
-    }
-];
-
-let writingprompts = [
-    {
-        "description": "What if werewoves were real, but they aren't around today because they colonized the moon?",
-        "details":[
-            {
-                "label":"Author",
-                "display":false,
-                "filter":false,
-                "value":"Spencer Zaugg"
-            }
-        ],
-        "id":"1"
-    },
-    {
-        "description": "What if I was actually good at writing?",
-        "details":[
-            {
-                "label":"Author",
-                "display":false,
-                "filter":false,
-                "value":"Spencer Zaugg"
-            }
-        ],
-        "id":"2"
-    },
-    {
-        "description": "What if I was actually good at programming?",
-        "details":[
-            {
-                "label":"Author",
-                "display":false,
-
-                "value":"Spencer Zaugg"
-            }
-        ],
-        "id":"3"
-    }
-];
-
-
-
-
-
-
-
-
-
-
+// Use MongoDB or another persistent data source instead of in-memory data
+let writingadvice = [];  // You could retrieve this data from the database
+let writingprompts = [];  // Same here
 
 
 function sanitizeId(id){
@@ -126,43 +43,12 @@ function sanitizeId(id){
         .replace(/\s+/g, "-")
         .replace(/[^\w-]/g, "");
 }
+
 async function createID(name, author){
     return sanitizeId(`${name}_${author}`);
 }
 
-
-async function createUser(email, username, password, displayname) {
-    const passwordHash = await bcrypt.hash(password, 10);
-
-    const user = {
-        email: email,
-        username:username,
-        password: passwordHash,
-        profanityFilter:true,
-
-    };
-    if(displayname && displayname !== ''){
-        user.displayname = displayname;
-    }
-    else{
-        user.displayname = username;
-    }
-
-    users.push(user);
-
-    return user;
-}
-
-
-function getUser(field, value){
-    if (value) {
-        return users.find((user) => user[field] === value);
-    }
-    return null;
-}
-
-
-function createAdvice(description, author, created){
+async function createAdvice(description, author, created){
     const advice = {description: description, details:[{
             label:"Author",
             value:author,
@@ -175,28 +61,24 @@ function createAdvice(description, author, created){
             display:false,
             filter:false
         }]
-    }
+    };
     writingadvice.push(advice);
     return advice;
-    
 }
 
 apiRouter.post('/writingadvice', verifyAuth, (req, res) => {
     const description = req.body.description;
     const author = req.body.author;
     const created = new Date().toJSON();
-    const advice = createAdvice(description, author,created )
+    const advice = createAdvice(description, author,created );
     res.status(201).send(advice);
 });
-function getResourceById(resource, id){
-    return resource.find(item => item.id === id);
-}
+
 apiRouter.post('/writingprompts', verifyAuth, (req, res) => {
     try{
         const description = req.body.Description;
         if (!description){
             return res.status(400).json({ error: 'text is required' });
-
         }
         const author = req.body.author;
         const created = new Date().toJSON();
@@ -213,7 +95,7 @@ apiRouter.post('/writingprompts', verifyAuth, (req, res) => {
                 display:false,
                 filter:false
             }
-        ]}
+        ]};
         writingprompts.push(output)
         res.status(201).json(JSON.stringify(output));
     }
@@ -221,23 +103,17 @@ apiRouter.post('/writingprompts', verifyAuth, (req, res) => {
         console.error("Error handling writing prompt submission:", err);
         res.status(500).send({ error: 'An error occurred while submitting the writing prompt' });
     }
-})
-
-
+});
 
 apiRouter.get('/writingadvice', async (_req, res) => {
     res.send(writingadvice);
 });
 
-
-
 apiRouter.get('/writingprompts', async (_req, res) => {
-    res.send(writingprompts)
+    res.send(writingprompts);
 });
 
-
-
-//registration
+// Registration
 apiRouter.post('/auth/register', async (req, res) => {
     if(req.body.username !== await sanitizeId(req.body.username)){
         return res.status(400).send({ msg: "Your username has invalid characters"});
@@ -248,7 +124,6 @@ apiRouter.post('/auth/register', async (req, res) => {
     else if(await getUser('username', req.body.username)){
         return res.status(409).send({msg:"Username already taken"})
     } else{
-        
         const user = await createUser(req.body.email, req.body.username, req.body.password, req.body.displayname);
         if(user){
             setAuthCookie(res, user);
@@ -258,21 +133,17 @@ apiRouter.post('/auth/register', async (req, res) => {
             res.status(500).send({ msg: "User creation failed" });
         }
     }
-    
 });
 
-// login
+// Login
 apiRouter.put('/auth/login', async (req, res) => {
     const identifier = req.body.username;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const isEmail = emailRegex.test(identifier);
 
-
     const user = await getUser(isEmail ? "email" : "username", identifier);
     if (user && (await bcrypt.compare(req.body.password, user.password))){
-
         setAuthCookie(res, user);  
-
         res.send({email:user.email, username:user.username, displayname:user.displayname, profanityFilter:user.profanityFilter});
     }
     else{
@@ -280,7 +151,7 @@ apiRouter.put('/auth/login', async (req, res) => {
     }
 });
 
-// logout
+// Logout
 apiRouter.delete('/auth/logout', verifyAuth, async (req, res) => {
     const token = req.cookies[authCookieName];
     const user = await getUser('token', token);
@@ -299,13 +170,7 @@ apiRouter.get(`/auth`, async (req, res) => {
     else{
         res.send({authenticated:false});
     }
-})
-
-const fs = require('fs');
-const path = require('path');
-
-
-  
+});
 
 apiRouter.get('/user/:user', async (req, res) => {
     try{
@@ -322,21 +187,23 @@ apiRouter.get('/user/:user', async (req, res) => {
         res.send({displayname:username});
     }
 });
-// getMe
+
 apiRouter.get('/user/me', async (req, res) => {
-            const token = req.cookies[authCookieName];
-        if(token){
-            const user = await getUser('token', token);
-            if (user) {
-                res.send({email:user.email, username:user.username, displayname:user.displayname, profanityFilter:user.profanityFilter});
-            } else {
+    const token = req.cookies[authCookieName];
+    if(token){
+        const user = await getUser('token', token);
+        if (user) {
+            res.send({email:user.email, username:user.username, displayname:user.displayname, profanityFilter:user.profanityFilter});
+        } else {
             res.status(401).send({ msg: 'Unauthorized' });
-            } 
-        }
-        else {
+        } 
+    }
+    else {
         res.status(401).send({ msg: 'Unauthorized' });
-        }
+    }
 });
+
+// Update User
 apiRouter.put('/user/prof', async(req, res) => {
     try {
         const token = req.cookies[authCookieName];
@@ -349,9 +216,8 @@ apiRouter.put('/user/prof', async(req, res) => {
             return res.status(400).send({ msg: 'Invalid input' });
         }
 
-        // Update user settings in memory (replace with MongoDB update later)
         user.profanityFilter = profanityFilter;
-        await updateUser(user); // Replace with actual DB update logic when using MongoDB
+        await updateUser(user); // Update user in database
         res.send({email:user.email, username:user.username, displayname:user.displayname, profanityFilter:user.profanityFilter});
     
     } catch (error) {
@@ -359,6 +225,7 @@ apiRouter.put('/user/prof', async(req, res) => {
         res.status(500).send({ msg: 'Internal server error' });
     }
 });
+
 apiRouter.put('/user/pass', verifyAuth, async(req, res) => {
     try {
         const { oldPassword, newPassword, confirmPassword } = req.body;
@@ -377,10 +244,8 @@ apiRouter.put('/user/pass', verifyAuth, async(req, res) => {
         const user = await getUser('token', token);
         
         if (user && (await bcrypt.compare(req.body.oldPassword, user.password))){
-            // Update user settings in memory (replace with MongoDB update later)
-            
             user.password = await bcrypt.hash(req.body.newPassword, 10);
-            await updateUser(user); // Replace with actual DB update logic when using MongoDB
+            await updateUser(user);  // Update password in database
             res.send({msg:"User successfully updated "});
         }
         else{
@@ -393,95 +258,7 @@ apiRouter.put('/user/pass', verifyAuth, async(req, res) => {
     }
 });
 
-apiRouter.put('/user/displayname', verifyAuth, async (req, res) =>{
-    try {
-        const token = req.cookies[authCookieName];
-        const user = await getUser('token', token);
-
-        const displayname  = req.body.displayname;
-
-        // Ensure profanityFilter is a boolean
-        if (typeof displayname !== 'string') {
-            return res.status(400).send({ msg: 'Invalid input' });
-        }
-
-
-        // Update user settings in memory (replace with MongoDB update later)
-        user.displayname = displayname;
-        await updateUser(user); // Replace with actual DB update logic when using MongoDB
-        res.send({email:user.email, username:user.username, displayname:user.displayname, profanityFilter:user.profanityFilter});
-    
-    } catch (error) {
-        console.error('Error updating display name:', error);
-        res.status(500).send({ msg: 'Internal server error' });
-    }
-});
-
-apiRouter.get('/user/prof',  async(req, res) => {
-    const token = req.cookies[authCookieName];
-    const user = await getUser('token', token);
-    if (user){
-        res.send({profanityFilter:user.profanityFilter});
-    }
-    else{
-        res.send({profanityFilter:true});
-    }
-})
-let bioSources = [
-    "/characters", 
-    "/characters/types", 
-    "/worldbuilding/races",
-    "/worldbuilding/races/types",
-    "/worldbuilding/biomes",
-    "/worldbuilding/biomes/types",
-    "/worldbuilding/countries",
-    "/worldbuilding/countries/types",
-    "/worldbuilding/worlds",
-    "/worldbuilding/worlds/types",
-    "/worldbuilding/magicsystems",
-    "/worldbuilding/magicsystems/types",
-    "/worldbuilding/flora",
-    "/worldbuilding/flora/types",
-    "/worldbuilding/wildlife",
-    "/worldbuilding/wildlife/types",
-    "/worldbuilding/organizations",
-    "/worldbuilding/organizations/types",
-]
-apiRouter.get('/sources/bio', async(req, res) => {
-    res.send(bioSources);
-})
-
- 
-
-
-//update user middleware
-async function updateUser(user){
-    const index = users.findIndex((use) => use.username === user.username);
-    if (index !== -1) {
-        users[index] = user;
-    } else {
-        console.warn(`User ${user.username} not found in memory.`);
-    }
-}
-
-
-
-
-
-// apiRouter.get('/cookie', (req, res) => {
-//     const token = uuid.v4();
-// })
-
-// apiRouter.get('*', (req, res) =>{
-//     const token = req.cookies?.token;
-//     if(!token){
-//         return res.status(401).send({msg: 'unauthorized'});
-//     }
-//     else{
-//         return res.send({msg: "secure"});
-//     }
-// });
-
+// Set auth cookie
 function setAuthCookie(res, user){
     user.token = uuid.v4();
     res.cookie('token', user.token, {
@@ -491,10 +268,7 @@ function setAuthCookie(res, user){
     });
 }
 
-apiRouter.use(function (err, req, res, next) {
-    res.status(500).send({ type: err.name, message: err.message });
-  });
-
+// Clear auth cookie
 function clearAuthCookie(res, user){
     delete user.token;
     res.clearCookie('token')
@@ -506,5 +280,4 @@ module.exports = {
     sanitizeId,
     createID,
     getUser,
-
 };
