@@ -7,15 +7,46 @@ const authCookieName = 'token';
 const { 
     getUserByToken,
     getUserByUsername,
-    getUserByEmail, createUser, updateUser } = require('./database');  // Import database functions
+    getUserByEmail, addUser, updateUser } = require('./database');  // Import database functions
 
 app.use(express.json());
 app.use(cookieParser());
+
+async function createUser(email, username, password, displayname) {
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    const user = {
+        email: email,
+        username:username,
+        password: passwordHash,
+        profanityFilter:true,
+
+    };
+    if(displayname && displayname !== ''){
+        user.displayname = displayname;
+    }
+    else{
+        user.displayname = username;
+    }
+
+    users.push(user);
+
+    return user;
+}
 
 app.use(express.static('public'));
 
 var apiRouter = express.Router();
 app.use(`/api`, apiRouter);
+
+users = [];
+
+function getUser(field, value){
+    if (value) {
+        return users.find((user) => user[field] === value);
+    }
+    return null;
+}
 
 
 // Middleware to verify that the user is authorized to call an endpoint
@@ -31,9 +62,7 @@ const verifyAuth = async (req, res, next) => {
     }
 };
 
-// Use MongoDB or another persistent data source instead of in-memory data
-let writingadvice = [];  // You could retrieve this data from the database
-let writingprompts = [];  // Same here
+
 
 
 function sanitizeId(id){
@@ -49,19 +78,7 @@ async function createID(name, author){
 }
 
 async function createAdvice(description, author, created){
-    const advice = {description: description, details:[{
-            label:"Author",
-            value:author,
-            display:false,
-            filter:false
-        },
-        {
-            label:"created",
-            value:created,
-            display:false,
-            filter:false
-        }]
-    };
+    const advice = { description, author, created};
     writingadvice.push(advice);
     return advice;
 }
@@ -82,20 +99,7 @@ apiRouter.post('/writingprompts', verifyAuth, (req, res) => {
         }
         const author = req.body.author;
         const created = new Date().toJSON();
-        const output = {description:description, details:[
-            {
-                label:"Author",
-                value:author,
-                display:false,
-                filter:false
-            },
-            {
-                label:"created",
-                value:created,
-                display:false,
-                filter:false
-            }
-        ]};
+        const output = {description, author, created};
         writingprompts.push(output)
         res.status(201).json(JSON.stringify(output));
     }
@@ -147,7 +151,7 @@ apiRouter.put('/auth/login', async (req, res) => {
         res.send({email:user.email, username:user.username, displayname:user.displayname, profanityFilter:user.profanityFilter});
     }
     else{
-        res.status(401).send({msg: 'Unauthorized'});
+        res.status(401).send({msg: 'Wrong Username or Password'});
     }
 });
 
@@ -157,8 +161,12 @@ apiRouter.delete('/auth/logout', verifyAuth, async (req, res) => {
     const user = await getUser('token', token);
     if(user){
         clearAuthCookie(res, user);
+        res.send({});
     }
-    res.send({});
+    else{
+        res.status(401).send({msg:"Aunotherized"});
+    }
+    
 });
 
 apiRouter.get(`/auth`, async (req, res) => {
@@ -172,7 +180,7 @@ apiRouter.get(`/auth`, async (req, res) => {
     }
 });
 
-apiRouter.get('/user/:user', async (req, res) => {
+apiRouter.get('/users/:user', async (req, res) => {
     try{
         const {username} = req.params;
         const user = await getUser('username', username);
@@ -280,4 +288,5 @@ module.exports = {
     sanitizeId,
     createID,
     getUser,
+    apiRouter
 };

@@ -5,44 +5,55 @@ const url = `mongodb+srv://${config.userName}:${config.password}@${config.hostna
 const client = new MongoClient(url);
 const db = client.db('yggdrasil');
 
+// Collections
 const userCollection = db.collection('user');
 const worldsCollection = db.collection('worlds');
-const worldBiosCollection = db.collection('worldBios')
-
 const floraCollection = db.collection('flora');
-const floraBiosCollection = db.collection('floraBios');
-
+const floraTypesCollection = db.collection('floraTypes');
 const wildlifeCollection = db.collection('wildlife');
-const wildlifeBiosCollection = db.collection('wildlifeBios');
-
+const wildlifeTypesCollection = db.collection('wildlifeTypes');
 const charactersCollection = db.collection('characters');
-const characterBiosCollection = db.collection('characterBios');
 const characterTypesCollection = db.collection('characterTypes');
-
 const racesCollection = db.collection('races');
-const raceBiosCollection = db.collection('racesBios');
 const raceTypesCollection = db.collection('raceTypes');
-
 const organizationsCollection = db.collection('organizations');
-const organizationBiosCollection = db.collection('organizationBios');
-const organizationTypesBiosCollection = db.collection('organizationTypesBios');
-
-
+const organizationTypesCollection = db.collection('organizationTypesBios');
 const magicSystemsCollection = db.collection('magicsystems');
-const magicSystemBiosCollection = db.collection('magicsystemBios');
-const magicTypesBiosCollection = db.collection('magicTypes');
-
-
+const magicTypesCollection = db.collection('magicTypes');
 const countriesCollection = db.collection('countries');
-const countryBiosCollection = db.collection('countryBios');
 const countryTypesCollection = db.collection('countryTypes');
-
-
 const biomesCollection = db.collection('biomes');
-const biomeBiosCollection = db.collection('biomeBios');
+const writingadviceCollection = db.collection('writingadvice');
+const writingpromptsCollection = db.collection('writingprompts');
+const storiesCollection = db.collection('stories');
+const genresCollection = db.collection('genres');
+const contentwarningsCollection = db.collection('contentwarnings');
+const chapterCollection = db.collection('chapter');
 
-const writingadviceCollection = db.collection('writingadvice')
-const writingpromptsCollection = db.collection('writingprompts')
-const storiesCollection = db.collection('stories')
-const genresCollection = db.collection('genres')
-const contentwarningsCollection = db.collection('contentwarnings')
+async function getUser(username){
+    return await userCollection.findOne({username:username});
+}
+function getUserByToken(token){
+    return userCollection.findOne({token:token})
+}
+
+async function addUser(user){
+    return await userCollection.insertOne(user)
+}
+
+async function updateUser(user){
+    return await userCollection.updateOne({username: user.username},{$set: user});
+}
+
+async function listUserDisplay(){
+    return await userCollection.find({},{projection:{displayname:1}}).toArray();
+}
+
+
+module.exports = {
+    addUser,
+    getUser,
+    getUserByToken,
+    updateUser,
+    listUserDisplay
+}

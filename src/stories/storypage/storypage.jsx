@@ -139,6 +139,8 @@ export function StoryPage(props) {
     const [visible, setVisibility] = useState(false);
     const [chapters, setChaptersMap] = useState({});
     const [selections, setSelections] = useState([]);
+    const [pervious, setPrevious] = useState([])
+    const [next, setNext] = useState([])
     const handleClose = () => setVisibility(false);
          
     const handleOpen = () => setVisibility(true);
@@ -153,6 +155,7 @@ export function StoryPage(props) {
     const { storyId } = useParams(); 
 
     useEffect(() => {
+        setLoading(true)
 
         //Get full path
         let paths = path;
@@ -164,14 +167,21 @@ export function StoryPage(props) {
             .then((response) => response.json())
             .then((data) => {
                 setStory(data);
-                setList(data.chapters);
                 setError(null);
             }).catch ((err) => {
                 setError(err.message);
-            }).finally (() => {
-                setLoading(false); // Make sure loading state is reset
             })
-
+        fetch(`/api${paths}/chapters`)
+        .then((res) => res.json())
+        .then((data) => {
+            setList(data)
+        })
+        .catch ((err) => {
+            setError(err.message);
+        })
+        .finally (() => {
+            setLoading(false); // Make sure loading state is reset
+        })
     }, [storyId]);
 
     useEffect(() => {
@@ -181,6 +191,16 @@ export function StoryPage(props) {
         });
         setChaptersMap(newChaptersMap);
     }, [list])
+
+    const updatePrevious = (selected) => {
+        const updatedPrevious = selected.map(option => option.value);
+        setPrevious(updatedPrevious)
+    }
+
+    const updateNext = (selected) => {
+        const updatedNext = selected.map(option => option.value);
+        setNext(updatedNext)
+    }
 
     const updateSelections = (label, selected) => {
         const updatedSelections = [...selections];
@@ -309,7 +329,7 @@ export function StoryPage(props) {
                                     isMulti
                                     className="form-control"
                                     name="previous"
-                                    onChange={(selected) => updateSelections("previous", selected)}
+                                    onChange={(selected) => updatePrevious(selected)}
                                 />
                             </div>
                             
@@ -333,7 +353,7 @@ export function StoryPage(props) {
                                     isMulti
                                     className="form-control"
                                     name="next"
-                                    onChange={(selected) => updateSelections("next", selected)}
+                                    onChange={(selected) => updateNext(selected)}
                                 />
                             </div>
                         </form>

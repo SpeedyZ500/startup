@@ -8,7 +8,7 @@ const magicRouter = require('./worldbuilding/magicsystems.js');
 const organizationsRouter = require('./worldbuilding/organizations.js');
 const racesRouter = require('./worldbuilding/races.js');
 const wildlifeRouter = require('./worldbuilding/wildlife.js');
-const worldRouter = require('./worldbuilding/worlds.js');
+const worldsRouter = require('./worldbuilding/worlds.js');
 
 app.use('/api', charactersRouter);
 app.use('/api', storiesRouter);

@@ -38,12 +38,17 @@
                 "source":"/api/worldbuilding/wildlife"
             },
             {
-                "label":"Abilities",
+                "label":"Flora",
                 "type":"multi-select",
                 "source":"/api/worldbuilding/flora"
             },
             {
-                "label":"Full",
+                "Label":"Biomes",
+                "type":"multi-select",
+                "source":"/api/worldbuilding/biomes"
+            },
+            {
+                "label":"Sections",
                 "type":"section-adder"
             }
         ]

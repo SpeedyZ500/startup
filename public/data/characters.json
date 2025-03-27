@@ -6,125 +6,235 @@
         "title":"New Character",
         "fields":[
             {
-                "label":"name",
+                "label":"Name",
                 "required":true,
-                "type":"text"
-                
+                "type":"text",
+                "key":"name"
             },
             {
                 "label":"Titles",
-                "type":"text",
-                "split":";",
-                "placeholder":"a list of titles separated by semicolons ;"
-                
+                "type":"text-creatable",
+                "placeholder":"Type each title and then press enter to save it",
+                "key":"titles"
             },
             {
-                "label":"Type",
+                "label":"Roles",
                 "type":"creatable",
-                "source":"/characters/types"
+                "source":"/characters/types",
+                "key":"roles"
             },
             {
-                "label":"description",
+                "label":"Description",
                 "type":"text-area",
-                "placeholder":"A short description/summary of your character"
-                
+                "placeholder":"A short description/summary of your character",
+                "key":"description"
             },
             {
                 "label":"Gender",
-                "type":"text"
+                "type":"text",
+                "key":"gender"
             },
             {
                 "label":"Pronouns",
-                "type":"text"
+                "type":"text",
+                "key":"pronouns"
             },
             {
                 "label":"Born",
-                "type":"text"
+                "type":"text",
+                "key":"born"
             },
             {
                 "label":"Died",
-                "type":"text"
+                "type":"text",
+                "key":"died"
             },
             {
-                "label":"World",
-                "type":"select",
-                "source":"/worldbuilding/worlds"
+                "label1":"Home World",
+                "type":"select-plus",
+                "source1":"/worldbuilding/worlds",
+                "type1":"select",
+                "key1":"homeWorld",
+                "label2":"Home Country",
+                "type2":"iteration-select",
+                "source2":"/worldbuilding/countries?world=",
+                "key2":"homeCountry",
+                "label3":"Home Town",
+                "type3":"iteration-selection",
+                "source":"/worldbuilding/countries/towns?country=",
+                "key3":"homeTown"
+            },
+            {
+                "label":"Worlds",
+                "type":"multi-select",
+                "source":"/worldbuilding/worlds",
+                "key":"otherWorlds"
+
             },
             {
                 "label":"Countries",
                 "type":"multi-select",
-                "source":"/worldbuilding/countries"
+                "source":"/worldbuilding/countries",
+                "key":"otherCountries"
             },
             {
                 "label":"Race",
                 "type":"special-select",
                 "source":"/worldbuilding/races",
-                "qualifier":["sudo-shape-shifter"]
+                "qualifier":["sudo-shape-shifter"],
+                "key1":"race",
+                "key2":"altForms"
             },
             {
                 "label":"Abilities",
                 "type":"multi-select",
-                "source":"/worldbuilding/magicsystems"
+                "source":"/worldbuilding/magicsystems",
+                "key":"abilities"
                 
             },
             {
                 "label":"Enemies",
                 "type":"multi-select",
-                "source":"/characters"
-                
+                "source":"/characters",
+                "key":"enemies"
             },
             {
                 "label":"Allies",
                 "type":"multi-select",
-                "source":"/characters"
+                "source":"/characters",
+                "key":"allies"
             },
             {
                 "label":"Organizations",
                 "type":"multi-select",
-                "source":"/worldbuilding/organizations"
+                "source":"/worldbuilding/organizations",
+                "key":"organizations"
             },
             {
                 "label":"Religion",
                 "type":"select",
                 "source":"/worldbuilding/organizations",
-                "category":"type=religion"
+                "category":"type=religion",
+                "key":"relegion"
             },
             {
                 "label":"Family",
                 "type":"super-select",
                 "categoryLabel":"Relation",
-                "source":"/characters"
+                "source":"/characters",
+                "key":"family"
+            },
+            {
+                "label":"Custom Fields",
+                "type":"custom-adder",
+                "key":"custom"
             },
             {
                 "label":"sections",
-                "type":"section-adder"
+                "type":"section-adder",
+                "key":"sections"
             }
         ]
     },
+    "card":{
+        "head":[
+            {"key":"name"}
+        ],
+        "body":[
+            {
+                "label":"Author:",
+                "key":"author",
+                "display":"/author/display/"
+            },
+            {
+                "label":"Home Land",
+                "set":[
+                    {
+                        "label":"World",
+                        "key":"homeWorld",
+                        "display":"/worldbuilding/worlds/display/"
+                    },
+                    {
+                        "label":"Country",
+                        "key":"homeCountry",
+                        "display":"/worldbuilding/country/display/"
+
+                    },
+                    {
+                        "label":"Town",
+                        "key":"homeTown"
+                    }
+                ]
+            },
+            {
+                "label":"Race",
+                "key":"race"
+            }
+        ],
+        "footer":[
+            {
+                "label":"Abilities",
+                "key":"abilities"
+            },
+            {
+                "label":"Past and Current Residences",
+                "key":"countries"
+            }
+        ]
+
+    },
+    "filter":[
+        {
+            "label":"Author",
+            "source":"/users",
+            "key":"author"
+        },
+        {
+            "label":"Home World",
+            "source":"/worldbuilding/worlds",
+            "key":"homeWorld"
+        },
+        {
+
+        }
+    ],
+
+    "cardData":[
+        {
+            "label":"Family",
+            "style":"table",
+            "key":"family"
+        },
+        {
+            "label":"Titles",
+            "key":"titles"
+        }
+    ],
+
     "sort":[
         {
             "label":"New to Old",
-            "value":{"category":"created", "az":false}
+            "value":{"key":"created", "az":false}
         },
         {
             "label":"Old to New",
-            "value":{"category":"created", "az":true}
+            "value":{"key":"created", "az":true}
         },
         {
             "label":"A-Z Name",
-            "value":{"category":"name", "az":true}
+            "value":{"key":"name", "az":true}
         },
         {
             "label":"Z-A Name",
-            "value":{"category":"name", "az":false}
+            "value":{"key":"name", "az":false}
         },
         {
             "label":"A-Z Author",
-            "value":{"category":"Author", "az":true}
+            "value":{"key":"author", "az":true}
         },
         {
             "label":"Z-A Author",
-            "value":{"category":"Author", "az":false}
+            "value":{"key":"author", "az":false}
         }
     ]
 
