@@ -7,7 +7,7 @@ const authCookieName = 'token';
 const { 
     getUserByToken,
     getUserByUsername,
-    getUserByEmail, addUser, updateUser } = require('./database');  // Import database functions
+    getUserByEmail, addUser, /*updateUser*/ } = require('./database');  // Import database functions
 
 app.use(express.json());
 app.use(cookieParser());
@@ -39,7 +39,7 @@ app.use(express.static('public'));
 var apiRouter = express.Router();
 app.use(`/api`, apiRouter);
 
-users = [];
+let users = [];
 
 function getUser(field, value){
     if (value) {
@@ -61,7 +61,11 @@ const verifyAuth = async (req, res, next) => {
       res.status(401).send({ msg: 'Unauthorized' });
     }
 };
-
+async function updateUser(user){
+    const index = users.find(me => me.username === user.username)
+    users[index] = user
+    return user
+}
 
 
 
@@ -77,36 +81,47 @@ async function createID(name, author){
     return sanitizeId(`${name}_${author}`);
 }
 
-async function createAdvice(description, author, created){
-    const advice = { description, author, created};
+async function createAdvice(description, author){
+    const created = new Date().toJSON();
+    
+    const advice = { description:description , author:author, created:created};
     writingadvice.push(advice);
+
     return advice;
 }
 
-apiRouter.post('/writingadvice', verifyAuth, (req, res) => {
+apiRouter.post('/writingadvice', verifyAuth, async (req, res) => {
     const description = req.body.description;
-    const author = req.body.author;
-    const created = new Date().toJSON();
-    const advice = createAdvice(description, author,created );
-    res.status(201).send(advice);
+    if (!description){
+        return res.status(400).json({ error: 'text is required' });
+    }
+    const author = req.username;
+    const advice = await createAdvice(description, author );
+    if(advice){
+        res.send({description:advice.description, author:advice.author});
+    }
+    else{
+        res.status(500).send({msg:"error creating advice"});
+    }
 });
+let writingadvice = [];
+let writingprompts = [];
+async function createPrompt(description, author){
+    const created = new Date().toJSON();
+    
+    const prompt = { description:description , author:author, created:created};
+    writingprompts.push(prompt);
 
-apiRouter.post('/writingprompts', verifyAuth, (req, res) => {
-    try{
-        const description = req.body.Description;
-        if (!description){
-            return res.status(400).json({ error: 'text is required' });
-        }
-        const author = req.body.author;
-        const created = new Date().toJSON();
-        const output = {description, author, created};
-        writingprompts.push(output)
-        res.status(201).json(JSON.stringify(output));
+    return prompt;
+}
+apiRouter.post('/writingprompts', verifyAuth, async (req, res) => {
+    const description = req.body.description;
+    if (!description){
+        return res.status(400).json({ error: 'text is required' });
     }
-    catch(err){
-        console.error("Error handling writing prompt submission:", err);
-        res.status(500).send({ error: 'An error occurred while submitting the writing prompt' });
-    }
+    const output = await createPrompt(description, req.username);
+    res.status(201).send({description:output.description, author:output.author});
+
 });
 
 apiRouter.get('/writingadvice', async (_req, res) => {
@@ -180,21 +195,7 @@ apiRouter.get(`/auth`, async (req, res) => {
     }
 });
 
-apiRouter.get('/users/:user', async (req, res) => {
-    try{
-        const {username} = req.params;
-        const user = await getUser('username', username);
-        if(user){
-            res.send({displayname:user.displayname});
-        }
-        else{
-            res.send({displayname:username});
-        }
-    }
-    catch(error){
-        res.send({displayname:username});
-    }
-});
+
 
 apiRouter.get('/user/me', async (req, res) => {
     const token = req.cookies[authCookieName];
@@ -210,13 +211,26 @@ apiRouter.get('/user/me', async (req, res) => {
         res.status(401).send({ msg: 'Unauthorized' });
     }
 });
+apiRouter.get('/user/:username', async (req, res) => {
+    try{
+        const {username} = req.params;
+        const user = await getUser('username', username);
+        if(user){
+            res.send({displayname:user.displayname});
+        }
+        else{
+            res.send({displayname:username});
+        }
+    }
+    catch(error){
+        res.send({displayname:username});
+    }
+});
 
 // Update User
-apiRouter.put('/user/prof', async(req, res) => {
+apiRouter.put('/user/prof', verifyAuth, async(req, res) => {
     try {
-        const token = req.cookies[authCookieName];
-        const user = await getUser('token', token);
-
+        const user = await getUser('username', req.username);
         const profanityFilter  = req.body.profanityFilter;
 
         // Ensure profanityFilter is a boolean
@@ -248,11 +262,10 @@ apiRouter.put('/user/pass', verifyAuth, async(req, res) => {
             return res.status(400).send({ msg: 'New password cannot be the same as the old password' });
         }
 
-        const token = req.cookies[authCookieName];
-        const user = await getUser('token', token);
+        const user = await getUser('username', req.username);
         
-        if (user && (await bcrypt.compare(req.body.oldPassword, user.password))){
-            user.password = await bcrypt.hash(req.body.newPassword, 10);
+        if (user && (await bcrypt.compare(oldPassword, user.password))){
+            user.password = await bcrypt.hash(newPassword, 10);
             await updateUser(user);  // Update password in database
             res.send({msg:"User successfully updated "});
         }

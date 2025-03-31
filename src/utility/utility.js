@@ -212,7 +212,7 @@ export async function filterProfanity(json, profanityFilterEnabled){
 }
 
 export async function replaceAuthor(username) {
-    const res = await fetch(`/api/users/${encodeURIComponent(username)}`, {
+    const res = await fetch(`/api/user/${encodeURIComponent(username)}`, {
         method: `GET`,
         headers: { 'Content-Type': 'application/json' }
     });

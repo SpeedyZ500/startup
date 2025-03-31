@@ -6,7 +6,7 @@ dbConfig.json
 test.txt
 cookie.txt
 
-/coverage/
+/service/coverage/
 
 # Playwright
 /test-results/

@@ -4,9 +4,7 @@ const urlPrefix = "/characters/"
 
 const characterRouter = express.Router();
 
-let characters = [
-    
-];
+let characters = [];
 
 let characterBios =[
     
@@ -45,6 +43,18 @@ async function getCharacters(queries){
         return characters;
     }
 }
+characterRouter.get(`${urlPrefix}options`, async (req, res) => {
+    const {role, world, race, } = req.query;
+    const options = characters.map((character) => {
+        return {
+            value: character.id, 
+            label: character.name,
+            qualifier: character.roles || []
+        }
+    })
+    res.send(options)
+})
+
 
 
 characterRouter.get(`${urlPrefix}:id?`, async (req, res) => {
@@ -83,20 +93,19 @@ characterRouter.get(`${urlPrefix}:id?`, async (req, res) => {
 });
 
 characterRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
-    const name = req.body.name;
+    
+    const {name, description} = req.body;
     const author = req.username;
-    const description = req.body.description;
     if(!name || !author || !description){
-        res.status(409).send({msg:"Required fields not filled out"});
-
+        return res.status(409).send({msg:"Required fields not filled out"});
     }
     const id = await createID(req.body.name, req.body.author);
     if(await getCharacter("id", id)){
-        res.status(409).send({msg:"A Character by you and by that name already exists"});
+        return res.status(409).send({msg:"A Character by you and by that name already exists"});
     }else{
         const character = await createCharacter(req.body, author, id);
         if(character){
-            res.send({name:character.name, url:character.url, id:character.id})
+            return res.send(character)
         }
     }
 });
@@ -114,7 +123,7 @@ characterRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
             if(updated.msg){
                 return res.status(500).send(updated.msg);
             }
-            res.send({name:updated.name, url:updated.url, id:updated.id})
+            res.send(updated);
         }
         else{
             res.status(401).send({msg:`${currUser.displayname} is not the author`});
@@ -176,13 +185,21 @@ async function createCharacter(characterData, author, id){
     return character
 }
 async function updateCharacter(id, updateData){
-    const {roles} = updateData
+    const {roles, homeWorld, otherWorlds, homeCountry, otherCountries} = updateData
     const character = await getCharacter("id", id);
     if(JSON.stringify(roles) !== JSON.stringify(character)){
         await addTypes(roles);
     }
+    const newWorlds = [homeWorld, ...(otherWorlds ?? [])]
+    if(JSON.stringify(newWorlds) !== JSON.stringify(character.worlds)){
+        updateData.worlds = newWorlds;
+    }
+    const newCountries = [homeCountry, ...(otherCountries ?? [])]
     updateData.modified = new Date().toJSON();
-    return await updateCharacter(updateData);
+    if(JSON.stringify(newCountries) !== JSON.stringify(character.countries)){
+        updateData.countries = newCountries;
+    }
+    return await characterUpdate(updateData);
 }
 async function characterUpdate(character){
     const index = characters.findIndex(char => char.id === character.id);
@@ -211,70 +228,52 @@ async function addTypes(type){
     return "done"
 }
 
-async function modifyCharacter(characterID, list, data, method) {
-    const { id, value, path } = data;
-
-    // Retrieve the character bio and main character data
-    const characterBio = await getCharacterBio("id", characterID);
-    const character = await getCharacter("id", characterID);
-
-    if (!characterBio || !character) {
-        console.error(`Character with ID '${characterID}' not found.`);
-        return { error: "Character not found" };
+async function modifyCharacter(character, list, data, method) {
+    if(list === "worlds" || list === "races" || list === "countries"){
+        return {error: `can't modify ${list} directly use other or alt version` };
     }
 
     // Locate the relevant list in both characterBio and character
-    const bioList = characterBio.infoCard.cardData.find(item => item.label.toLowerCase() === list.toLowerCase());
-    const characterList = character[list.toLowerCase()];
+    const characterList = character[list];
 
-    if (!bioList || !characterList) {
-        console.error(`List '${list}' not found.`);
-        return { error: `List '${list}' not found.` };
+    if (!characterList || !Array.isArray(characterList)) {
+        console.error(`List '${list}' not found, or not a list.`);
+        return { error: `List '${list}' not found, or not a list.` };
     }
-
-    // Create the item object (value, id, path)
-    const newItem = { value, id, path };
-
+    
+    
     // Add or update references
     if (method === 'add' || method === 'put') {
-        const existsInCharacter = characterList.some(item => item.id === id);
-        const existsInBio = bioList.value.some(item => item.id === id);
-
+        const existsInCharacter = characterList.includes(data);
         if (!existsInCharacter) {
-            characterList.push(newItem);  // Add to character object
-        }
-        if (!existsInBio) {
-            bioList.value.push(newItem);  // Add to character bio
+            characterList.push(data);  // Add to character object
         }
     } 
     // Delete references
     else if (method === 'delete') {
-        // Remove from character object
-        const characterListIndex = characterList.findIndex(item => item.id === id);
+        const characterListIndex = characterList.findIndex(item => item.id === data);
         if (characterListIndex !== -1) {
             characterList.splice(characterListIndex, 1);
         }
-
-        // Remove from bio card data
-        const bioListIndex = bioList.value.findIndex(item => item.id === id);
-        if (bioListIndex !== -1) {
-            bioList.value.splice(bioListIndex, 1);
-        }
     }
-
-    // Return updated character
-    return { message: `Character '${list}' modified successfully`, character };
+    character[list] = characterList;
+    return await updateCharacter(character.id, character);
 }
 
 // 🚀 Router: Modify a character field (add/put/delete references)
 characterRouter.patch(`${urlPrefix}:id/:list`, verifyAuth, async (req, res) => {
     const { id, list } = req.params;
     const { method, data } = req.body;
+    const character = getCharacter("id", id)
+    if(!character){
+        return res.status(404).json(result);
 
-    const result = await modifyCharacter(id, list, data, method);
+    }
+
+    const result = await modifyCharacter(character, list, data, method);
 
     if (result.error) {
-        res.status(404).json(result);
+        res.status(400).send(result);
     } else {
         res.send(result);
     }
