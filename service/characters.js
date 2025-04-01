@@ -6,9 +6,7 @@ const characterRouter = express.Router();
 
 let characters = [];
 
-let characterBios =[
-    
-]
+
 let characterTypes = []
 
 async function getCharacter(field, value){
@@ -17,12 +15,7 @@ async function getCharacter(field, value){
     }
     return null;
 }
-async function getCharacterBio(field, value){
-    if (value) {
-        return characterBios.find((character) => character[field] === value);
-    }
-    return null;
-}
+
 
 async function getCharacters(queries){
     if(typeof queries === "object"){
@@ -44,8 +37,8 @@ async function getCharacters(queries){
     }
 }
 characterRouter.get(`${urlPrefix}options`, async (req, res) => {
-    const {role, world, race, } = req.query;
-    const options = characters.map((character) => {
+    const filteredCharacters = await getCharacters(req.query);
+    const options = filteredCharacters.map((character) => {
         return {
             value: character.id, 
             label: character.name,
@@ -62,20 +55,15 @@ characterRouter.get(`${urlPrefix}:id?`, async (req, res) => {
     const queries = req.query || {};
     const {author} = req.query || "";
     if(!id || id === "undefined" || id.trim() === ""){
-        if(Object.keys(queries).length > 0){
-            let charactersToSend = await getCharacters(queries);
-            res.send(charactersToSend)
-        }
-        else{
-            res.send(characters)
-        }
+        let charactersToSend = await getCharacters(queries);
+        res.send(charactersToSend)
     }
     else{
         if(id == "types"){
             res.send(characterTypes);
         }
         else{
-            const character = await getCharacterBio("id", id);
+            const character = await getCharacter("id", id);
             if(character){
                 if(author){
                     const isAuthor = author === character.author;
@@ -105,7 +93,7 @@ characterRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
     }else{
         const character = await createCharacter(req.body, author, id);
         if(character){
-            return res.send(character)
+            return res.json(character)
         }
     }
 });
@@ -117,22 +105,25 @@ characterRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     const username  = req.username;
     const character = await getCharacter("id", id);
     if(character){
+        if(username !== character.author){
+            const currUser = await getUser("username", username)
+            res.status(401).send({msg:`${currUser.displayname} is not the author`});
+        }
         if(username === character.author){
             const updateData = req.body;
             const updated = await updateCharacter(id, updateData)
             if(updated.msg){
                 return res.status(500).send(updated.msg);
             }
-            res.send(updated);
+            return res.send(updated);
         }
         else{
-            res.status(401).send({msg:`${currUser.displayname} is not the author`});
         }
     }
     else{
         res.status(404).send({msg:`Character ${id}, not found`});
     }
-})
+});
 
 
 
@@ -185,10 +176,14 @@ async function createCharacter(characterData, author, id){
     return character
 }
 async function updateCharacter(id, updateData){
-    const {roles, homeWorld, otherWorlds, homeCountry, otherCountries} = updateData
+    const {roles, homeWorld, otherWorlds, homeCountry, otherCountries, race, altForms} = updateData
     const character = await getCharacter("id", id);
     if(JSON.stringify(roles) !== JSON.stringify(character)){
         await addTypes(roles);
+    }
+    const newRaces = [race, ...(altForms ?? [])]
+    if(JSON.stringify(newRaces) !== JSON.stringify(character.race)){
+        updateData.races = newRaces;
     }
     const newWorlds = [homeWorld, ...(otherWorlds ?? [])]
     if(JSON.stringify(newWorlds) !== JSON.stringify(character.worlds)){
@@ -229,17 +224,14 @@ async function addTypes(type){
 }
 
 async function modifyCharacter(character, list, data, method) {
-    if(list === "worlds" || list === "races" || list === "countries"){
+    const restrictedLists = ["worlds", "races", "countries", "family", "sections", "custom", "titles", "abilities"];
+    if(restrictedLists.includes(list)){
         return {error: `can't modify ${list} directly use other or alt version` };
     }
-
-    // Locate the relevant list in both characterBio and character
-    const characterList = character[list];
-
-    if (!characterList || !Array.isArray(characterList)) {
-        console.error(`List '${list}' not found, or not a list.`);
+    if (!character[list] || !Array.isArray(character[list])) {
         return { error: `List '${list}' not found, or not a list.` };
     }
+    const characterList = character[list];
     
     
     // Add or update references
@@ -251,9 +243,14 @@ async function modifyCharacter(character, list, data, method) {
     } 
     // Delete references
     else if (method === 'delete') {
-        const characterListIndex = characterList.findIndex(item => item.id === data);
+        const characterListIndex = characterList.findIndex(item => item === data);
         if (characterListIndex !== -1) {
-            characterList.splice(characterListIndex, 1);
+            if(characterListIndex === characterList.length - 1){
+                characterList.pop()
+            }
+            else{
+                characterList.splice(characterListIndex, 1);
+            }
         }
     }
     character[list] = characterList;
@@ -264,18 +261,17 @@ async function modifyCharacter(character, list, data, method) {
 characterRouter.patch(`${urlPrefix}:id/:list`, verifyAuth, async (req, res) => {
     const { id, list } = req.params;
     const { method, data } = req.body;
-    const character = getCharacter("id", id)
+    const character = await getCharacter("id", id)
     if(!character){
-        return res.status(404).json(result);
-
+        return res.status(404).send({msg:"Error Character not found"});
     }
 
     const result = await modifyCharacter(character, list, data, method);
 
     if (result.error) {
-        res.status(400).send(result);
+        return res.status(400).send(result);
     } else {
-        res.send(result);
+        return res.send(result);
     }
 });
 
