@@ -1,19 +1,9 @@
 const request = require('supertest');
 const {app} = require('./service');
+const { testGetOptions, registerUser, getRandomName } = require('./testUtils')
 
 
-function getRandomName(prefix) {
-    return `${prefix}_${Math.random().toString(36).substring(2, 15)}`;
-}
-  
-async function registerUser() {
-    const email = getRandomName('email');
-    const username = getRandomName('username');
-    const password = 'toomanysecrets';
-    const response = await request(app).post('/api/auth/register').send({ email, username, password });
 
-    return [response, email, username, password];
-}
 
 function validateAuth(response) {
     expect(response).toBeDefined();
@@ -27,7 +17,7 @@ function validateAuth(response) {
 
   
 test('register', async () => {
-    const [register, email, username] = await registerUser();
+    const [register, email, username] = await registerUser(app);
     const displayname = username;
     const profanityFilter = true;
 
@@ -37,13 +27,13 @@ test('register', async () => {
 });
 
 test('create duplicate user', async () => {
-    const [, email, username] = await registerUser();
+    const [, email, username] = await registerUser(app);
     const response = await request(app).post('/api/auth/register').send({ email, username, password:"password" });
     expect(response.status).toBe(409);
 })
 
 test('login', async () => {
-    const [, email, username, password] = await registerUser();
+    const [, email, username, password] = await registerUser(app);
     const displayname = username;
     const profanityFilter = true;
     const response = await request(app).put('/api/auth/login').send({username, password });
@@ -59,7 +49,7 @@ test('Wrong Username or password, or non-existing user', async () => {
 })
 
 test('Logout', async () => {
-    const [register] = await registerUser();
+    const [register] = await registerUser(app);
     const cookie = register.headers['set-cookie'];
     const loggout = await request(app).delete('/api/auth/logout').set('Cookie', cookie);
     expect(loggout).toBeDefined();
@@ -73,7 +63,7 @@ test('Logout failed', async () => {
 })
 
 test('get authenticated', async () => {
-    const [register] = await registerUser();
+    const [register] = await registerUser(app);
     const cookie = register.headers['set-cookie'];
     const authenticated = true
     const result = await request(app).get('/api/auth').set('Cookie', cookie);
@@ -91,7 +81,7 @@ test('get unauthenticated', async () => {
 })
 
 test('get me', async () => {
-    const [register, email, username] = await registerUser();
+    const [register, email, username] = await registerUser(app);
     const displayname = username;
     const profanityFilter = true;
     const cookie = register.headers['set-cookie'];
@@ -106,7 +96,7 @@ test('get me unauthenteicated', async () => {
 })
 
 test('get me badToken', async () => {
-    const [register] = await registerUser();
+    const [register] = await registerUser(app);
     const cookie = register.headers['set-cookie'];
     await request(app).delete('/api/auth/logout').set('Cookie', cookie);
 
@@ -115,7 +105,7 @@ test('get me badToken', async () => {
 })
 
 test('get user', async () => {
-    const [, , username] = await registerUser();
+    const [, , username] = await registerUser(app);
     const displayname = username;
     const getUser = await request(app).get(`/api/user/${encodeURIComponent(username)}`);
     expect(getUser.headers['content-type']).toMatch('application/json; charset=utf-8');
@@ -131,7 +121,7 @@ test('get nonexisting user', async () => {
 })
 
 test('update profanity', async () => {
-    const [register, email, username] = await registerUser();
+    const [register, email, username] = await registerUser(app);
     const displayname = username;
     const profanityFilter = false;
     const cookie = register.headers['set-cookie'];
@@ -140,17 +130,23 @@ test('update profanity', async () => {
     expect(updateProf.body).toMatchObject({email, username, displayname, profanityFilter})
 })
 
-test('update profanity, unauthenticated', async () => {
+test('Update profanity, unauthenticated', async () => {
     const profanityFilter = false;
     const updateProf = await request(app).put('/api/user/prof').send({profanityFilter});
     expect(updateProf.status).toBe(401);
+})
+
+test('get User options', async () => {
+    const [,,id] = await registerUser(app);
+    const userOption = {id, name:id};
+    await testGetOptions(app, `users`, userOption);
 })
 
 
 
 
 test('change password', async () => {
-    const [register, , ,oldPassword] = await registerUser();
+    const [register, , ,oldPassword] = await registerUser(app);
     const newPassword = "whatever"
     const confirmPassword = newPassword;
     const cookie = register.headers['set-cookie'];
@@ -160,7 +156,7 @@ test('change password', async () => {
 })
 
 test('same as old', async () => {
-    const [register, , ,oldPassword] = await registerUser();
+    const [register, , ,oldPassword] = await registerUser(app);
     const newPassword = oldPassword
     const confirmPassword = oldPassword;
     const cookie = register.headers['set-cookie'];
@@ -170,7 +166,7 @@ test('same as old', async () => {
 })
 
 test('wrong password', async () => {
-    const [register, , oldPassword] = await registerUser();
+    const [register, , oldPassword] = await registerUser(app);
     const newPassword = "whatever"
     const confirmPassword = newPassword;
     const cookie = register.headers['set-cookie'];
@@ -180,7 +176,7 @@ test('wrong password', async () => {
 })
 
 test('"new and confirm dont match', async () => {
-    const [register, , , oldPassword] = await registerUser();
+    const [register, , , oldPassword] = await registerUser(app);
     const newPassword = "whatever"
     const confirmPassword = "whateve";
     const cookie = register.headers['set-cookie'];
@@ -190,7 +186,7 @@ test('"new and confirm dont match', async () => {
 })
 
 test('missing component', async () => {
-    const [register, , , oldPassword] = await registerUser();
+    const [register, , , oldPassword] = await registerUser(app);
     const newPassword = "whatever"
     const cookie = register.headers['set-cookie'];
 
@@ -199,7 +195,7 @@ test('missing component', async () => {
 })
 
 test('post advice', async () => {
-    const [register, , author] = await registerUser();
+    const [register, , author] = await registerUser(app);
     const description = "whatever";
     const cookie = register.headers['set-cookie'];
     const writingadvice = await request(app).post('/api/writingadvice').send({description}).set('Cookie', cookie);
@@ -209,14 +205,14 @@ test('post advice', async () => {
 })
 
 test('post advice without decription', async () => {
-    const [register] = await registerUser();
+    const [register] = await registerUser(app);
     const cookie = register.headers['set-cookie'];
     const writingadvice = await request(app).post('/api/writingadvice').set('Cookie', cookie);
     expect(writingadvice.status).toBe(400);
 })
 
 test('post prompt', async () => {
-    const [register, , author] = await registerUser();
+    const [register, , author] = await registerUser(app);
     const description = "whatever";
     const cookie = register.headers['set-cookie'];
     const writingprompts = await request(app).post('/api/writingprompts').send({description}).set('Cookie', cookie);
@@ -226,7 +222,7 @@ test('post prompt', async () => {
 })
 
 test('post prompt without decription', async () => {
-    const [register] = await registerUser();
+    const [register] = await registerUser(app);
     const cookie = register.headers['set-cookie'];
     const writingprompts = await request(app).post('/api/writingprompts').set('Cookie', cookie);
     expect(writingprompts.status).toBe(400);
@@ -246,5 +242,4 @@ test('get advice', async () => {
 
 })
 
-module.exports = {registerUser, getRandomName}
 

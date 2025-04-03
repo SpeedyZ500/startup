@@ -120,6 +120,33 @@ worldsRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     res.send(update);
 });
 
+worldsRouter.get(`${urlPrefix}:id/continents`, async (req, res) => {
+    const world = await getWorld('id', req.params.id);
+    if(world){
+        return res.send( world.continents);
+    }
+    else{
+        return res.status(404).send({msg:"World not found"})
+    }
+})
+
+worldsRouter.get(`${urlPrefix}:id/continents/options`, async (req, res) => {
+    const world = await getWorld('id', req.params.id);
+    if(world){
+        options = world.continents.map((value) => {
+            return {
+                value: value, 
+                label: value,
+                qualifier: world.id
+            }
+        });
+        return res.send(options);
+    }
+    else{
+        return res.status(404).send({msg:"World not found"})
+    }
+})
+
 
 // ✅ Create a new world
 async function createWorld(worldData, id, author) {
@@ -153,24 +180,13 @@ async function createWorld(worldData, id, author) {
 function createWorldGetterSections(id, continents){
     const getterSections = continents.map(continent => ({
         label: `Countries in ${continent}`,
-        query: `/worldbuilding/countries?worlds=${id}&continent=${encodeURIComponent(continent)}`
+        query: `/worldbuilding/countries?worlds=${id}&continents=${encodeURIComponent(continent)}`
     }));
 
-    const additionalSections = [
-        { label: "Biomes", query: `/worldbuilding/biomes?worlds=${id}` },
-        { label: "Flora", query: `/worldbuilding/flora?worlds=${id}` },
-        { label: "Wildlife", query: `/worldbuilding/wildlife?worlds=${id}` },
-        { label: "Magic Systems", query: `/worldbuilding/magicsystems?worlds=${id}` },
-        { label: "Organizations", query: `/worldbuilding/organizations?worlds=${id}` },
-        { label: "Races", query: `/worldbuilding/races?worlds=${id}` },
-        { label: "Characters Found Here/have visited/lived here", query:`/characters?worlds=${id}`}
-    ];
-
-    const finalGetterSections = [...getterSections, ...additionalSections];
-    return finalGetterSections;
+    
+    return getterSections;
 }
 
-module.exports = worldsRouter;
 
 async function updateWorld(updateData){
     const {id, continents} = updateData
@@ -193,3 +209,4 @@ async function updateWorld(updateData){
         return {msg:"Error updating world"} 
     }
 }
+module.exports = worldsRouter;

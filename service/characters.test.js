@@ -18,11 +18,12 @@ const {testGetSpecific,
     testNotFound,
     testPatchDescription,
     testMismatchIDs,
-    testNoDataPassed
+    testNoDataPassed, 
+    registerUser, 
+    getRandomName
 } = require('./testUtils')
 const {app, createID} = require('./service');
 
-const {registerUser, getRandomName} = require('./service.test');
 
 const {characterRouter} = require("./characters");
 
@@ -44,7 +45,7 @@ test('fail to get character', async () => {
 })
 
 async function createCharacter(){
-    const [register, , author] = await registerUser();
+    const [register, , author] = await registerUser(app);
     const cookie = register.headers['set-cookie'];
     const name = getRandomName("name");
     const family = [{
@@ -225,7 +226,7 @@ test("Test Duplicate Character Creation", async () => {
 });
 
 test("Test Character Creation missing required field", async () => {
-    const [register, , name] = await registerUser();
+    const [register, , name] = await registerUser(app);
     const cookie = register.headers['set-cookie'];
     const character = await request(app).post('/api/characters').send({name}).set("Cookie", cookie);
     expect(character.status).toBe(409);
@@ -265,12 +266,12 @@ test("Test Update Character No Data passed", async () => {
 
 test("Test Character update, no character of that id found", async () => {
 
-    const [register, , name] = await registerUser();
+    const [register, , name] = await registerUser(app);
     await testNotExist(register, `/characters/${name}`, app)
 });
 
 test("Test Character update, not author", async () => {
-    // const [register] = await registerUser();
+    // const [register] = await registerUser(app);
     // const cookie = register.headers['set-cookie'];
     const [ , ,characterReturn] = await createCharacter();
     const character = characterReturn.body;

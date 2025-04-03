@@ -195,7 +195,15 @@ apiRouter.get(`/auth`, async (req, res) => {
     }
 });
 
-
+apiRouter.get(`/users/options`, async (req, res) =>{
+    const options = users.map((user) => {
+        return {
+            value: user.username, 
+            label: user.displayname,
+        }
+    })
+    res.send(options)
+})
 
 apiRouter.get('/user/me', async (req, res) => {
     const token = req.cookies[authCookieName];

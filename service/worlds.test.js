@@ -3,12 +3,6 @@ const {testGetSpecific,
     testUpdate,
     testNotExist, 
     testWrongAuthor, 
-    testPatchAdd, 
-    testPatchRemove,
-    testPatchNotFound,
-    testPatchFailures,
-    testPatchSections,
-    testPatchCustom,
     testGetOptions,
     testGetFilteredOptions,
     testGetMany,
@@ -16,13 +10,13 @@ const {testGetSpecific,
     testIsAuthor,
     testisNotAuthor,
     testNotFound,
-    testPatchDescription,
     testMismatchIDs,
-    testNoDataPassed
+    testNoDataPassed,
+    registerUser, 
+    getRandomName
 } = require('./testUtils')
 const {app, createID} = require('./service');
 
-const {registerUser, getRandomName} = require('./service.test');
 
 const worldsRouter = require("./worldbuilding/worlds");
 
@@ -40,7 +34,7 @@ test('fail to get Worlds', async () => {
 
 
 async function createWorld(){
-    const [register, , author] = await registerUser();
+    const [register, , author] = await registerUser(app);
     const cookie = register.headers['set-cookie'];
     const name = getRandomName("world")
     const continents = [getRandomName("continent")]
@@ -84,20 +78,11 @@ async function createWorld(){
 function createGetterSections(continents, id){
     const getterSections = continents.map(continent => ({
         label: `Countries in ${continent}`,
-        query: `/worldbuilding/countries?worlds=${id}&continent=${encodeURIComponent(continent)}`
+        query: `/worldbuilding/countries?worlds=${id}&continents=${encodeURIComponent(continent)}`
     }));
 
-    const additionalSections = [
-        { label: "Biomes", query: `/worldbuilding/biomes?worlds=${id}` },
-        { label: "Flora", query: `/worldbuilding/flora?worlds=${id}` },
-        { label: "Wildlife", query: `/worldbuilding/wildlife?worlds=${id}` },
-        { label: "Magic Systems", query: `/worldbuilding/magicsystems?worlds=${id}` },
-        { label: "Organizations", query: `/worldbuilding/organizations?worlds=${id}` },
-        { label: "Races", query: `/worldbuilding/races?worlds=${id}` },
-        { label: "Characters Found Here/have visited/lived here", query:`/characters?worlds=${id}`}
-    ];
-    const finalGetterSections = [...getterSections, ...additionalSections];
-    return finalGetterSections;
+    
+    return getterSections;
 }
 test("Test World Creation", async () => {
     const [
@@ -159,7 +144,7 @@ test("Test Duplicate World Creation", async () => {
 })
 
 test("Test World Creation missing required field", async () => {
-    const [register, , name] = await registerUser();
+    const [register, , name] = await registerUser(app);
     const cookie = register.headers['set-cookie'];
     const world = await request(app).post('/api/worldbuilding/worlds').send({name}).set("Cookie", cookie);
     expect(world.status).toBe(409);
@@ -199,7 +184,7 @@ test("Test Update World No Data passed", async () => {
 
 test("Test World update, no world of that id found", async () => {
 
-    const [register, , name] = await registerUser();
+    const [register, , name] = await registerUser(app);
     await testNotExist(register, `worldbuilding/worlds/${name}`, app)
 });
 
@@ -246,4 +231,29 @@ test("Get Filtered Options", async () => {
     const [ , ,worldReturn] = await createWorld();
     const world = worldReturn.body;
     await testGetFilteredOptions(app, "worldbuilding/worlds", "author", world.author, "continents", world.continents)
+})
+
+test("Get continents", async () => {
+    const [ , ,worldReturn, , ,continents] = await createWorld();
+    const path = worldReturn.body.url;
+    const result = await request(app).get(`/api/${path}/continents`);
+    expect(result.headers['content-type']).toMatch('application/json; charset=utf-8');
+    expect(Array.isArray(result.body)).toBe(true);
+    expect(result.body).toEqual(continents);
+})
+test("Get continents world not found", async () => {
+    const result = await request(app).get(`/api/worldbuilding/worlds/bad/continents`);
+    expect(result.status).toBe(404);
+})
+
+test("Get Continents options", async () => {
+    const [ , ,worldReturn, id, ,continents] = await createWorld();
+    const path = worldReturn.body.url;
+    const expected = {id:continents[0], name:continents[0], world:id}
+    await testGetOptions(app,`${path}/continents`, expected,"world");
+})
+
+test("Fail to get options", async () => {
+    const result = await request(app).get(`/api/worldbuilding/worlds/bad/continents/options`);
+    expect(result.status).toBe(404);
 })

@@ -68,6 +68,16 @@
 
 
     },
+    "queryingSections": [
+        { "label": "All Countries", "query":"/worldbuilding/countries?worlds="},
+        { "label": "Biomes", "query": "/worldbuilding/biomes?worlds=" },
+        { "label": "Flora", "query": "/worldbuilding/flora?worlds=" },
+        { "label": "Wildlife", "query": "/worldbuilding/wildlife?worlds=" },
+        { "label": "Magic Systems", "query": "/worldbuilding/magicsystems?worlds=" },
+        { "label": "Organizations", "query": "/worldbuilding/organizations?worlds=" },
+        { "label": "Races", "query": "/worldbuilding/races?worlds=" },
+        { "label": "Characters Found Here/have visited/lived here", "query":"/characters?worlds="}
+    ],
     "sort":[
         {
             "label":"New to Old",

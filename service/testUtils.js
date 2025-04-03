@@ -1,5 +1,4 @@
 const request = require('supertest');
-const {registerUser, getRandomName} = require('./service.test');
 
 async function testGetSpecific(original, app){
     const result = await request(app).get(`/api${original.url}`);
@@ -44,7 +43,7 @@ async function testNotExist(response, path, app){
 }
 
 async function testWrongAuthor(original, app){
-    const [register] = await registerUser();
+    const [register] = await registerUser(app);
     const cookie = register.headers['set-cookie'];
 
     const updated = await request(app).put(`/api${original.url}`).send(original).set("Cookie", cookie);
@@ -52,7 +51,7 @@ async function testWrongAuthor(original, app){
 }
 
 async function testPatchAdd(path, list, app){
-    const [register] = await registerUser();
+    const [register] = await registerUser(app);
     const cookie = register.headers['set-cookie'];
     const data = getRandomName("data");
     const response = await request(app)
@@ -65,7 +64,7 @@ async function testPatchAdd(path, list, app){
 }
 
 async function testPatchRemove(path, list, data, app){
-    const [register] = await registerUser();
+    const [register] = await registerUser(app);
     const cookie = register.headers['set-cookie'];
     const response = await request(app)
         .patch(`/api${path}/${encodeURI(list)}`)
@@ -77,7 +76,7 @@ async function testPatchRemove(path, list, data, app){
 }
 
 async function testPatchNotFound(path, list, app){
-    const [register, ,username] = await registerUser();
+    const [register, ,username] = await registerUser(app);
     const cookie = register.headers['set-cookie'];
     const response = await request(app)
     .patch(`/api/${path}/${username}/${list}`)
@@ -87,7 +86,7 @@ async function testPatchNotFound(path, list, app){
 }
 
 async function testPatchFailures(path, list, app){
-    const [register] = await registerUser();
+    const [register] = await registerUser(app);
     const cookie = register.headers['set-cookie'];
     const response = await request(app)
     .patch(`/api/${path}/${list}`)
@@ -97,7 +96,7 @@ async function testPatchFailures(path, list, app){
 }
 
 async function testPatchSections(path, app){
-    const [register] = await registerUser();
+    const [register] = await registerUser(app);
     const cookie = register.headers['set-cookie'];
     const response = await request(app)
     .patch(`/api/${path}/sections`)
@@ -107,7 +106,7 @@ async function testPatchSections(path, app){
 }
 
 async function testPatchDescription(path, app){
-    const [register] = await registerUser();
+    const [register] = await registerUser(app);
     const cookie = register.headers['set-cookie'];
     const response = await request(app)
     .patch(`/api/${path}/description`)
@@ -117,7 +116,7 @@ async function testPatchDescription(path, app){
 }
 
 async function testPatchCustom(path, app){
-    const [register] = await registerUser();
+    const [register] = await registerUser(app);
     const cookie = register.headers['set-cookie'];
     const response = await request(app)
     .patch(`/api/${path}/sections`)
@@ -180,6 +179,19 @@ async function testNoDataPassed(app, response, original){
     const updated = await request(app).put(`/api${original.url}manipulated`).set("Cookie", cookie);
     expect(updated.status).toBe(400);
 }
+
+function getRandomName(prefix) {
+    return `${prefix}_${Math.random().toString(36).substring(2, 15)}`;
+}
+  
+async function registerUser(app) {
+    const email = getRandomName('email');
+    const username = getRandomName('username');
+    const password = 'toomanysecrets';
+    const response = await request(app).post('/api/auth/register').send({ email, username, password });
+
+    return [response, email, username, password];
+}
 module.exports = { 
     testGetSpecific,
     testUpdate,
@@ -200,5 +212,7 @@ module.exports = {
     testNotFound,
     testPatchDescription,
     testMismatchIDs,
-    testNoDataPassed
+    testNoDataPassed,
+    getRandomName,
+    registerUser
 }
