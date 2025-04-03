@@ -1,17 +1,10 @@
 const express = require('express');
 const { verifyAuth, createID } = require('./../service.js');
-const { modifyMagicSystem } = require('./magicsystems.js');
-const { modifyBiome } = require('./biomes.js');
-const { modifyFlora } = require('./flora.js');
-const { modifyWildlife } = require('./wildlife.js');
-const { modifyOrganization } = require('./organizations.js');
-const { modifyCountry } = require('./countries.js');
 const urlPrefix = "/worldbuilding/worlds/";
 
 const worldsRouter = express.Router();
 
 let worlds = [];
-let worldBios = [];
 
 async function getWorld(field, value) {
     if (value) {
@@ -20,12 +13,36 @@ async function getWorld(field, value) {
     return null;
 }
 
-async function getWorldBio(field, value) {
-    if (value) {
-        return worldBios.find((world) => world[field] === value);
+async function getWorlds(queries){
+    if(typeof queries === "object"){
+        let filterWorlds = worlds;
+        for(const [key, value] of Object.entries(queries)){
+            if(Array.isArray(value)){
+                filterWorlds = filterWorlds.filter(((world) => 
+                    Array.isArray(world[key]) ? world[key].some(wor => value.includes(wor)) : value.includes(world[key] )))
+            }
+            else{
+                filterWorlds = filterWorlds.filter(((world) => 
+                    Array.isArray(world[key]) ? world[key].includes(value) : value === world[key]))
+            }
+        }
+        return filterWorlds;
     }
-    return null;
+    else{
+        return worlds;
+    }
 }
+
+worldsRouter.get(`${urlPrefix}options`, async (req, res) => {
+    const filteredWorlds = await getWorlds(req.query);
+    const options = filteredWorlds.map((world) => {
+        return {
+            value: world.id, 
+            label: world.name,
+        }
+    })
+    res.send(options)
+})
 
 // 🚀 Router: Fetch worlds or individual world
 worldsRouter.get(`${urlPrefix}:id?`, async (req, res) => {
@@ -34,276 +51,145 @@ worldsRouter.get(`${urlPrefix}:id?`, async (req, res) => {
     const queries = req.query || {};
 
     if (!id || id === "undefined" || id.trim() === "") {
-        if (Object.keys(queries).length > 0) {
-            let worldsToSend = await getWorlds(queries);
-            res.send(worldsToSend);
-        } else {
-            res.send(worlds);
-        }
+        let worldsToSend = await getWorlds(queries);
+        return res.send(worldsToSend);
     } else {
-        const world = await getWorldBio("id", id);
+        const world = await getWorld("id", id);
         if (world) {
             if (author) {
                 const isAuthor = author === world.author;
-                res.send({ isAuthor });
+                return res.send({ isAuthor });
             } else {
-                res.send(world);
+                return res.send(world);
             }
         } else {
-            res.status(404).json({ error: "World not found" });
+            return res.status(404).json({ error: "World not found" });
         }
     }
 });
 
+
+
 // 🚀 Router: Create a new world
 worldsRouter.post(`${urlPrefix}`, verifyAuth, async (req, res) => {
-    const { name, author, Description, MagicSystems, Races, Flora, Wildlife, Biomes, Continents, Countries, Religion, Organizations, Sections } = req.body;
+    const { name, description, sections } = req.body;
+    const author = req.username;
+    if(!name || !description || !sections){
+        return res.status(409).send({msg:"Required fields not filled out"});
+    }
     const id = createID(name, author);
-    
     // Check if the world already exists
     if (await getWorld("id", id)) {
         return res.status(409).send({ msg: `A world entry by you with the name "${name}" already exists.` });
     }
+    
 
     // Create new world using createWorld function
-    const newWorld = await createWorld(req.body, id);
+    const newWorld = await createWorld(req.body, id, author);
 
-    // Modify references for related entities (magic systems, biomes, flora, wildlife, etc.)
-    if (MagicSystems && MagicSystems.length > 0) {
-        for (const magicSystemId of MagicSystems) {
-            await modifyMagicSystem(magicSystemId, "add", {
-                id: newWorld.id,
-                path: newWorld.url,
-                value: newWorld.name
-            });
-        }
-    }
-
-    if (Biomes && Biomes.length > 0) {
-        for (const biomeId of Biomes) {
-            await modifyBiome(biomeId, "add", {
-                id: newWorld.id,
-                path: newWorld.url,
-                value: newWorld.name
-            });
-        }
-    }
-
-    if (Flora && Flora.length > 0) {
-        for (const floraId of Flora) {
-            await modifyFlora(floraId, "add", {
-                id: newWorld.id,
-                path: newWorld.url,
-                value: newWorld.name
-            });
-        }
-    }
-
-    if (Wildlife && Wildlife.length > 0) {
-        for (const wildlifeId of Wildlife) {
-            await modifyWildlife(wildlifeId, "add", {
-                id: newWorld.id,
-                path: newWorld.url,
-                value: newWorld.name
-            });
-        }
-    }
-
-    if (Organizations && Organizations.length > 0) {
-        for (const organizationId of Organizations) {
-            await modifyOrganization(organizationId, "add", {
-                id: newWorld.id,
-                path: newWorld.url,
-                value: newWorld.name
-            });
-        }
-    }
-
-    if (Religion && Religion.length > 0) {
-        for (const religionId of Religion) {
-            await modifyOrganization(religionId, "add", {
-                id: newWorld.id,
-                path: newWorld.url,
-                value: newWorld.name
-            });
-        }
-    }
-
-    if (Countries && Countries.length > 0) {
-        for (const countryId of Countries) {
-            await modifyCountry(countryId, "add", {
-                id: newWorld.id,
-                path: newWorld.url,
-                value: newWorld.name
-            });
-        }
-    }
-
-    res.status(201).json(newWorld); // Respond with created world
+    res.send(newWorld); // Respond with created world
 });
 
 // 🚀 Router: Modify an existing world (author check)
 worldsRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
+    
     const { id } = req.params;
-    const { body } = req;
-
-    const world = await getWorldBio("id", id);
+    const { body, username } = req;
+    if(!body){
+        return res.status(400).send({ msg: "Missing data to update." });
+    }
+    else if( !body.id || body.id !== id ){
+        return res.status(400).send({ msg: "ID mismatch. Cannot modify a different World." });
+    }
+    
+    const world = await getWorld("id", id);
     if (!world) {
         return res.status(404).json({ error: "World not found" });
     }
 
     // Ensure the author is the original author
-    if (world.author !== req.username) {
-        return res.status(403).json({ error: "You do not have permission to update this world." });
+    if (world.author !== username || world.author !== body.author) {
+        return res.status(401).json({ error: "You do not have permission to update this world/field." });
     }
 
     // Update world details
-    Object.assign(world, body);
-
-    res.send({ message: `World ${id} updated successfully` });
+    const update = await updateWorld(body);
+    if(update.msg){
+        return res.status(500).send(update)
+    }
+    res.send(update);
 });
 
-// 🚀 Router: Modify world references (e.g., add/remove magic systems, biomes, flora, etc.)
-worldsRouter.patch(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
-    const { id } = req.params;
-    const { method, data } = req.body;
-
-    const world = await getWorldBio("id", id);
-    if (!world) {
-        return res.status(404).json({ error: "World not found" });
-    }
-
-    // Ensure the author is the original author
-    if (world.author !== req.username) {
-        return res.status(403).json({ error: "You do not have permission to modify references in this world." });
-    }
-
-    // Modify magic systems references
-    if (data && data.magicSystems) {
-        for (const magicSystemId of data.magicSystems) {
-            await modifyMagicSystems(magicSystemId, method, {
-                id: world.id,
-                path: world.url,
-                value: world.name
-            });
-        }
-    }
-
-    // Modify biomes references
-    if (data && data.biomes) {
-        for (const biomeId of data.biomes) {
-            await modifyBiome(biomeId, method, {
-                id: world.id,
-                path: world.url,
-                value: world.name
-            });
-        }
-    }
-
-    // Modify flora references
-    if (data && data.flora) {
-        for (const floraId of data.flora) {
-            await modifyFlora(floraId, method, {
-                id: world.id,
-                path: world.url,
-                value: world.name
-            });
-        }
-    }
-
-    // Modify wildlife references
-    if (data && data.wildlife) {
-        for (const wildlifeId of data.wildlife) {
-            await modifyWildlife(wildlifeId, method, {
-                id: world.id,
-                path: world.url,
-                value: world.name
-            });
-        }
-    }
-
-    // Modify organizations references
-    if (data && data.organizations) {
-        for (const organizationId of data.organizations) {
-            await modifyOrganization(organizationId, method, {
-                id: world.id,
-                path: world.url,
-                value: world.name
-            });
-        }
-    }
-
-    // Modify religions references
-    if (data && data.religions) {
-        for (const religionId of data.religions) {
-            await modifyOrganization(religionId, method, {
-                id: world.id,
-                path: world.url,
-                value: world.name
-            });
-        }
-    }
-
-    // Modify countries references
-    if (data && data.countries) {
-        for (const countryId of data.countries) {
-            await modifyCountry(countryId, method, {
-                id: world.id,
-                path: world.url,
-                value: world.name
-            });
-        }
-    }
-
-    res.send({ message: `World references updated successfully` });
-});
 
 // ✅ Create a new world
-async function createWorld(worldData, id) {
-    const worldURL = urlPrefix + id;
+async function createWorld(worldData, id, author) {
+    const {name, description, continents, custom, sections} = worldData;
+    const url = urlPrefix + id;
     const created = new Date().toJSON();
+    const formattedContinents = Array.isArray(continents) ? continents : [continents];
 
-    const worldBio = {
-        id: id,
-        name: worldData.name,
-        url: worldURL,
-        author: worldData.author,
-        infoCard: {
-            name: worldData.name,
-            cardData: [
-                { label: "Author", value: worldData.author },
-                { label: "Countries", value: worldData.Countries, source: "/worldbuilding/countries", edit: "multi-select" },
-                { label: "Continents", value: worldData.Continents, source: "/worldbuilding/countries", categoryLabel: "Continent" }
-            ],
-            created: created,
-            description: worldData.Description
-        },
-        listSections: [
-            { label: "Organizations", source: `/api/worldbuilding/organizations?worlds=${id}`, canModifyReferences: true },
-            { label: "Magic Systems", source: `/api/worldbuilding/magicsystems?worlds=${id}`, canModifyReferences: true },
-            { label: "Races", source: `/api/worldbuilding/races?worlds=${id}`, canModifyReferences: true },
-            { label: "Flora", source: `/api/worldbuilding/flora?worlds=${id}`, canModifyReferences: true },
-            { label: "Wildlife", source: `/api/worldbuilding/wildlife?worlds=${id}`, canModifyReferences: true },
-            { label: "Biomes", source: `/api/worldbuilding/biomes?worlds=${id}`, canModifyReferences: true }
-        ]
-    };
+    const getterSections = createWorldGetterSections(id, formattedContinents);
 
     // Format the world for the list
-    const worldList = {
+    const world = {
         id: id,
-        name: worldData.name,
-        url: worldURL,
-        author: worldData.author,
-        details: [
-            { label: "name", value: worldData.name, path: worldURL, location: "head", filter: false },
-            { label: "author", value: worldData.author }
-        ]
+        name,
+        author,
+        url,
+        continents: formattedContinents,
+        custom,
+        description,
+        sections,
+        getterSections,
+        created,
+        modified: created
     };
 
     // Store world in the world list
-    worlds.push(worldList);
-    worldBios.push(worldBio);
-    return worldBio;
+    worlds.push(world);
+    return world;
+}
+
+function createWorldGetterSections(id, continents){
+    const getterSections = continents.map(continent => ({
+        label: `Countries in ${continent}`,
+        query: `/worldbuilding/countries?worlds=${id}&continent=${encodeURIComponent(continent)}`
+    }));
+
+    const additionalSections = [
+        { label: "Biomes", query: `/worldbuilding/biomes?worlds=${id}` },
+        { label: "Flora", query: `/worldbuilding/flora?worlds=${id}` },
+        { label: "Wildlife", query: `/worldbuilding/wildlife?worlds=${id}` },
+        { label: "Magic Systems", query: `/worldbuilding/magicsystems?worlds=${id}` },
+        { label: "Organizations", query: `/worldbuilding/organizations?worlds=${id}` },
+        { label: "Races", query: `/worldbuilding/races?worlds=${id}` },
+        { label: "Characters Found Here/have visited/lived here", query:`/characters?worlds=${id}`}
+    ];
+
+    const finalGetterSections = [...getterSections, ...additionalSections];
+    return finalGetterSections;
 }
 
 module.exports = worldsRouter;
+
+async function updateWorld(updateData){
+    const {id, continents} = updateData
+    const world = getWorld('id', id);
+    if(!world){
+        return {msg:"Error updating world"}
+    }
+    const formattedContinents = Array.isArray(continents) ? continents : [continents];
+
+    if(JSON.stringify(formattedContinents) != JSON.stringify(world.continents)){
+        updateData.getterSections = createWorldGetterSections(id, formattedContinents);
+    }
+    updateData.modified = new Date().toJSON();
+    const index = worlds.findIndex(world => world.id === id);
+    if(index !== -1){
+        worlds[index] = updateData;
+        return updateData;
+    }
+    else{
+        return {msg:"Error updating world"} 
+    }
+}

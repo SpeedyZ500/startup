@@ -77,7 +77,7 @@ function sanitizeId(id){
         .replace(/[^\w-]/g, "");
 }
 
-async function createID(name, author){
+function createID(name, author){
     return sanitizeId(`${name}_${author}`);
 }
 

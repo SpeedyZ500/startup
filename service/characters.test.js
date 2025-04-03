@@ -16,7 +16,9 @@ const {testGetSpecific,
     testIsAuthor,
     testisNotAuthor,
     testNotFound,
-    testPatchDescription
+    testPatchDescription,
+    testMismatchIDs,
+    testNoDataPassed
 } = require('./testUtils')
 const {app, createID} = require('./service');
 
@@ -173,15 +175,16 @@ test("Test Character Creation", async () => {
         sections,
         custom
     ] = await createCharacter();
-    const {created, modified, url, ...characterWithoutDates} = character.body;
+    const {created, modified, ...characterWithoutDates} = character.body;
     const worlds = [homeWorld, ...otherWorlds]
     const countries = [homeCountry, ...otherCountries]
     const races = [race, ...altForms];
     expect(character.headers['content-type']).toMatch('application/json; charset=utf-8');
-
-    expect(characterWithoutDates).toMatchObject({
+    const url = `/characters/${id}`
+    const expected = {
         id,
         name,
+        url,
         author,
         family,
         titles,
@@ -208,7 +211,9 @@ test("Test Character Creation", async () => {
         custom,
         description,
         sections
-    })
+    }
+
+    expect(characterWithoutDates).toMatchObject(expected)
 });
 
 test("Test Duplicate Character Creation", async () => {
@@ -240,21 +245,28 @@ test("Test Update Character", async () => {
     expected.countries = [expected.homeCountry, ...expected.otherCountries];
     expected.races = [expected.race, ...expected.altForms];
     await testUpdate(register, character, expected, app)
-    // const cookie = register.headers['set-cookie'];
-    // const updateCharacter = await request(app).put(`/api${character.url}`).send(character).set("Cookie", cookie);
-    // expect(updateCharacter.headers['content-type']).toMatch('application/json; charset=utf-8');
-    // const {modified: modifiedResult, ...characterResult} = updateCharacter.body
-    // expect(modifiedResult != modified).toBe(true);
-    // expect(characterResult).toMatchObject(expected)
+});
+
+
+test("Test Update Character ID Mismatch", async () => {
+    const [register, ,characterReturn] = await createCharacter();
+    const character = characterReturn.body;
+    await testMismatchIDs(app,register, character )
+    
+
+});
+
+test("Test Update Character No Data passed", async () => {
+    const [register, ,characterReturn] = await createCharacter();
+    const character = characterReturn.body;
+    await testNoDataPassed(app,register, character )
+
 });
 
 test("Test Character update, no character of that id found", async () => {
 
     const [register, , name] = await registerUser();
     await testNotExist(register, `/characters/${name}`, app)
-    // const cookie = register.headers['set-cookie'];
-    // const updateCharacter = await request(app).put(`/api/characters/${name}`).send({name:"nonsence"}).set("Cookie", cookie);
-    // expect(updateCharacter.status).toBe(404)
 });
 
 test("Test Character update, not author", async () => {

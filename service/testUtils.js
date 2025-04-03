@@ -28,6 +28,7 @@ async function testGetManyFiltered(app, path, individualKey, individualValue, ar
 
 }
 
+
 async function testUpdate(response, original, expected, app){
     const cookie = response.headers['set-cookie'];
     const updated = await request(app).put(`/api${original.url}`).send(original).set("Cookie", cookie);
@@ -38,7 +39,7 @@ async function testUpdate(response, original, expected, app){
 
 async function testNotExist(response, path, app){
     const cookie = response.headers['set-cookie'];
-    const updated = await request(app).put(`/api${path}`).send({name:"noice"}).set("Cookie", cookie);
+    const updated = await request(app).put(`/api${path}/noice`).send({id:"noice"}).set("Cookie", cookie);
     expect(updated.status).toBe(404);
 }
 
@@ -169,6 +170,16 @@ async function testNotFound(app, path){
     expect(response.status).toBe(404);
 }
 
+async function testMismatchIDs(app, response, original){
+    const cookie = response.headers['set-cookie'];
+    const updated = await request(app).put(`/api${original.url}manipulated`).send(original).set("Cookie", cookie);
+    expect(updated.status).toBe(400);
+}
+async function testNoDataPassed(app, response, original){
+    const cookie = response.headers['set-cookie'];
+    const updated = await request(app).put(`/api${original.url}manipulated`).set("Cookie", cookie);
+    expect(updated.status).toBe(400);
+}
 module.exports = { 
     testGetSpecific,
     testUpdate,
@@ -187,5 +198,7 @@ module.exports = {
     testIsAuthor,
     testisNotAuthor,
     testNotFound,
-    testPatchDescription
+    testPatchDescription,
+    testMismatchIDs,
+    testNoDataPassed
 }

@@ -87,7 +87,7 @@ characterRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
     if(!name || !author || !description){
         return res.status(409).send({msg:"Required fields not filled out"});
     }
-    const id = await createID(req.body.name, req.body.author);
+    const id = createID(req.body.name, author);
     if(await getCharacter("id", id)){
         return res.status(409).send({msg:"A Character by you and by that name already exists"});
     }else{
@@ -103,11 +103,17 @@ characterRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
 characterRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     const { id } = req.params;
     const username  = req.username;
+    const updateData = req.body;
+    if(!updateData){
+        return res.status(400).send({ msg: "Missing data to update." });
+    }
+    else if(!updateData.id || updateData.id !== id ){
+        return res.status(400).send({ msg: "ID mismatch. Cannot modify a different Character." });
+    }
     const character = await getCharacter("id", id);
     if(character){
-        if(username !== character.author){
-            const currUser = await getUser("username", username)
-            res.status(401).send({msg:`${currUser.displayname} is not the author`});
+        if(username !== character.author || updateData.author !== character.author){
+            res.status(401).send({msg:`cannot update character, or field`});
         }
         if(username === character.author){
             const updateData = req.body;
