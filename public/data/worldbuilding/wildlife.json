@@ -6,31 +6,38 @@
         "title":"New Wildlife",
         "fields":[
             {
-                "label": "name",
+                "label": "Name",
                 "required": true,
                 "type": "text"
             },
             {
                 "label":"Type",
                 "type":"creatable",
-                "source":"/worldbuilding/wildlife/types"
+                "source":"/worldbuilding/wildlife/types",
+                "key":"type"
             },
             {
                 "label":"Description",
                 "type":"text-area",
-                "placeholder":"Describe your Wildlife"
+                "placeholder":"Describe your Wildlife",
+                "key":"description"
             },
             {
-                "label":"Origin_World",
-                "type":"select",
-                "source":"/worldbuilding/worlds",
-                "onCard":true,
-                "inList":true
+                "label1":"Origin World",
+                "type":"select-plus",
+                "type1":"select",
+                "source1":"/worldbuilding/worlds",
+                "key1":"originWorld",
+                "label2":"Origin Biome",
+                "type2":"iteration-select",
+                "source2":"originBiome",
+                "key2":"originBiome"
             },
             {
-                "label":"Worlds",
+                "label":"Other Worlds",
                 "type":"multi-select",
-                "source":"/worldbuilding/worlds"
+                "source":"/worldbuilding/worlds",
+                "key":"otherWorlds"
             },
             {
                 "label":"Abilities",
@@ -39,8 +46,9 @@
 
             },
             {
-                "label":"Biomes",
-                "type":"multi-select"
+                "label":"Other Biomes",
+                "type":"multi-select",
+                "key":"otherBiomes"
             },
             {
                 "label":"Sections",

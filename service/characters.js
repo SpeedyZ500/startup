@@ -36,6 +36,16 @@ async function getCharacters(queries){
         return characters;
     }
 }
+characterRouter.get(`${urlPrefix}types/options`, async (_req, res) => {
+    const options = characterTypes.map((type) => {
+        return {
+            value: type, 
+            label: type,
+        }
+    })
+    res.send(options)
+})
+
 characterRouter.get(`${urlPrefix}options`, async (req, res) => {
     const filteredCharacters = await getCharacters(req.query);
     const options = filteredCharacters.map((character) => {

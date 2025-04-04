@@ -367,3 +367,10 @@ test("Attempt to modify fields that arnt allowed", async () => {
     await testPatchCustom(path, app)
     await testPatchDescription(path, app)
 })
+
+test("Get Character Types optoins", async () => {
+    const [ , ,characterReturn,,, , , ,,, ,
+        roles ] = await createCharacter();
+    const option = {id:roles[0], name:roles[0]}
+    await testGetOptions(app, "characters/types", option);
+})
