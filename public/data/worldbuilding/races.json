@@ -21,9 +21,16 @@
                 "placeholder":"Describe your Wildlife"
             },
             {
-                "label":"Worlds",
+                "label1":"Origin World",
+                "type":"select",
+                "source":"/worldbuilding/worlds",
+                "key":"originWorld"
+            },
+            {
+                "label":"Other Worlds",
                 "type":"multi-select",
-                "source":"/worldbuilding/worlds"
+                "source":"/worldbuilding/worlds",
+                "key":"otherWorlds"
             },
             {
                 "label":"Countries",

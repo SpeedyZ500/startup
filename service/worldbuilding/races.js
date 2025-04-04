@@ -5,268 +5,265 @@ const urlPrefix = "/worldbuilding/races/";
 const racesRouter = express.Router();
 
 let races = [];
-let raceBios = [];
 let raceTypes = ["sudo-shape-shifter"];
 
-async function getRace(field, value) {
+
+async function getRace(field, value){
     if (value) {
         return races.find((race) => race[field] === value);
     }
     return null;
 }
 
-async function getRaceBio(field, value) {
-    if (value) {
-        return raceBios.find((race) => race[field] === value);
-    }
-    return null;
-}
 
-async function getRaces(queries) {
-    if (typeof queries === "object") {
+async function getRaces(queries){
+    if(typeof queries === "object"){
         let filterRaces = races;
-        for (const [key, value] of Object.entries(queries)) {
-            if (Array.isArray(value)) {
-                filterRaces = filterRaces.filter((race) =>
-                    Array.isArray(race[key])
-                        ? race[key].some((el) => value.includes(el))
-                        : value.includes(race[key])
-                );
-            } else {
-                filterRaces = filterRaces.filter((race) =>
-                    Array.isArray(race[key])
-                        ? race[key].includes(value)
-                        : value === race[key]
-                );
+        for(const [key, value] of Object.entries(queries)){
+            if(Array.isArray(value)){
+                filterRaces = filterRaces.filter(((race) => 
+                    Array.isArray(race[key]) ? race[key].some(char => value.includes(char)) : value.includes(race[key] )))
+            }
+            else{
+                filterRaces = filterRaces.filter(((race) => 
+                    Array.isArray(race[key]) ? race[key].includes(value) : value === race[key]))
             }
         }
         return filterRaces;
-    } else {
+    }
+    else{
         return races;
     }
 }
 
-// 🚀 Router: Fetch races or individual race
+
+racesRouter.get(`${urlPrefix}options`, async (req, res) => {
+    const filteredRaces = await getRaces(req.query);
+    const options = filteredRaces.map((race) => {
+        return {
+            value: race.id, 
+            label: race.name,
+            qualifier: race.types || []
+        }
+    })
+    res.send(options)
+})
+
+racesRouter.get(`${urlPrefix}types/options`, async (req, res) => {
+    const options = raceTypes.map((type) => {
+        return {
+            value: type,
+            label: type,
+        }
+    })
+    res.send(options)
+})
+
+
+
 racesRouter.get(`${urlPrefix}:id?`, async (req, res) => {
     const { id } = req.params;
-    const { author } = req.query || "";
     const queries = req.query || {};
-
-    if (!id || id === "undefined" || id.trim() === "") {
-        if (Object.keys(queries).length > 0) {
-            let racesToSend = await getRaces(queries);
-            res.send(racesToSend);
-        } else {
-            res.send(races);
-        }
-    } else {
-        if (id === "types") {
+    const {author} = req.query || "";
+    if(!id || id === "undefined" || id.trim() === ""){
+        let racesToSend = await getRaces(queries);
+        res.send(racesToSend)
+    }
+    else{
+        if(id == "types"){
             res.send(raceTypes);
-        } else {
-            const race = await getRaceBio("id", id);
-            if (race) {
-                if (author) {
+        }
+        else{
+            const race = await getRace("id", id);
+            if(race){
+                if(author){
                     const isAuthor = author === race.author;
-                    res.send({ isAuthor });
-                } else {
+                    res.send({isAuthor})
+                }
+                else{
                     res.send(race);
                 }
-            } else {
+            }
+            else{
                 res.status(404).json({ error: "Race not found" });
             }
         }
     }
 });
 
-// 🚀 Router: Create a new race
-racesRouter.post(`${urlPrefix}`, verifyAuth, async (req, res) => {
-    const id = createID(req.body.name, req.body.author);
-    if (await getRace("id", id)) {
-        return res.status(409).send({ msg: `A Race entry by you with the name "${name}" already exists.` });
+racesRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
+    
+    const {name, description} = req.body;
+    const author = req.username;
+    if(!name || !author || !description){
+        return res.status(409).send({msg:"Required fields not filled out"});
     }
-    const newRace = await createRace(req.body, id);
-    res.send(newRace);
+    const id = createID(req.body.name, author);
+    if(await getRace("id", id)){
+        return res.status(409).send({msg:"A Race by you and by that name already exists"});
+    }else{
+        const race = await createRace(req.body, author, id);
+        if(race){
+            return res.json(race)
+        }
+    }
 });
 
-// 🚀 Router: Update an existing race
+
+
 racesRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     const { id } = req.params;
+    const username  = req.username;
     const updateData = req.body;
-
-    // Get the race bio and the race itself
-    const raceBio = await getRaceBio("id", id);
+    if(!updateData){
+        return res.status(400).send({ msg: "Missing data to update." });
+    }
+    else if(!updateData.id || updateData.id !== id ){
+        return res.status(400).send({ msg: "ID mismatch. Cannot modify a different Race." });
+    }
     const race = await getRace("id", id);
-
-    // Ensure race and raceBio exist and that the current user is the author
-    if (!raceBio || !race) {
-        return res.status(404).json({ error: `Race with ID '${id}' not found` });
+    if(race){
+        if(username !== race.author || updateData.author !== race.author){
+            res.status(401).send({msg:`cannot update race, or field`});
+        }
+        if(username === race.author){
+            const updateData = req.body;
+            const updated = await updateRace(id, updateData)
+            if(updated.msg){
+                return res.status(500).send(updated.msg);
+            }
+            return res.send(updated);
+        }
+        else{
+        }
     }
-
-    if (race.author !== req.username) {
-        return res.status(403).json({ error: "You do not have permission to update this race" });
+    else{
+        res.status(404).send({msg:`Race ${id}, not found`});
     }
-
-    // Proceed with the update if ownership matches
-    await updateRace(id, updateData);
-    res.send({ message: `Race ${id} updated successfully` });
 });
 
+
+
+
+async function createRace(raceData, author, id){
+    const raceURL = urlPrefix + id;
+    const {name, types, description, 
+        originWorld,
+        otherWorlds = [], 
+        abilities, 
+        countries,  custom, sections
+    } = raceData
+    
+    const created = new Date().toJSON();
+    await addTypes(types);
+    const race = {
+        id,
+        name,
+        url:raceURL,
+        author,
+        types,
+        abilities,
+        originWorld,
+        otherWorlds,
+        countries,
+        worlds: [originWorld, ...(otherWorlds ?? [])],
+        custom,
+        description,
+        sections,
+        created,
+        modified:created,
+    }
+    races.push(race)
+    return race
+}
+async function updateRace(id, updateData){
+    const {types, originWorld, otherWorlds } = updateData
+    const race = await getRace("id", id);
+    if(JSON.stringify(types) !== JSON.stringify(race)){
+        await addTypes(types);
+    }
+    const newWorlds = [originWorld, ...(otherWorlds ?? [])]
+    if(JSON.stringify(newWorlds) !== JSON.stringify(race.worlds)){
+        updateData.worlds = newWorlds;
+    }
+    return await raceUpdate(updateData);
+}
+async function raceUpdate(race){
+    const index = races.findIndex(char => char.id === race.id);
+    if(index !== -1){
+        races[index] = race;
+        return race
+    }
+    else {
+        return {msg:"failed to update race"}
+    }
+}
+
+async function addTypes(type){
+    if(Array.isArray(type)){
+        type.forEach((item) => {
+            if(!raceTypes.includes(item)){
+                raceTypes.push(item);
+            }
+        })
+    }
+    else{
+        if(!raceTypes.includes(type)){
+            raceTypes.push(type)
+        }
+    }
+    return "done"
+}
+
+async function modifyRace(race, list, data, method) {
+    const restrictedLists = ["worlds", "abilities", "sections", "custom"];
+    if(restrictedLists.includes(list)){
+        return {error: `can't modify ${list} directly use other or alt version` };
+    }
+    if (!race[list] || !Array.isArray(race[list])) {
+        return { error: `List '${list}' not found, or not a list.` };
+    }
+    const races = race[list];
+    
+    
+    // Add or update references
+    if (method === 'add' || method === 'put') {
+        const existsInRace = races.includes(data);
+        if (!existsInRace) {
+            races.push(data);  // Add to race object
+        }
+    } 
+    // Delete references
+    else if (method === 'delete') {
+        const racesIndex = races.findIndex(item => item === data);
+        if (racesIndex !== -1) {
+            if(racesIndex === races.length - 1){
+                races.pop()
+            }
+            else{
+                races.splice(racesIndex, 1);
+            }
+        }
+    }
+    race[list] = races;
+    return await updateRace(race.id, race);
+}
 
 // 🚀 Router: Modify a race field (add/put/delete references)
 racesRouter.patch(`${urlPrefix}:id/:list`, verifyAuth, async (req, res) => {
     const { id, list } = req.params;
     const { method, data } = req.body;
+    const race = await getRace("id", id)
+    if(!race){
+        return res.status(404).send({msg:"Error Race not found"});
+    }
 
-    const result = await modifyRace(id, list, data, method);
+    const result = await modifyRace(race, list, data, method);
 
     if (result.error) {
-        res.status(404).json(result);
+        return res.status(400).send(result);
     } else {
-        res.send(result);
+        return res.send(result);
     }
 });
-
-// ✅ Create a new race
-async function createRace(raceData, id) {
-    const raceURL = urlPrefix + id;
-    const created = new Date().toJSON();
-
-    const raceBio = {
-        id: id,
-        name: raceData.name,
-        url: raceURL,
-        author: raceData.author,
-        infoCard: {
-            name: raceData.name,
-            cardData: [
-                { label: "Author", value: raceData.author },
-                { label: "Worlds", value: raceData.Worlds, source: "/worldbuilding/worlds", edit: "multi-select" },
-                { label: "Countries", value: raceData.Countries, source: "/worldbuilding/countries", edit: "multi-select" },
-                { label: "Abilities", value: raceData.Abilities, source: "/worldbuilding/magicsystems", edit: "multi-select" },
-                { label: "Type", value: raceData.Type, source: "/worldbuilding/races/types", edit: "creatable" }
-            ],
-            created: created,
-            modified: created
-        },
-        description: raceData.Description,
-        sections: raceData.sections || [],
-        listSections: [
-            {
-                label:"Members of this Race",
-                query: `/characters?races=${id}`,
-                canModifyReferences: false
-            }
-        ]
-    };
-
-    await addTypes(raceData.Type);
-    raceBios.push(raceBio);
-
-    const race = {
-        id: id,
-        name: raceData.name,
-        url: raceURL,
-        author: raceData.author,
-        description: raceData.Description,
-        abilities: raceData.Abilities?.map(abil => abil.id) || [],
-        worlds: raceData.Worlds?.map(world => world.id) || [],
-        countries: raceData.Countries?.map(country => country.id) || [],
-        type: raceData.Type || [],
-        details: [
-            { label: "name", value: raceData.name, path: raceURL, location: "head", filter: false },
-            { label: "author", value: raceData.author },
-            { label: "type", value: raceData.Type || [] },
-            { label: "Created", value: created, display: false, filter: false }
-        ]
-    };
-
-    races.push(race);
-    return race;
-}
-
-// ✅ Add new types dynamically
-async function addTypes(type) {
-    if (Array.isArray(type)) {
-        type.forEach((item) => {
-            if (!raceTypes.includes(item)) {
-                raceTypes.push(item);
-            }
-        });
-    } else {
-        if (!raceTypes.includes(type)) {
-            raceTypes.push(type);
-        }
-    }
-    return "done";
-}
-
-// ✅ Update race data
-async function updateRace(id, updateData) {
-    const { description, infoCard, sections } = updateData;
-    const raceBio = await getRaceBio("id", id);
-    const race = await getRace("id", id);
-
-    if (!raceBio || !race) {
-        console.error(`Race with ID '${id}' not found.`);
-        return;
-    }
-
-    if (description && description !== raceBio.description) {
-        raceBio.description = description;
-        race.description = description;
-    }
-
-    if (infoCard) {
-        raceBio.infoCard = infoCard;
-        race.name = infoCard.name;
-    }
-
-    if (sections) {
-        raceBio.sections = sections;
-    }
-
-    const bioIndex = raceBios.findIndex(b => b.id === id);
-    const raceIndex = races.findIndex(r => r.id === id);
-
-    raceBios[bioIndex] = raceBio;
-    races[raceIndex] = race;
-}
-
-// ✅ Modify a race (add/put/delete references)
-async function modifyRace(raceID, list, data, method) {
-    const { id, value, path } = data;
-
-    const raceBio = await getRaceBio("id", raceID);
-    const race = await getRace("id", raceID);
-
-    if (!raceBio || !race) {
-        console.error(`Race with ID '${raceID}' not found.`);
-        return { error: "Race not found" };
-    }
-
-    const bioList = raceBio.infoCard.cardData.find(item => item.label.toLowerCase() === list.toLowerCase());
-    const raceList = race[list.toLowerCase()];
-
-    if (!bioList || !raceList) {
-        console.error(`List '${list}' not found.`);
-        return { error: `List '${list}' not found.` };
-    }
-
-    const newItem = { value, id, path };
-
-    if (method === 'add' || method === 'put') {
-        if (!raceList.some(item => item.id === id)) {
-            raceList.push(newItem);
-        }
-        if (!bioList.value.some(item => item.id === id)) {
-            bioList.value.push(newItem);
-        }
-    } else if (method === 'delete') {
-        raceList.splice(raceList.findIndex(item => item.id === id), 1);
-        bioList.value.splice(bioList.value.findIndex(item => item.id === id), 1);
-    }
-
-    return { message: `Race '${list}' modified successfully`, race };
-}
-
-module.exports = racesRouter;
+module.exports = {racesRouter, modifyRace};

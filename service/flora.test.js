@@ -40,7 +40,7 @@ test('get Flora types', async () => {
    await testGetMany(app, "worldbuilding/flora/types");
 })
 
-test('fail to get Wildlfe', async () => {
+test('fail to get Flora', async () => {
     await testNotFound(app, "worldbuilding/flora");
 })
 
