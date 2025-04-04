@@ -4,365 +4,279 @@ const urlPrefix = "/worldbuilding/flora/"
 
 const floraRouter = express.Router();
 let floraList = [];
-let floraBios = [];
 let floraTypes = [
     "Plant",
     "Tree",
     "Flower",
     "Mushroom",
-    "Magic Tree"
+    "Magic Tree",
+    "Monster"
 ]
 
-async function getFlora(field, value) {
+async function getFlora(field, value){
     if (value) {
         return floraList.find((flora) => flora[field] === value);
     }
     return null;
 }
 
-async function getFloraBio(field, value) {
-    if (value) {
-        return floraBios.find((flora) => flora[field] === value);
-    }
-    return null;
-}
 
-async function getFloraList(queries) {
-    if (typeof queries === "object") {
-        let filterFlora = floraList;
-        for (const [key, value] of Object.entries(queries)) {
-            if (Array.isArray(value)) {
-                filterFlora = filterFlora.filter((flora) =>
-                    Array.isArray(flora[key])
-                        ? flora[key].some((el) => value.includes(el))
-                        : value.includes(flora[key])
-                );
-            } else {
-                filterFlora = filterFlora.filter((flora) =>
-                    Array.isArray(flora[key])
-                        ? flora[key].includes(value)
-                        : value === flora[key]
-                );
+async function getFloraList(queries){
+    if(typeof queries === "object"){
+        let filterFloraList = floraList;
+        for(const [key, value] of Object.entries(queries)){
+            if(Array.isArray(value)){
+                filterFloraList = filterFloraList.filter(((flora) => 
+                    Array.isArray(flora[key]) ? flora[key].some(char => value.includes(char)) : value.includes(flora[key] )))
+            }
+            else{
+                filterFloraList = filterFloraList.filter(((flora) => 
+                    Array.isArray(flora[key]) ? flora[key].includes(value) : value === flora[key]))
             }
         }
-        return filterFlora;
-    } else {
+        return filterFloraList;
+    }
+    else{
         return floraList;
     }
 }
 
+
+floraRouter.get(`${urlPrefix}options`, async (req, res) => {
+    const filteredFloraList = await getFloraList(req.query);
+    const options = filteredFloraList.map((flora) => {
+        return {
+            value: flora.id, 
+            label: flora.name,
+            qualifier: flora.types || []
+        }
+    })
+    res.send(options)
+})
+
+floraRouter.get(`${urlPrefix}types/options`, async (req, res) => {
+    const options = floraTypes.map((type) => {
+        return {
+            value: type,
+            label: type,
+        }
+    })
+    res.send(options)
+})
+
+
+
 floraRouter.get(`${urlPrefix}:id?`, async (req, res) => {
     const { id } = req.params;
-    const { author } = req.query || "";
     const queries = req.query || {};
-
-    if (!id || id === "undefined" || id.trim() === "") {
-        if (Object.keys(queries).length > 0) {
-            let floraToSend = await getFloraList(queries);
-            res.send(floraToSend);
-        } else {
-            res.send(floraList);
-        }
-    } else {
-        if (id === "types") {
+    const {author} = req.query || "";
+    if(!id || id === "undefined" || id.trim() === ""){
+        let floraListToSend = await getFloraList(queries);
+        res.send(floraListToSend)
+    }
+    else{
+        if(id == "types"){
             res.send(floraTypes);
-        } else {
-            const flora = await getFloraBio("id", id);
-            if (flora) {
-                if (author) {
+        }
+        else{
+            const flora = await getFlora("id", id);
+            if(flora){
+                if(author){
                     const isAuthor = author === flora.author;
-                    res.send({ isAuthor });
-                } else {
+                    res.send({isAuthor})
+                }
+                else{
                     res.send(flora);
                 }
-            } else {
+            }
+            else{
                 res.status(404).json({ error: "Flora not found" });
             }
         }
     }
 });
 
-// 🚀 Create new flora
-floraRouter.post(urlPrefix, verifyAuth, async (req, res) => {
-    const { body } = req;
-    const id = createID(req.body.name, req.body.author);
-    if (await getFlora("id", id)) {
-        return res.status(409).send({ msg: `A Flora entry by you with the name "${name}" already exists.` });
+floraRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
+    
+    const {name, description} = req.body;
+    const author = req.username;
+    if(!name || !author || !description){
+        return res.status(409).send({msg:"Required fields not filled out"});
     }
-    const newFlora = await createFlora(body, id);
-    res.status(201).json(newFlora); // Respond with created flora
+    const id = createID(req.body.name, author);
+    if(await getFlora("id", id)){
+        return res.status(409).send({msg:"A Flora by you and by that name already exists"});
+    }else{
+        const flora = await createFlora(req.body, author, id);
+        if(flora){
+            return res.json(flora)
+        }
+    }
 });
 
-// 🚀 Modify flora (e.g., update details, sections, etc.)
+
+
 floraRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     const { id } = req.params;
-    const { body } = req;
-
-    // Get the flora bio and the flora itself
-    const floraBio = await getFloraBio("id", id);
+    const username  = req.username;
+    const updateData = req.body;
+    if(!updateData){
+        return res.status(400).send({ msg: "Missing data to update." });
+    }
+    else if(!updateData.id || updateData.id !== id ){
+        return res.status(400).send({ msg: "ID mismatch. Cannot modify a different Flora." });
+    }
     const flora = await getFlora("id", id);
-
-    // Ensure flora and floraBio exist and that the current user is the author
-    if (!floraBio || !flora) {
-        return res.status(404).json({ error: `Flora with ID '${id}' not found` });
+    if(flora){
+        if(username !== flora.author || updateData.author !== flora.author){
+            res.status(401).send({msg:`cannot update flora, or field`});
+        }
+        if(username === flora.author){
+            const updateData = req.body;
+            const updated = await updateFlora(id, updateData)
+            if(updated.msg){
+                return res.status(500).send(updated.msg);
+            }
+            return res.send(updated);
+        }
+        else{
+        }
     }
-
-    if (flora.author !== req.username) {
-        return res.status(403).json({ error: "You do not have permission to update this flora" });
+    else{
+        res.status(404).send({msg:`Flora ${id}, not found`});
     }
-
-    // Proceed with the update if ownership matches
-    const updatedFlora = await updateFlora(id, body);
-    res.status(200).json(updatedFlora); // Respond with updated flora
 });
 
-// 🚀 Add types to the flora types list
-floraRouter.post(`${urlPrefix}types`, verifyAuth, async (req, res) => {
-    const { type } = req.body;
-    const result = await addTypes(type);
-    res.status(200).json({ message: result });
-});
 
 
-async function createFlora(floraData, id) {
-    const floraURL = `${urlPrefix}${id}`;
+
+async function createFlora(floraData, author, id){
+    const floraURL = urlPrefix + id;
+    const {name, types, description, 
+        originWorld, originBiome,
+        otherWorlds = [],  otherBiomes = [], 
+        abilities, 
+        countries,  custom, sections
+    } = floraData
+    
     const created = new Date().toJSON();
-    const floraBio = {
-        id,
-        name: floraData.name,
-        url: floraURL,
-        author: floraData.author,
-        infoCard: {
-            name: floraData.name,
-            cardData: [
-                { label: "Author", value: floraData.author },
-                { label: "Origin World", value: floraData.Origin_World, source: "/worldbuilding/worlds", edit: "select" },
-                { label: "Type", value: floraData.Type, source: "/worldbuilding/flora/types", edit: "creatable" },
-                { label: "Worlds", value: floraData.Worlds, source: "/worldbuilding/worlds", edit: "multi-select" },
-                { label: "Countries", value: floraData.Countries, source: "/worldbuilding/countries", edit: "multi-select" },
-                { label: "Biomes", value: floraData.Biomes, source: "/worldbuilding/biomes", edit: "multi-select" },
-                { label: "Properties", value: floraData.Properties, source: "/worldbuilding/magicsystems", edit: "multi-select" }
-            ],
-            created,
-            modified: created
-        },
-        description: floraData.Description,
-        sections: floraData.sections || []
-    };
-
-    let originValue = floraData.Origin_World;
-    if (Array.isArray(floraData.Origin_World)) {
-        floraData.Worlds.push(...floraData.Origin_World);
-        originValue = floraData.Origin_World[0];
-    } else {
-        floraData.Worlds.push(floraData.Origin_World);
-    }
-
+    await addTypes(types);
     const flora = {
         id,
-        name: floraData.name,
-        url: floraURL,
-        author: floraData.author,
-        description: floraData.Description,
-        originWorld: originValue.id || originValue,
-        worlds: floraData.Worlds.map(world => world.id),
-        countries: floraData.Countries.map(country => country.id),
-        biomes: floraData.Biomes.map(biome => biome.id),
-        type: floraData.Type || [],
-        properties: floraData.Properties.map(prop => prop.id),
-        details: [
-            { label: "name", value: floraData.name, path: floraURL, location: "head", filter: false },
-            { label: "author", value: floraData.author },
-            { label: "Origin World", value: originValue.value || originValue, path: originValue.path || originValue.url || null },
-            { label: "type", value: floraData.Type || [] },
-            { label: "Created", value: created, display: false, filter: false }
-        ]
-    };
-
-    floraBios.push(floraBio);
-    floraList.push(flora);
-    return flora;
+        name,
+        url:floraURL,
+        author,
+        types,
+        abilities,
+        originWorld,
+        originBiome,
+        otherWorlds,
+        otherBiomes,
+        countries,
+        biomes:[originBiome, ...(otherBiomes ?? [])],
+        worlds: [originWorld, ...(otherWorlds ?? [])],
+        custom,
+        description,
+        sections,
+        created,
+        modified:created,
+    }
+    floraList.push(flora)
+    return flora
 }
-
-async function modifyFlora(floraID, list, data, method) {
-    const { id, value, path } = data;
-
-    // Retrieve the flora bio and flora data
-    const floraBio = await getFloraBio("id", floraID);
-    const flora = await getFlora("id", floraID);
-
-    // Ensure Origin World cannot be modified
-    if (list.toLowerCase() === 'origin_world' && method === 'put') {
-        console.error(`Modification of Origin World is restricted.`);
-        return { error: "Modification of Origin World is restricted." };
-    }
-
-    const bioIndex = floraBios.findIndex(bio => bio.id === floraID);
-    const floraIndex = floraList.findIndex(f => f.id === floraID);
-
-    const bioList = floraBio.infoCard.cardData.find(item => item.label.toLowerCase() === list.toLowerCase());
-    const floraListObj = flora[list.toLowerCase()];
-
-    if (!bioList || !floraListObj) {
-        console.error(`List '${list}' not found in either floraBio or flora.`);
-        return;
-    }
-
-    const newItem = { value, id, path };
-
-    if (method === 'add' || method === 'put') {
-        const existsInFlora = floraListObj.some(item => item.id === id && item.value === value && item.path === path);
-        const existsInBio = bioList.value.some(item => item.id === id && item.value === value && item.path === path);
-
-        if (!existsInFlora) {
-            floraListObj.push(newItem.id); // Add only the ID to the flora object list
-        }
-        if (!existsInBio) {
-            bioList.value.push(newItem); // Add only the ID to the floraBio cardData list
-        }
-    } else if (method === 'delete') {
-        const floraListIndex = floraListObj.findIndex(item => item.id === id && item.value === value && item.path === path);
-        if (floraListIndex !== -1) {
-            floraListObj.splice(floraListIndex, 1);
-        }
-
-        const bioListIndex = bioList.value.findIndex(item => item.id === id && item.value === value && item.path === path);
-        if (bioListIndex !== -1) {
-            bioList.value.splice(bioListIndex, 1);
-        }
-    }
-
-    floraBios[bioIndex] = floraBio;
-    floraList[floraIndex] = flora;
-
-    return flora;
-}
-
-async function updateFlora(id, updateData) {
-    const { description, infoCard, sections } = updateData;
-    const floraBio = await getFloraBio("id", id);
+async function updateFlora(id, updateData){
+    const {types, originWorld, otherWorlds, originBiome, otherBiomes } = updateData
     const flora = await getFlora("id", id);
-
-    if (!floraBio || !flora) {
-        console.error(`Flora with ID ${id} not found.`);
-        return { error: "Flora not found" };
+    if(JSON.stringify(types) !== JSON.stringify(flora)){
+        await addTypes(types);
     }
+    const newBiomes = [originBiome, ...(otherBiomes ?? [])]
+    if(JSON.stringify(newBiomes) !== JSON.stringify(flora.biomes)){
+        updateData.biomes = newBiomes;
+    }
+    const newWorlds = [originWorld, ...(otherWorlds ?? [])]
+    if(JSON.stringify(newWorlds) !== JSON.stringify(flora.worlds)){
+        updateData.worlds = newWorlds;
+    }
+    return await floraUpdate(updateData);
+}
+async function floraUpdate(flora){
+    const index = floraList.findIndex(char => char.id === flora.id);
+    if(index !== -1){
+        floraList[index] = flora;
+        return flora
+    }
+    else {
+        return {msg:"failed to update flora"}
+    }
+}
 
-    let modified = false;
+async function addTypes(type){
+    if(Array.isArray(type)){
+        type.forEach((item) => {
+            if(!floraTypes.includes(item)){
+                floraTypes.push(item);
+            }
+        })
+    }
+    else{
+        if(!floraTypes.includes(type)){
+            floraTypes.push(type)
+        }
+    }
+    return "done"
+}
 
-    if (infoCard && JSON.stringify(infoCard) !== JSON.stringify(floraBio.infoCard)) {
-        floraBio.infoCard = infoCard;
-        modified = true;
-
-        for (const item of infoCard.cardData) {
-            const label = item.label.toLowerCase();
-
-            switch (label) {
-                case "worlds": {
-                    let newWorldIDs = item.value.map(world => world.id);
-                    if (flora.originWorld && !newWorldIDs.includes(flora.originWorld.id)) {
-                        newWorldIDs.unshift(flora.originWorld.id);
-                    }
-
-                    if (JSON.stringify(newWorldIDs) !== JSON.stringify(flora.worlds)) {
-                        flora.worlds = newWorldIDs;
-                        modified = true;
-                    }
-                    break;
-                }
-
-                case "origin world": {
-                    if (item.value && item.value.id) {
-                        const newOrigin = item.value;
-
-                        if (JSON.stringify(flora.originWorld) !== JSON.stringify(newOrigin)) {
-                            flora.originWorld = newOrigin;
-                            if (!flora.worlds.includes(newOrigin.id)) {
-                                flora.worlds.unshift(newOrigin.id);
-                            }
-
-                            const originDetailIndex = flora.details.findIndex(detail => detail.label === "Origin World");
-                            if (originDetailIndex !== -1) {
-                                flora.details[originDetailIndex] = {
-                                    label: "Origin World",
-                                    value: newOrigin.value || newOrigin.name,
-                                    path: newOrigin.path || newOrigin.url || null
-                                };
-                            } else {
-                                flora.details.push({
-                                    label: "Origin World",
-                                    value: newOrigin || newOrigin.name,
-                                    path: newOrigin.path || newOrigin.url || null
-                                });
-                            }
-                            modified = true;
-                        }
-                    }
-                    break;
-                }
-
-                case "properties": {
-                    const newProperties = item.value.map(prop => prop.id);
-                    if (JSON.stringify(newProperties) !== JSON.stringify(flora.properties)) {
-                        flora.properties = newProperties;
-                        modified = true;
-                    }
-                    break;
-                }
-
-                case "biomes": {
-                    const newBiomes = item.value.map(biome => biome.id);
-                    if (JSON.stringify(newBiomes) !== JSON.stringify(flora.biomes)) {
-                        flora.biomes = newBiomes;
-                        modified = true;
-                    }
-                    break;
-                }
-
-                case "countries": {
-                    const newCountries = item.value.map(country => country.id);
-                    if (JSON.stringify(newCountries) !== JSON.stringify(flora.countries)) {
-                        flora.countries = newCountries;
-                        modified = true;
-                    }
-                    break;
-                }
-
-                case "type": {
-                    if (JSON.stringify(item.value) !== JSON.stringify(flora.type)) {
-                        flora.type = item.value;
-                        modified = true;
-                    }
-                    break;
-                }
+async function modifyFlora(flora, list, data, method) {
+    const restrictedLists = ["worlds", "biomes", "abilities", "sections", "custom"];
+    if(restrictedLists.includes(list)){
+        return {error: `can't modify ${list} directly use other or alt version` };
+    }
+    if (!flora[list] || !Array.isArray(flora[list])) {
+        return { error: `List '${list}' not found, or not a list.` };
+    }
+    const floraList = flora[list];
+    
+    
+    // Add or update references
+    if (method === 'add' || method === 'put') {
+        const existsInFlora = floraList.includes(data);
+        if (!existsInFlora) {
+            floraList.push(data);  // Add to flora object
+        }
+    } 
+    // Delete references
+    else if (method === 'delete') {
+        const floraListIndex = floraList.findIndex(item => item === data);
+        if (floraListIndex !== -1) {
+            if(floraListIndex === floraList.length - 1){
+                floraList.pop()
+            }
+            else{
+                floraList.splice(floraListIndex, 1);
             }
         }
     }
-
-    if (sections && JSON.stringify(sections) !== JSON.stringify(floraBio.sections)) {
-        floraBio.sections = sections;
-        modified = true;
-    }
-
-    if (description && description !== flora.description) {
-        floraBio.description = description;
-        flora.description = description;
-        modified = true;
-    }
-
-    if (modified) {
-        floraBio.infoCard.modified = new Date().toJSON();
-        const bioIndex = floraBios.findIndex(bio => bio.id === id);
-        const floraIndex = floraList.findIndex(f => f.id === id);
-
-        if (bioIndex !== -1) floraBios[bioIndex] = floraBio;
-        if (floraIndex !== -1) floraList[floraIndex] = flora;
-        console.log(`Flora ${id} updated successfully`);
-        return { message: "Flora updated successfully", flora };
-    }
-
-    console.log(`No changes detected for Flora ${id}`);
-    return { message: "No changes detected" };
+    flora[list] = floraList;
+    return await updateFlora(flora.id, flora);
 }
+
+// 🚀 Router: Modify a flora field (add/put/delete references)
+floraRouter.patch(`${urlPrefix}:id/:list`, verifyAuth, async (req, res) => {
+    const { id, list } = req.params;
+    const { method, data } = req.body;
+    const flora = await getFlora("id", id)
+    if(!flora){
+        return res.status(404).send({msg:"Error Flora not found"});
+    }
+
+    const result = await modifyFlora(flora, list, data, method);
+
+    if (result.error) {
+        return res.status(400).send(result);
+    } else {
+        return res.send(result);
+    }
+});
 
 module.exports = {floraRouter, modifyFlora};
