@@ -20,7 +20,7 @@ const {testGetSpecific,
     testMismatchIDs,
     testNoDataPassed, 
     registerUser, 
-    getRandomName
+    createCharacter
 } = require('./testUtils')
 const {app, createID} = require('./service');
 
@@ -44,107 +44,7 @@ test('fail to get character', async () => {
     await testNotFound(app, "characters");
 })
 
-async function createCharacter(){
-    const [register, , author] = await registerUser(app);
-    const cookie = register.headers['set-cookie'];
-    const name = getRandomName("name");
-    const family = [{
-        label:getRandomName('relation'), 
-        value:[getRandomName('character')]
-    }];
-    const titles = [getRandomName("title")];
-    const born = "in more interesting times";
-    const died = "in lest intersting times"
-    const roles = ["test-character"];
-    const race = getRandomName('race');
-    const altForms = [getRandomName('race')];
-    const religion = getRandomName("religion");
-    const organizations = [getRandomName("organization")];
-    const abilities = [getRandomName('magicSystem')]
-    const enemies = [getRandomName('character')]
-    const allies = [getRandomName('character')]
-    const homeWorld = getRandomName("world")
-    const otherWorlds = [getRandomName("world")]
-    const homeCountry = getRandomName("country")
-    const otherCountries = [getRandomName("country")]
-    const homeTown = getRandomName("town")
-    const description = "an example description"
-    const sections = [{
-        section: "test section",
-        text: "A test section",
-        subsections:[]
-    }]
-    const custom = [
-        {
-            edit:"select",
-            label:"Alchemy Specialty",
-            source:"/magicsystems",
-            type:"alchemy",
-            value:getRandomName("magicsystem")
-        }
-    ]
-    const gender = "what are you a cop"
-    const pronouns = "wouldn't you like to know wheather boy"
 
-
-
-    const character = await request(app).post('/api/characters').send({
-        name,
-        family,
-        titles,
-        gender, 
-        pronouns,
-        born,
-        died,
-        roles,
-        race,
-        altForms,
-        religion,
-        organizations,
-        abilities,
-        enemies,
-        allies,
-        homeWorld,
-        otherWorlds,
-        homeCountry,
-        otherCountries,
-        homeTown,
-        description,
-        sections,
-        custom
-    })
-    .set('Cookie', cookie)
-    const id = createID(name, author)
-    return [
-        register, 
-        author, 
-        character, 
-        id,
-        name, 
-        family, 
-        titles, 
-        gender,
-        pronouns,
-        born, 
-        died,
-        roles, 
-        race,
-        altForms,
-        religion, 
-        organizations,
-        abilities,
-        enemies,
-        allies,
-        homeWorld,
-        otherWorlds,
-        homeCountry,
-        otherCountries,
-        homeTown,
-        description,
-        sections,
-        custom
-    ]
-}
 
 test("Test Character Creation", async () => {
     const [
@@ -175,7 +75,7 @@ test("Test Character Creation", async () => {
         description,
         sections,
         custom
-    ] = await createCharacter();
+    ] = await createCharacter(app);
     const {created, modified, ...characterWithoutDates} = character.body;
     const worlds = [homeWorld, ...otherWorlds]
     const countries = [homeCountry, ...otherCountries]
@@ -218,7 +118,7 @@ test("Test Character Creation", async () => {
 });
 
 test("Test Duplicate Character Creation", async () => {
-    const [register, , , , name ] = await createCharacter();
+    const [register, , , , name ] = await createCharacter(app);
     const cookie = register.headers['set-cookie'];
     const description = "Duplicate test";
     const character = await request(app).post('/api/characters').send({name, description}).set("Cookie", cookie);
@@ -233,7 +133,7 @@ test("Test Character Creation missing required field", async () => {
 });
 
 test("Test Update Character", async () => {
-    const [register, ,characterReturn] = await createCharacter();
+    const [register, ,characterReturn] = await createCharacter(app);
     const character = characterReturn.body;
     character.race= "newRace";
     character.altForms = ["whatever"];
@@ -250,7 +150,7 @@ test("Test Update Character", async () => {
 
 
 test("Test Update Character ID Mismatch", async () => {
-    const [register, ,characterReturn] = await createCharacter();
+    const [register, ,characterReturn] = await createCharacter(app);
     const character = characterReturn.body;
     await testMismatchIDs(app,register, character )
     
@@ -258,7 +158,7 @@ test("Test Update Character ID Mismatch", async () => {
 });
 
 test("Test Update Character No Data passed", async () => {
-    const [register, ,characterReturn] = await createCharacter();
+    const [register, ,characterReturn] = await createCharacter(app);
     const character = characterReturn.body;
     await testNoDataPassed(app,register, character )
 
@@ -273,7 +173,7 @@ test("Test Character update, no character of that id found", async () => {
 test("Test Character update, not author", async () => {
     // const [register] = await registerUser(app);
     // const cookie = register.headers['set-cookie'];
-    const [ , ,characterReturn] = await createCharacter();
+    const [ , ,characterReturn] = await createCharacter(app);
     const character = characterReturn.body;
     // character.description ="test changing wrong author";
     await testWrongAuthor(character, app)
@@ -283,7 +183,7 @@ test("Test Character update, not author", async () => {
 });
 
 test("Test Get Character", async () => {
-    const [ , ,characterReturn] = await createCharacter();
+    const [ , ,characterReturn] = await createCharacter(app);
     const character = characterReturn.body;
     await testGetSpecific(character, app)
 
@@ -291,37 +191,37 @@ test("Test Get Character", async () => {
 
 
 test("Filter Characters", async () => {
-    const [ , ,characterReturn] = await createCharacter();
+    const [ , ,characterReturn] = await createCharacter(app);
     const character = characterReturn.body;
     await testGetManyFiltered(app, "characters", "race", character.race, "worlds", character.worlds)
 })
 
 test("Get Options", async() => {
-    const [ , ,characterReturn] = await createCharacter();
+    const [ , ,characterReturn] = await createCharacter(app);
     const character = characterReturn.body;
     await testGetOptions(app, "characters", character, "roles")
 })
 
 test("Get Filtered Options", async () => {
-    const [ , ,characterReturn] = await createCharacter();
+    const [ , ,characterReturn] = await createCharacter(app);
     const character = characterReturn.body;
     await testGetFilteredOptions(app, "characters", "race", character.race, "worlds", character.worlds)
 })
 
 test("Is author", async () => {
-    const [ , ,characterReturn] = await createCharacter();
+    const [ , ,characterReturn] = await createCharacter(app);
     const character = characterReturn.body;
     await testIsAuthor(app, character)
 })
 
 test("Is Not author", async () => {
-    const [ , ,characterReturn] = await createCharacter();
+    const [ , ,characterReturn] = await createCharacter(app);
     const character = characterReturn.body;
     await testisNotAuthor(app, character)
 })
 
 test("Add stuff", async () => {
-    const [ , ,characterReturn] = await createCharacter();
+    const [ , ,characterReturn] = await createCharacter(app);
     const path = characterReturn.body.url
     await testPatchAdd(path, "otherWorlds", app)
     await testPatchAdd(path, "otherCountries", app)
@@ -338,7 +238,7 @@ test("Delete stuff", async () => {
         organizations,,,,,
         otherWorlds,,
         otherCountries,,,,
-    ] = await createCharacter();
+    ] = await createCharacter(app);
     const path = characterReturn.body.url;
     await testPatchRemove(path,"otherWorlds", otherWorlds[0],app )
     await testPatchRemove(path,"otherCountries", otherCountries[0],app )
@@ -352,7 +252,7 @@ test("Attempt to modify nonexisting", async () => {
 })
 
 test("Attempt to modify fields that arnt allowed", async () => {
-    const [ , ,characterReturn] = await createCharacter();
+    const [ , ,characterReturn] = await createCharacter(app);
     const path = characterReturn.body.url;
     await testPatchFailures(path, "homeWorld", app)
     await testPatchFailures(path, "worlds", app)
@@ -370,7 +270,7 @@ test("Attempt to modify fields that arnt allowed", async () => {
 
 test("Get Character Types optoins", async () => {
     const [ , ,characterReturn,,, , , ,,, ,
-        roles ] = await createCharacter();
+        roles ] = await createCharacter(app);
     const option = {id:roles[0], name:roles[0]}
     await testGetOptions(app, "characters/types", option);
 })

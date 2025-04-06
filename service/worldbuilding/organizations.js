@@ -1,249 +1,297 @@
 const express = require('express');
 const { verifyAuth, createID } = require('./../service.js');
-const {modifyCharacter} = require(`./../characters.js`)
+const {modifyCharacter, getCharacter} = require(`./../characters.js`)
 const urlPrefix = "/worldbuilding/organizations/";
 
 const organizationsRouter = express.Router();
 let organizations = [];
-let organizationTypes = ["Religious", "Political", "Military", "Social", "Other"];
+let organizationTypes = ["Religion", "Political", "Military", "Social", "Other"];
 
-async function getOrganization(field, value) {
+async function getOrganization(field, value){
     if (value) {
         return organizations.find((organization) => organization[field] === value);
     }
     return null;
 }
 
-async function getOrganizations(queries) {
-    if (typeof queries === "object") {
+
+async function getOrganizations(queries){
+    if(typeof queries === "object"){
         let filterOrganizations = organizations;
-        for (const [key, value] of Object.entries(queries)) {
-            if (Array.isArray(value)) {
-                filterOrganizations = filterOrganizations.filter((organization) =>
-                    Array.isArray(organization[key])
-                        ? organization[key].some((el) => value.includes(el))
-                        : value.includes(organization[key])
-                );
-            } else {
-                filterOrganizations = filterOrganizations.filter((organization) =>
-                    Array.isArray(organization[key])
-                        ? organization[key].includes(value)
-                        : value === organization[key]
-                );
+        for(const [key, value] of Object.entries(queries)){
+            if(Array.isArray(value)){
+                filterOrganizations = filterOrganizations.filter(((organization) => 
+                    Array.isArray(organization[key]) ? organization[key].some(char => value.includes(char)) : value.includes(organization[key] )))
+            }
+            else{
+                filterOrganizations = filterOrganizations.filter(((organization) => 
+                    Array.isArray(organization[key]) ? organization[key].includes(value) : value === organization[key]))
             }
         }
         return filterOrganizations;
-    } else {
+    }
+    else{
         return organizations;
     }
 }
 
-// 🚀 Router: Fetch organizations or individual organization
+
+organizationsRouter.get(`${urlPrefix}options`, async (req, res) => {
+    const filteredOrganizations = await getOrganizations(req.query);
+    const options = filteredOrganizations.map((organization) => {
+        return {
+            value: organization.id, 
+            label: organization.name,
+            qualifier: organization.types || []
+        }
+    })
+    res.send(options)
+})
+
+organizationsRouter.get(`${urlPrefix}types/options`, async (_req, res) => {
+    const options = organizationTypes.map((type) => {
+        return {
+            value: type,
+            label: type,
+        }
+    })
+    res.send(options)
+})
+
+
+
 organizationsRouter.get(`${urlPrefix}:id?`, async (req, res) => {
     const { id } = req.params;
     const queries = req.query || {};
-
-    if (!id || id === "undefined" || id.trim() === "") {
-        if (Object.keys(queries).length > 0) {
-            let organizationsToSend = await getOrganizations(queries);
-            res.send(organizationsToSend);
-        } else {
-            res.send(organizations);
+    const {author} = req.query || "";
+    if(!id || id === "undefined" || id.trim() === ""){
+        let organizationsToSend = await getOrganizations(queries);
+        res.send(organizationsToSend)
+    }
+    else{
+        if(id == "types"){
+            res.send(organizationTypes);
         }
-    } else {
-        if (id === "types") {
-            return res.send(organizationTypes);
-        } else {
+        else{
             const organization = await getOrganization("id", id);
-            if (organization) {
-                res.send(organization);
-            } else {
+            if(organization){
+                if(author){
+                    const isAuthor = author === organization.author;
+                    res.send({isAuthor})
+                }
+                else{
+                    res.send(organization);
+                }
+            }
+            else{
                 res.status(404).json({ error: "Organization not found" });
             }
         }
     }
 });
 
-// 🚀 Router: Create a new organization
-organizationsRouter.post(`${urlPrefix}`, verifyAuth, async (req, res) => {
-    const { name, author, World, Other_Worlds, Type, Leaders, description, Goals, Sections } = req.body;
-
-    // Check if organization by the same author and name exists
-    if (await getOrganization("name", name)) {
-        return res.status(409).send({ msg: "An Organization by you with that name already exists, please append 'Jr.' or similar" });
-    }
-
-    const id = createID(name, author);
+organizationsRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
     
-    // Create the organization
-    const newOrganization = await createOrganization(req.body, id);
-
-    // Add the organization to the referenced leaders (use modifyCharacter for leaders)
-    if (Leaders && Leaders.length > 0) {
-        for (const leaderId of Leaders) {
-            await modifyCharacter(leaderId, "add", {
-                id: newOrganization.id,
-                path: newOrganization.url,
-                value: newOrganization.name
-            });
+    const {name, description} = req.body;
+    const author = req.username;
+    if(!name || !author || !description){
+        return res.status(409).send({msg:"Required fields not filled out"});
+    }
+    const id = createID(req.body.name, author);
+    if(await getOrganization("id", id)){
+        return res.status(409).send({msg:"A Organization by you and by that name already exists"});
+    }else{
+        const organization = await createOrganization(req.body, author, id);
+        if(organization){
+            return res.json(organization)
         }
     }
-
-    res.status(201).json(newOrganization); // Respond with created organization
 });
 
-// 🚀 Router: Update an existing organization (with author check)
+
+
 organizationsRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     const { id } = req.params;
-    const { name, World, Other_Worlds, Type, Leaders, description, Goals, Sections } = req.body;
-
-    // Check if the organization exists
+    const username  = req.username;
+    const updateData = req.body;
+    if(!updateData){
+        return res.status(400).send({ msg: "Missing data to update." });
+    }
+    else if(!updateData.id || updateData.id !== id ){
+        return res.status(400).send({ msg: "ID mismatch. Cannot modify a different Organization." });
+    }
     const organization = await getOrganization("id", id);
-    if (!organization) {
-        return res.status(404).json({ error: "Organization not found" });
+    if(organization){
+        if(username !== organization.author || updateData.author !== organization.author){
+            res.status(401).send({msg:`cannot update organization, or field`});
+        }
+        if(username === organization.author){
+            const updateData = req.body;
+            const updated = await updateOrganization(id, updateData)
+            if(updated.msg){
+                return res.status(500).send(updated.msg);
+            }
+            return res.send(updated);
+        }
+        else{
+        }
     }
-
-    // Ensure the author is the original author
-    if (organization.author !== req.username) {
-        return res.status(403).json({ error: "You do not have permission to update this organization." });
+    else{
+        res.status(404).send({msg:`Organization ${id}, not found`});
     }
-
-    await updateOrganization(id, req.body);
-    res.send({ message: `Organization ${id} updated successfully` });
 });
 
-// 🚀 Router: Modify an organization (add/put/delete leaders and worlds)
-organizationsRouter.patch(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
-    const { id } = req.params;
-    const { method, data } = req.body;
+
+
+
+async function createOrganization(organizationData, author, id){
+    const organizationURL = urlPrefix + id;
+    const {name, types, description, 
+        originWorld,
+        otherWorlds = [], 
+        leaders = [], authorIsLeader,
+        countries,  custom, sections
+    } = organizationData
+
+    const leadersArray = Array.isArray(leaders) ? leaders : leaders != null  ?  [leaders] : []
     
-    const result = await modifyOrganization(id, data, method);
+    const created = new Date().toJSON();
+    await addTypes(types);
+    const organization = {
+        id,
+        name,
+        url:organizationURL,
+        author,
+        types,
+        leaders: leadersArray,
+        authorIsLeader,
+        originWorld,
+        otherWorlds,
+        countries,
+        worlds: [originWorld, ...(otherWorlds ?? [])],
+        custom,
+        description,
+        sections,
+        created,
+        modified:created,
+    }
+
+    if(Array.isArray(types) && !types.includes("Religion")){
+        await Promise.all(
+            leadersArray.map(async (leader) => {
+                const character = await getCharacter("id", leader);
+                if (character) {
+                    await modifyCharacter(character, "organizations", id, "add");
+                }
+            })
+        );
+    }
+    organizations.push(organization)
+
+    return organization
+}
+async function updateOrganization(id, updateData){
+    const {types, originWorld, otherWorlds, leaders } = updateData
+    const organization = await getOrganization("id", id);
+    if(JSON.stringify(types) !== JSON.stringify(organization.types)){
+        await addTypes(types);
+    }
+    if(JSON.stringify(leaders) !== JSON.stringify(organization.leaders)){
+        if(!types.includes("Religion")){
+            await Promise.all(
+                leaders.map(async (leader) => {
+                    const character = await getCharacter("id", leader);
+                    if (character) {
+                        await modifyCharacter(character, "organizations", id, "add");
+                    }
+                })
+            );
+        }
+    }
+    const newWorlds = [originWorld, ...(otherWorlds ?? [])]
+    if(JSON.stringify(newWorlds) !== JSON.stringify(organization.worlds)){
+        updateData.worlds = newWorlds;
+    }
+    return await organizationUpdate(updateData);
+}
+async function organizationUpdate(organization){
+    const index = organizations.findIndex(char => char.id === organization.id);
+    if(index !== -1){
+        organizations[index] = organization;
+        return organization
+    }
+    else {
+        return {msg:"failed to update organization"}
+    }
+}
+
+async function addTypes(type){
+    if(Array.isArray(type)){
+        type.forEach((item) => {
+            if(!organizationTypes.includes(item)){
+                organizationTypes.push(item);
+            }
+        })
+    }
+    else{
+        if(!organizationTypes.includes(type)){
+            organizationTypes.push(type)
+        }
+    }
+    return "done"
+}
+
+async function modifyOrganization(organization, list, data, method) {
+    const restrictedLists = ["worlds", "sections", "custom"];
+    if(restrictedLists.includes(list) || (list === "leaders" && (method === "add" || method === "put"))){
+        return {error: `can't modify ${list} directly use other or alt version` };
+    }
+    if (!organization[list] || !Array.isArray(organization[list])) {
+        return { error: `List '${list}' not found, or not a list.` };
+    }
+    const organizations = organization[list];
+    
+    
+    // Add or update references
+    if (method === 'add' || method === 'put') {
+        const existsInOrganization = organizations.includes(data);
+        if (!existsInOrganization) {
+            organizations.push(data);  // Add to organization object
+        }
+    } 
+    // Delete references
+    else if (method === 'delete') {
+        const organizationsIndex = organizations.findIndex(item => item === data);
+        if (organizationsIndex !== -1) {
+            if(organizationsIndex === organizations.length - 1){
+                organizations.pop()
+            }
+            else{
+                organizations.splice(organizationsIndex, 1);
+            }
+        }
+    }
+    organization[list] = organizations;
+    return await updateOrganization(organization.id, organization);
+}
+
+// 🚀 Router: Modify a organization field (add/put/delete references)
+organizationsRouter.patch(`${urlPrefix}:id/:list`, verifyAuth, async (req, res) => {
+    const { id, list } = req.params;
+    const { method, data } = req.body;
+    const organization = await getOrganization("id", id)
+    if(!organization){
+        return res.status(404).send({msg:"Error Organization not found"});
+    }
+
+    const result = await modifyOrganization(organization, list, data, method);
 
     if (result.error) {
-        res.status(404).json(result);
+        return res.status(400).send(result);
     } else {
-        res.send(result);
+        return res.send(result);
     }
 });
 
-// ✅ Create a new organization
-async function createOrganization(organizationData, id) {
-    const organizationURL = urlPrefix + id;
-    const created = new Date().toJSON();
-
-    const organizationBio = {
-        id: id,
-        name: organizationData.name,
-        url: organizationURL,
-        author: organizationData.author,
-        infoCard: {
-            name: organizationData.name,
-            cardData: [
-                { label: "Author", value: organizationData.author },
-                { label: "World", value: organizationData.World, source: "/worldbuilding/worlds", edit: "select" },
-                { label: "Other Worlds", value: organizationData.Other_Worlds, source: "/worldbuilding/worlds", edit: "multi-select" },
-                { label: "Type", value: organizationData.Type, source: "/worldbuilding/organizations/types", edit: "creatable" },
-                { label: "Leaders", value: organizationData.Leaders, source: "/characters", edit: "multi-select" },
-                { label: "Classification", value: organizationData.Other_Worlds.length > 0 ? "multi-world" : "uni-world" }
-            ],
-            created: created,
-            modified: created
-        },
-        description: organizationData.description,
-        goals: organizationData.Goals || "",
-        sections: organizationData.Sections || [],
-        listSections: [
-            {
-                label: "Leaders",
-                query: `/characters?organizations=${id}`,
-                canModifyReferences: true
-            },
-            {
-                label: "Members",
-                query: `/characters?organizationMembership=${id}`,
-                canModifyReferences: false
-            }
-        ]
-    };
-
-    organizations.push(organizationBio);
-    return organizationBio;
-}
-
-// ✅ Update an organization
-async function updateOrganization(id, updateData) {
-    const organization = await getOrganization("id", id);
-
-    if (!organization) {
-        console.error(`Organization with ID '${id}' not found.`);
-        return;
-    }
-
-    const { description, infoCard, sections } = updateData;
-
-    if (description) {
-        organization.description = description;
-    }
-
-    if (infoCard) {
-        organization.infoCard = infoCard;
-    }
-
-    if (sections) {
-        organization.sections = sections;
-    }
-}
-
-// ✅ Modify an organization (add/put/delete references to leaders, worlds, etc.)
-async function modifyOrganization(id, data, method) {
-    const { worldId, leaderId, path, value } = data;
-
-    const organization = await getOrganization("id", id);
-    
-    if (!organization) {
-        console.error(`Organization with ID '${id}' not found.`);
-        return { error: "Organization not found" };
-    }
-
-    if (method === "add") {
-        if (leaderId) {
-            // Add to leaders
-            if (!organization.Leaders.includes(leaderId)) {
-                organization.Leaders.push(leaderId);
-            }
-        }
-
-        if (worldId) {
-            // Add to worlds (ensure unique)
-            if (!organization.Worlds.includes(worldId)) {
-                organization.Worlds.push(worldId);
-                // If other worlds exist, tag as multi-world
-                if (organization.Other_Worlds.length > 0) {
-                    organization.infoCard.cardData.find((field) => field.label === "Classification").value = "multi-world";
-                }
-            }
-        }
-    } else if (method === "delete") {
-        if (leaderId) {
-            const index = organization.Leaders.indexOf(leaderId);
-            if (index > -1) {
-                organization.Leaders.splice(index, 1);
-            }
-        }
-
-        if (worldId) {
-            const index = organization.Worlds.indexOf(worldId);
-            if (index > -1) {
-                organization.Worlds.splice(index, 1);
-                // If no other worlds, revert to uni-world
-                if (organization.Other_Worlds.length === 0) {
-                    organization.infoCard.cardData.find((field) => field.label === "Classification").value = "uni-world";
-                }
-            }
-        }
-    }
-
-    return organization;
-}
 
 module.exports = {organizationsRouter, modifyOrganization};

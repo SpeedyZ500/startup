@@ -1,4 +1,5 @@
 const request = require('supertest');
+const {createID } = require('./service')
 
 async function testGetSpecific(original, app){
     const result = await request(app).get(`/api${original.url}`);
@@ -90,7 +91,7 @@ async function testPatchFailures(path, list, app){
     const cookie = register.headers['set-cookie'];
     const response = await request(app)
     .patch(`/api/${path}/${list}`)
-    .send("bad List")
+    .send({data:"bad list", method:"add"} )
     .set("Cookie", cookie);
     expect(response.status).toBe(400);
 }
@@ -192,6 +193,108 @@ async function registerUser(app) {
 
     return [response, email, username, password];
 }
+
+async function createCharacter(app){
+    const [register, , author] = await registerUser(app);
+    const cookie = register.headers['set-cookie'];
+    const name = getRandomName("name");
+    const family = [{
+        label:getRandomName('relation'), 
+        value:[getRandomName('character')]
+    }];
+    const titles = [getRandomName("title")];
+    const born = "in more interesting times";
+    const died = "in lest intersting times"
+    const roles = ["test-character"];
+    const race = getRandomName('race');
+    const altForms = [getRandomName('race')];
+    const religion = getRandomName("religion");
+    const organizations = [getRandomName("organization")];
+    const abilities = [getRandomName('magicSystem')]
+    const enemies = [getRandomName('character')]
+    const allies = [getRandomName('character')]
+    const homeWorld = getRandomName("world")
+    const otherWorlds = [getRandomName("world")]
+    const homeCountry = getRandomName("country")
+    const otherCountries = [getRandomName("country")]
+    const homeTown = getRandomName("town")
+    const description = "an example description"
+    const sections = [{
+        section: "test section",
+        text: "A test section",
+        subsections:[]
+    }]
+    const custom = [
+        {
+            edit:"select",
+            label:"Alchemy Specialty",
+            source:"/magicsystems",
+            type:"alchemy",
+            value:getRandomName("magicsystem")
+        }
+    ]
+    const gender = "what are you a cop"
+    const pronouns = "wouldn't you like to know wheather boy"
+
+
+
+    const character = await request(app).post('/api/characters').send({
+        name,
+        family,
+        titles,
+        gender, 
+        pronouns,
+        born,
+        died,
+        roles,
+        race,
+        altForms,
+        religion,
+        organizations,
+        abilities,
+        enemies,
+        allies,
+        homeWorld,
+        otherWorlds,
+        homeCountry,
+        otherCountries,
+        homeTown,
+        description,
+        sections,
+        custom
+    })
+    .set('Cookie', cookie)
+    const id = createID(name, author)
+    return [
+        register, 
+        author, 
+        character, 
+        id,
+        name, 
+        family, 
+        titles, 
+        gender,
+        pronouns,
+        born, 
+        died,
+        roles, 
+        race,
+        altForms,
+        religion, 
+        organizations,
+        abilities,
+        enemies,
+        allies,
+        homeWorld,
+        otherWorlds,
+        homeCountry,
+        otherCountries,
+        homeTown,
+        description,
+        sections,
+        custom
+    ]
+}
 module.exports = { 
     testGetSpecific,
     testUpdate,
@@ -214,5 +317,6 @@ module.exports = {
     testMismatchIDs,
     testNoDataPassed,
     getRandomName,
-    registerUser
+    registerUser,
+    createCharacter
 }

@@ -293,4 +293,4 @@ characterRouter.patch(`${urlPrefix}:id/:list`, verifyAuth, async (req, res) => {
 
 
 
-module.exports = {characterRouter, modifyCharacter}
+module.exports = {characterRouter, modifyCharacter, getCharacter}

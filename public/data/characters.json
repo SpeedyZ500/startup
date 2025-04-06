@@ -57,11 +57,13 @@
                 "key1":"homeWorld",
                 "label2":"Home Country",
                 "type2":"iteration-select",
-                "source2":"/worldbuilding/countries?world=",
+                "source2":"/worldbuilding/countries",
+                "filter2":"worlds=",
                 "key2":"homeCountry",
                 "label3":"Home Town",
                 "type3":"iteration-selection",
-                "source":"/worldbuilding/countries/towns?country=",
+                "source3":"/worldbuilding/countries/towns",
+                "filter3":"country=",
                 "key3":"homeTown"
             },
             {
@@ -113,9 +115,9 @@
             {
                 "label":"Religion",
                 "type":"select",
-                "source":"/worldbuilding/organizations",
-                "category":"type=religion",
-                "key":"relegion"
+                "source":"/worldbuilding/organizations/",
+                "filter":"types=Religion",
+                "key":"religion"
             },
             {
                 "label":"Family",
