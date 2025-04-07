@@ -55,6 +55,7 @@ async function createCountry(){
     const originWorld = getRandomName("world")
     const otherWorlds = [getRandomName("world")]
     const description = "an example description"
+    const biomes = [getRandomName("biomes")]
     const sections = [{
         section: "test section",
         text: "A test section",
@@ -82,7 +83,8 @@ async function createCountry(){
         description,
         sections,
         continents,
-        custom
+        custom,
+        biomes
     })
     .set('Cookie', cookie)
     const character = await request(app).get(`/api/characters/${characterID}`);
@@ -104,7 +106,8 @@ async function createCountry(){
         description,
         sections,
         continents,
-        custom
+        custom,
+        biomes
     ]
 }
 
@@ -125,7 +128,8 @@ test("Test Country Creation", async () => {
         description,
         sections,
         continents,
-        custom
+        custom,
+        biomes
     ] = await createCountry();
     const {created, modified, ...countryWithoutDates} = country.body;
     const worlds = [originWorld, ...otherWorlds]
@@ -146,7 +150,8 @@ test("Test Country Creation", async () => {
         custom,
         description,
         continents,
-        sections
+        sections,
+        biomes
     }
 
     expect(countryWithoutDates).toMatchObject(expected)
@@ -175,6 +180,8 @@ test("Test Update Country", async () => {
     country.otherWorlds = ["neet"];
     country.types.push("another one");
     country.continents.push("random");
+    country.biomes.push(getRandomName("biome"));
+
 
     
     country.leaders.push(characterID)
@@ -274,13 +281,16 @@ test("Delete stuff", async () => {
         description,
         sections,
         continents,
-        custom
+        custom,
+        biomes
     ] = await createCountry();
     const path = countryReturn.body.url;
     await testPatchRemove(path,"otherWorlds", otherWorlds[0],app )
     await testPatchRemove(path,"continents", continents[0],app )
     await testPatchRemove(path,"types", types[0],app )
     await testPatchRemove(path,"leaders", leaders[0],app )
+    await testPatchRemove(path,"biomes", biomes[0],app )
+
 })
 
 test("Attempt to modify nonexisting", async () => {

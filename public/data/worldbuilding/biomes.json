@@ -12,7 +12,9 @@
                 "onCard":true,
                 "inList":true,
                 "filterable":false,
-                "location":"head"
+                "location":"head",
+                "key":"name"
+
             },
             {
                 "label":"Description",
@@ -20,27 +22,43 @@
                 "placeholder":"A short description/summary of your Biome",
                 "onCard":false,
                 "inList":true,
-                "filterable":false
+                "filterable":false,
+                "key":"description"
+
             },
             {
                 "label":"Worlds",
                 "type":"multi-select",
+                "key":"worlds",
+
                 "source":"/api/worldbuilding/worlds"
             },
             {
                 "label":"Wildlife",
+                "key":"wildlife",
+
                 "type":"multi-select",
                 "source":"/api/worldbuilding/wildlife"
             },
             {
                 "label":"Flora",
+                "key":"flora",
+
                 "type":"multi-select",
                 "source":"/api/worldbuilding/flora"
             },
             {
+                "label":"Custom Fields",
+                "type":"custom-adder",
+                "key":"custom"
+            },
+            {
                 "label":"Sections",
+                "key":"sections",
+
                 "type":"section-adder"
             }
+            
         ]
     },
     "sort":[

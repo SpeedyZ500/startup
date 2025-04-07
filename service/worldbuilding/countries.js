@@ -163,9 +163,9 @@ async function createCountry(countryData, author, id){
         originWorld,
         otherWorlds = [], 
         leaders = [], authorIsLeader, types,
-         continents, custom, sections
+         continents, biomes, custom, sections
     } = countryData
-
+    const biomesArray = Array.isArray(biomes) ? biomes : biomes ? [biomes] : []
     const leadersArray = Array.isArray(leaders) ? leaders : leaders != null  ?  [leaders] : []
     
     const created = new Date().toJSON();
@@ -182,6 +182,7 @@ async function createCountry(countryData, author, id){
         authorIsLeader,
         originWorld,
         otherWorlds,
+        biomes: biomesArray,
         worlds: [originWorld, ...(otherWorlds ?? [])],
         custom,
         description,
