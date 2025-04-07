@@ -126,12 +126,13 @@ async function testPatchCustom(path, app){
     expect(response.status).toBe(400);
 }
 
-async function testGetOptions(app, path, original, qualifier){
+async function testGetOptions(app, path, original, qualifier, filter){
     const expected = {value: original.id, label: original.name};
     if(qualifier){
         expected.qualifier = original[qualifier];
     }
-    const response = await request(app).get(`/api/${path}/options`);
+    const requestPath = filter ? `/api/${path}/options?${filter}` : `/api/${path}/options`
+    const response = await request(app).get(requestPath);
     expect(Array.isArray(response.body)).toBe(true);
     expect(response.body.length).toBeGreaterThan(0);
     expect(response.headers['content-type']).toMatch('application/json; charset=utf-8');

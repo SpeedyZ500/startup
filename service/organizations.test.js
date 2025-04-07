@@ -332,15 +332,10 @@ test("Test Organization update, no Organization of that id found", async () => {
 });
 
 test("Test Organization update, not author", async () => {
-    // const [register] = await registerUser(app);
-    // const cookie = register.headers['set-cookie'];
     const [ , ,,organizationReturn] = await createOrganization();
     const organization = organizationReturn.body;
-    // character.description ="test changing wrong author";
     await testWrongAuthor(organization, app)
-    // const updateCharacter = await request(app).put(`/api${character.url}`).send(character).set("Cookie", cookie);
 
-    // expect(updateCharacter.status).toBe(401)
 });
 
 test("Test Get Organization", async () => {

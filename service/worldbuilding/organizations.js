@@ -133,8 +133,7 @@ organizationsRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
             }
             return res.send(updated);
         }
-        else{
-        }
+       
     }
     else{
         res.status(404).send({msg:`Organization ${id}, not found`});
