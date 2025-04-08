@@ -248,29 +248,29 @@ async function modifyOrganization(organization, list, data, method) {
     if (!organization[list] || !Array.isArray(organization[list])) {
         return { error: `List '${list}' not found, or not a list.` };
     }
-    const organizations = organization[list];
+    const organizationData = organization[list];
     
     
     // Add or update references
     if (method === 'add' || method === 'put') {
-        const existsInOrganization = organizations.includes(data);
+        const existsInOrganization = organizationData.includes(data);
         if (!existsInOrganization) {
-            organizations.push(data);  // Add to organization object
+            organizationData.push(data);  // Add to organization object
         }
     } 
     // Delete references
     else if (method === 'delete') {
-        const organizationsIndex = organizations.findIndex(item => item === data);
-        if (organizationsIndex !== -1) {
-            if(organizationsIndex === organizations.length - 1){
-                organizations.pop()
+        const organizationIndex = organizationData.findIndex(item => item === data);
+        if (organizationIndex !== -1) {
+            if(organizationIndex === organizationData.length - 1){
+                organizationData.pop()
             }
             else{
-                organizations.splice(organizationsIndex, 1);
+                organizationData.splice(organizationIndex, 1);
             }
         }
     }
-    organization[list] = organizations;
+    organization[list] = organizationData;
     return await updateOrganization(organization.id, organization);
 }
 

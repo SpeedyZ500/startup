@@ -235,29 +235,29 @@ async function modifyFlora(flora, list, data, method) {
     if (!flora[list] || !Array.isArray(flora[list])) {
         return { error: `List '${list}' not found, or not a list.` };
     }
-    const floraList = flora[list];
+    const floraData = flora[list];
     
     
     // Add or update references
     if (method === 'add' || method === 'put') {
-        const existsInFlora = floraList.includes(data);
+        const existsInFlora = floraData.includes(data);
         if (!existsInFlora) {
-            floraList.push(data);  // Add to flora object
+            floraData.push(data);  // Add to flora object
         }
     } 
     // Delete references
     else if (method === 'delete') {
-        const floraListIndex = floraList.findIndex(item => item === data);
+        const floraListIndex = floraData.findIndex(item => item === data);
         if (floraListIndex !== -1) {
-            if(floraListIndex === floraList.length - 1){
-                floraList.pop()
+            if(floraListIndex === floraData.length - 1){
+                floraData.pop()
             }
             else{
-                floraList.splice(floraListIndex, 1);
+                floraData.splice(floraListIndex, 1);
             }
         }
     }
-    flora[list] = floraList;
+    flora[list] = floraData;
     return await updateFlora(flora.id, flora);
 }
 

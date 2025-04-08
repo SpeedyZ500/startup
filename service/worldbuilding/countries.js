@@ -262,29 +262,29 @@ async function modifyCountry(country, list, data, method) {
     if (!country[list] || !Array.isArray(country[list])) {
         return { error: `List '${list}' not found, or not a list.` };
     }
-    const countries = country[list];
+    const countryData = country[list];
     
     
     // Add or update references
     if (method === 'add' || method === 'put') {
-        const existsInCountry = countries.includes(data);
+        const existsInCountry = countryData.includes(data);
         if (!existsInCountry) {
-            countries.push(data);  // Add to country object
+            countryData.push(data);  // Add to country object
         }
     } 
     // Delete references
     else if (method === 'delete') {
-        const countriesIndex = countries.findIndex(item => item === data);
+        const countriesIndex = countryData.findIndex(item => item === data);
         if (countriesIndex !== -1) {
-            if(countriesIndex === countries.length - 1){
-                countries.pop()
+            if(countriesIndex === countryData.length - 1){
+                countryData.pop()
             }
             else{
-                countries.splice(countriesIndex, 1);
+                countryData.splice(countriesIndex, 1);
             }
         }
     }
-    country[list] = countries;
+    country[list] = countryData;
     return await updateCountry(country.id, country);
 }
 

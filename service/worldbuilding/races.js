@@ -223,29 +223,29 @@ async function modifyRace(race, list, data, method) {
     if (!race[list] || !Array.isArray(race[list])) {
         return { error: `List '${list}' not found, or not a list.` };
     }
-    const races = race[list];
+    const raceData = race[list];
     
     
     // Add or update references
     if (method === 'add' || method === 'put') {
-        const existsInRace = races.includes(data);
+        const existsInRace = raceData.includes(data);
         if (!existsInRace) {
-            races.push(data);  // Add to race object
+            raceData.push(data);  // Add to race object
         }
     } 
     // Delete references
     else if (method === 'delete') {
-        const racesIndex = races.findIndex(item => item === data);
+        const racesIndex = raceData.findIndex(item => item === data);
         if (racesIndex !== -1) {
             if(racesIndex === races.length - 1){
-                races.pop()
+                raceData.pop()
             }
             else{
-                races.splice(racesIndex, 1);
+                raceData.splice(racesIndex, 1);
             }
         }
     }
-    race[list] = races;
+    race[list] = raceData;
     return await updateRace(race.id, race);
 }
 

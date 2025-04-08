@@ -228,29 +228,29 @@ async function modifyWildlife(wildlife, list, data, method) {
     if (!wildlife[list] || !Array.isArray(wildlife[list])) {
         return { error: `List '${list}' not found, or not a list.` };
     }
-    const wildlifeList = wildlife[list];
+    const wildlifeData = wildlife[list];
     
     
     // Add or update references
     if (method === 'add' || method === 'put') {
-        const existsInWildlife = wildlifeList.includes(data);
+        const existsInWildlife = wildlifeData.includes(data);
         if (!existsInWildlife) {
-            wildlifeList.push(data);  // Add to wildlife object
+            wildlifeData.push(data);  // Add to wildlife object
         }
     } 
     // Delete references
     else if (method === 'delete') {
-        const wildlifeListIndex = wildlifeList.findIndex(item => item === data);
+        const wildlifeListIndex = wildlifeData.findIndex(item => item === data);
         if (wildlifeListIndex !== -1) {
-            if(wildlifeListIndex === wildlifeList.length - 1){
-                wildlifeList.pop()
+            if(wildlifeListIndex === wildlifeData.length - 1){
+                wildlifeData.pop()
             }
             else{
-                wildlifeList.splice(wildlifeListIndex, 1);
+                wildlifeData.splice(wildlifeListIndex, 1);
             }
         }
     }
-    wildlife[list] = wildlifeList;
+    wildlife[list] = wildlifeData;
     return await updateWildlife(wildlife.id, wildlife);
 }
 
