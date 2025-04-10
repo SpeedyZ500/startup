@@ -114,10 +114,10 @@ test("Test Biome Creation", async () => {
 })
 
 test("Test Duplicate Biome Creation", async () => {
-    const [register, , , , name ] = await createBiome(app);
+    const [register, , , , name , , , sections] = await createBiome(app);
     const cookie = register.headers['set-cookie'];
     const description = "Duplicate test";
-    const biome = await request(app).post('/api/worldbuilding/biomes').send({name, description}).set("Cookie", cookie);
+    const biome = await request(app).post('/api/worldbuilding/biomes').send({name, description, sections}).set("Cookie", cookie);
     expect(biome.status).toBe(409);
 });
 
@@ -184,7 +184,7 @@ test("Get Options", async() => {
 test("Get Filtered Options", async () => {
     const [ , ,biomeReturn] = await createBiome();
     const biome = biomeReturn.body;
-    await testGetManyFiltered(app, "worldbuilding/biomes", "author", biome.author, "worlds", biome.worlds)
+    await testGetFilteredOptions(app, "worldbuilding/biomes", "author", biome.author, "worlds", biome.worlds)
 })
 
 test("Is author", async () => {

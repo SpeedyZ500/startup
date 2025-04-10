@@ -6,265 +6,262 @@ const urlPrefix = "/worldbuilding/magicsystems/";
 const magicRouter = express.Router();
 
 let magicSystems = [];
-let magicSystemBios = [];
 let magicTypes = ["Alchemical", "Dimensional", "Technological", "Elemental", "Transformational"];
 
-async function getMagicSystem(field, value) {
+async function getMagicSystem(field, value){
     if (value) {
         return magicSystems.find((magicSystem) => magicSystem[field] === value);
     }
     return null;
 }
 
-async function getMagicSystemBio(field, value) {
-    if (value) {
-        return magicSystemBios.find((magicSystem) => magicSystem[field] === value);
-    }
-    return null;
-}
 
-async function getMagicSystems(queries) {
-    if (typeof queries === "object") {
+async function getMagicSystems(queries){
+    if(typeof queries === "object"){
         let filterMagicSystems = magicSystems;
-        for (const [key, value] of Object.entries(queries)) {
-            if (Array.isArray(value)) {
-                filterMagicSystems = filterMagicSystems.filter((magicSystem) =>
-                    Array.isArray(magicSystem[key])
-                        ? magicSystem[key].some((el) => value.includes(el))
-                        : value.includes(magicSystem[key])
-                );
-            } else {
-                filterMagicSystems = filterMagicSystems.filter((magicSystem) =>
-                    Array.isArray(magicSystem[key])
-                        ? magicSystem[key].includes(value)
-                        : value === magicSystem[key]
-                );
+        for(const [key, value] of Object.entries(queries)){
+            if(Array.isArray(value)){
+                filterMagicSystems = filterMagicSystems.filter(((magicSystem) => 
+                    Array.isArray(magicSystem[key]) ? magicSystem[key].some(magic => value.includes(magic)) : value.includes(magicSystem[key] )))
+            }
+            else{
+                filterMagicSystems = filterMagicSystems.filter(((magicSystem) => 
+                    Array.isArray(magicSystem[key]) ? magicSystem[key].includes(value) : value === magicSystem[key]))
             }
         }
         return filterMagicSystems;
-    } else {
+    }
+    else{
         return magicSystems;
     }
 }
+magicRouter.get(`${urlPrefix}types/options`, async (_req, res) => {
+    const options = magicTypes.map((type) => {
+        return {
+            value: type, 
+            label: type,
+        }
+    })
+    res.send(options)
+})
 
-// 🚀 Router: Fetch magic systems or individual magic system
+magicRouter.get(`${urlPrefix}options`, async (req, res) => {
+    const filteredmagicSystems = await getMagicSystems(req.query);
+    const options = filteredmagicSystems.map((magicSystem) => {
+        return {
+            value: magicSystem.id, 
+            label: magicSystem.name,
+            qualifier: magicSystem.types || []
+        }
+    })
+    res.send(options)
+})
+
+
+
 magicRouter.get(`${urlPrefix}:id?`, async (req, res) => {
     const { id } = req.params;
-    const { author } = req.query || "";
     const queries = req.query || {};
-
-    if (!id || id === "undefined" || id.trim() === "") {
-        if (Object.keys(queries).length > 0) {
-            let magicSystemsToSend = await getMagicSystems(queries);
-            res.send(magicSystemsToSend);
-        } else {
-            res.send(magicSystems);
-        }
-    } else {
-        if (id === "types") {
+    const {author} = req.query || "";
+    if(!id || id === "undefined" || id.trim() === ""){
+        let magicSystemsToSend = await getMagicSystems(queries);
+        res.send(magicSystemsToSend)
+    }
+    else{
+        if(id == "types"){
             res.send(magicTypes);
-        } else {
-            const magicSystem = await getMagicSystemBio("id", id);
-            if (magicSystem) {
-                if (author) {
+        }
+        else{
+            const magicSystem = await getMagicSystem("id", id);
+            if(magicSystem){
+                if(author){
                     const isAuthor = author === magicSystem.author;
-                    res.send({ isAuthor });
-                } else {
+                    res.send({isAuthor})
+                }
+                else{
                     res.send(magicSystem);
                 }
-            } else {
+            }
+            else{
                 res.status(404).json({ error: "Magic System not found" });
             }
         }
     }
 });
 
-// 🚀 Router: Create a new magic system
-magicRouter.post(`${urlPrefix}`, verifyAuth, async (req, res) => {
-    const id = createID(req.body.name, req.body.author);
-    if (await getMagicSystem("id", id)) {
-        return res.status(409).send({ msg: `A Magic System entry by you with the name "${name}" already exists.` });
+magicRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
+    
+    const {name, description} = req.body;
+    const author = req.username;
+    if(!name || !author || !description){
+        return res.status(409).send({msg:"Required fields not filled out"});
     }
-    const newMagicSystem = await createMagicSystem(req.body, id);
-    res.send(newMagicSystem);
+    const id = createID(req.body.name, author);
+    if(await getMagicSystem("id", id)){
+        return res.status(409).send({msg:"A Magic System by you and by that name already exists"});
+    }else{
+        const magicSystem = await createMagicSystem(req.body, author, id);
+        if(magicSystem){
+            return res.json(magicSystem)
+        }
+    }
 });
 
-// 🚀 Router: Update an existing magic system (with author check)
+
+
 magicRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     const { id } = req.params;
+    const username  = req.username;
     const updateData = req.body;
-
-    // Ensure the author is the original author
-    const magicSystem = await getMagicSystemBio("id", id);
-    if (magicSystem.author !== req.user.id) {
-        return res.status(403).json({ error: "You do not have permission to update this magic system." });
+    if(!updateData){
+        return res.status(400).send({ msg: "Missing data to update." });
     }
-
-    await updateMagicSystem(id, updateData);
-    res.send({ message: `Magic System ${id} updated successfully` });
+    else if(!updateData.id || updateData.id !== id ){
+        return res.status(400).send({ msg: "ID mismatch. Cannot modify a different Magic System." });
+    }
+    const magicSystem = await getMagicSystem("id", id);
+    if(magicSystem){
+        if(username !== magicSystem.author || updateData.author !== magicSystem.author){
+            res.status(401).send({msg:`cannot update Magic System, or field`});
+        }
+        if(username === magicSystem.author){
+            const updateData = req.body;
+            const updated = await updateMagicSystem(id, updateData)
+            if(updated.msg){
+                return res.status(500).send(updated.msg);
+            }
+            return res.send(updated);
+        }
+        else{
+        }
+    }
+    else{
+        res.status(404).send({msg:`Magic System ${id}, not found`});
+    }
 });
 
-// 🚀 Router: Modify a magic system field (add/put/delete references)
+
+
+
+async function createMagicSystem(magicSystemData, author, id){
+    const magicSystemURL = urlPrefix + id;
+    const {name, types, description, 
+        originWorld,
+        otherWorlds = [], custom, sections
+    } = magicSystemData
+    
+    const created = new Date().toJSON();
+    await addTypes(types);
+    const magicSystem = {
+        id,
+        name,
+        url:magicSystemURL,
+        author,
+        types,
+        originWorld,
+        otherWorlds,
+        worlds: [originWorld, ...(otherWorlds ?? [])],
+        custom,
+        description,
+        sections,
+        created,
+        modified:created,
+    }
+    magicSystems.push(magicSystem)
+    return magicSystem
+}
+async function updateMagicSystem(id, updateData){
+    const {types, originWorld, otherWorlds, } = updateData
+    const magicSystem = await getMagicSystem("id", id);
+    if(JSON.stringify(types) !== JSON.stringify(types)){
+        await addTypes(types);
+    }
+   
+    const newWorlds = [originWorld, ...(otherWorlds ?? [])]
+    if(JSON.stringify(newWorlds) !== JSON.stringify(magicSystem.worlds)){
+        updateData.worlds = newWorlds;
+    }
+    
+    return await magicSystemUpdate(updateData);
+}
+async function magicSystemUpdate(magicSystem){
+    const index = magicSystems.findIndex(char => char.id === magicSystem.id);
+    if(index !== -1){
+        magicSystems[index] = magicSystem;
+        return magicSystem
+    }
+    else {
+        return {msg:"failed to update Magic System"}
+    }
+}
+
+async function addTypes(type){
+    if(Array.isArray(type)){
+        type.forEach((item) => {
+            if(!magicTypes.includes(item)){
+                magicTypes.push(item);
+            }
+        })
+    }
+    else{
+        if(!magicTypes.includes(type)){
+            magicTypes.push(type)
+        }
+    }
+    return "done"
+}
+
+async function modifyMagicSystem(magicSystem, list, data, method) {
+    const restrictedLists = ["worlds", "sections", "custom"];
+    if(restrictedLists.includes(list)){
+        return {error: `can't modify ${list} directly use other or alt version` };
+    }
+    if (!magicSystem[list] || !Array.isArray(magicSystem[list])) {
+        return { error: `List '${list}' not found, or not a list.` };
+    }
+    const magicSystemList = magicSystem[list];
+    
+    
+    // Add or update references
+    if (method === 'add' || method === 'put') {
+        const existsInMagicSystem = magicSystemList.includes(data);
+        if (!existsInMagicSystem) {
+            magicSystemList.push(data);  // Add to magicSystem object
+        }
+    } 
+    // Delete references
+    else if (method === 'delete') {
+        const magicSystemListIndex = magicSystemList.findIndex(item => item === data);
+        if (magicSystemListIndex !== -1) {
+            if(magicSystemListIndex === magicSystemList.length - 1){
+                magicSystemList.pop()
+            }
+            else{
+                magicSystemList.splice(magicSystemListIndex, 1);
+            }
+        }
+    }
+    magicSystem[list] = magicSystemList;
+    return await updateMagicSystem(magicSystem.id, magicSystem);
+}
+
+// 🚀 Router: Modify a magicSystem field (add/put/delete references)
 magicRouter.patch(`${urlPrefix}:id/:list`, verifyAuth, async (req, res) => {
     const { id, list } = req.params;
     const { method, data } = req.body;
+    const magicSystem = await getMagicSystem("id", id)
+    if(!magicSystem){
+        return res.status(404).send({msg:"Error Magic System not found"});
+    }
 
-    const result = await modifyMagicSystem(id, list, data, method);
+    const result = await modifyMagicSystem(magicSystem, list, data, method);
 
     if (result.error) {
-        res.status(404).json(result);
+        return res.status(400).send(result);
     } else {
-        res.send(result);
+        return res.send(result);
     }
 });
 
-// ✅ Create a new magic system
-async function createMagicSystem(magicSystemData, id) {
-    const magicSystemURL = urlPrefix + id;
-    const created = new Date().toJSON();
-
-    const magicSystemBio = {
-        id: id,
-        name: magicSystemData.name,
-        url: magicSystemURL,
-        author: magicSystemData.author,
-        infoCard: {
-            name: magicSystemData.name,
-            cardData: [
-                { label: "Author", value: magicSystemData.author },
-                { label: "Worlds", value: magicSystemData.Worlds, source: "/worldbuilding/worlds", edit: "multi-select" },
-                { label: "Type", value: magicSystemData.Type, source: "/worldbuilding/magicsystems/types", edit: "creatable" }
-            ],
-            created: created,
-            modified: created
-        },
-        description: magicSystemData.Description,
-        sections: magicSystemData.sections || [],
-        listSections: [
-            {
-                label: "Practitioners",
-                query: `/characters?abilities=${id}`,
-                canModifyReferences: false
-            },
-            {
-                label: "Magical Creatures",
-                query: `/wildlife?abilities=${id}`,
-                canModifyReferences: false
-            },
-            {
-                label: "Flora with Magical Properties",
-                query: `/flora?properties=${id}`,
-                canModifyReferences: false
-            }
-        ]
-    };
-
-    await addTypes(magicSystemData.Type);
-    magicSystemBios.push(magicSystemBio);
-
-    const magicSystem = {
-        id: id,
-        name: magicSystemData.name,
-        url: magicSystemURL,
-        author: magicSystemData.author,
-        description: magicSystemData.Description,
-        worlds: magicSystemData.Worlds?.map(world => world.id) || [],
-        type: magicSystemData.Type || [],
-        details: [
-            { label: "name", value: magicSystemData.name, path: magicSystemURL, location: "head", filter: false },
-            { label: "author", value: magicSystemData.author },
-            { label: "type", value: magicSystemData.Type || [] },
-            { label: "Created", value: created, display: false, filter: false }
-        ]
-    };
-
-    magicSystems.push(magicSystem);
-    return magicSystem;
-}
-
-// ✅ Add new types dynamically
-async function addTypes(type) {
-    if (Array.isArray(type)) {
-        type.forEach((item) => {
-            if (!magicTypes.includes(item)) {
-                magicTypes.push(item);
-            }
-        });
-    } else {
-        if (!magicTypes.includes(type)) {
-            magicTypes.push(type);
-        }
-    }
-    return "done";
-}
-
-// ✅ Update magic system data
-async function updateMagicSystem(id, updateData) {
-    const { description, infoCard, sections } = updateData;
-    const magicSystemBio = await getMagicSystemBio("id", id);
-    const magicSystem = await getMagicSystem("id", id);
-
-    if (!magicSystemBio || !magicSystem) {
-        console.error(`Magic System with ID '${id}' not found.`);
-        return;
-    }
-
-    if (description && description !== magicSystemBio.description) {
-        magicSystemBio.description = description;
-        magicSystem.description = description;
-    }
-
-    if (infoCard) {
-        magicSystemBio.infoCard = infoCard;
-        magicSystem.name = infoCard.name;
-    }
-
-    if (sections) {
-        magicSystemBio.sections = sections;
-    }
-
-    const bioIndex = magicSystemBios.findIndex(b => b.id === id);
-    const magicSystemIndex = magicSystems.findIndex(m => m.id === id);
-
-    magicSystemBios[bioIndex] = magicSystemBio;
-    magicSystems[magicSystemIndex] = magicSystem;
-}
-
-// ✅ Modify a magic system (add/put/delete references)
-async function modifyMagicSystem(magicSystemID, list, data, method) {
-    const { id, value, path } = data;
-
-    const magicSystemBio = await getMagicSystemBio("id", magicSystemID);
-    const magicSystem = await getMagicSystem("id", magicSystemID);
-
-    if (!magicSystemBio || !magicSystem) {
-        console.error(`Magic System with ID '${magicSystemID}' not found.`);
-        return { error: "Magic System not found" };
-    }
-
-    const bioList = magicSystemBio.infoCard.cardData.find(item => item.label.toLowerCase() === list.toLowerCase());
-    const magicSystemList = magicSystem[list.toLowerCase()];
-
-    if (!bioList || !magicSystemList) {
-        console.error(`List '${list}' not found.`);
-        return { error: `List '${list}' not found.` };
-    }
-
-    const newItem = { value, id, path };
-
-    if (method === 'add' || method === 'put') {
-        if (!magicSystemList.some(item => item.id === id)) {
-            magicSystemList.push(newItem);
-        }
-        if (!bioList.value.some(item => item.id === id)) {
-            bioList.value.push(newItem);
-        }
-    } else if (method === 'delete') {
-        magicSystemList.splice(magicSystemList.findIndex(item => item.id === id), 1);
-        bioList.value.splice(bioList.value.findIndex(item => item.id === id), 1);
-    }
-
-    return { message: `Magic System '${list}' modified successfully`, magicSystem };
-}
 
 module.exports = {magicRouter,modifyMagicSystem};
