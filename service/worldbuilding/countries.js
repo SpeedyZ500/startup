@@ -1,6 +1,6 @@
 const express = require('express');
 const { verifyAuth, createID } = require('./../service.js');
-const { modifyCharacter, getCharacter } = require('./../characters'); // Import modifyCharacters
+const { modifyCharacter, getCharacter, charactersExists } = require('./../characters'); // Import modifyCharacters
 const urlPrefix = "/worldbuilding/countries/";
 
 const countriesRouter = express.Router();
@@ -105,15 +105,23 @@ countriesRouter.get(`${urlPrefix}:id?`, async (req, res) => {
 
 countriesRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
     
-    const {name, description} = req.body;
+    const {name, description, leaders} = req.body;
+    
     const author = req.username;
+
     if(!name || !author || !description){
         return res.status(409).send({msg:"Required fields not filled out"});
     }
+    
     const id = createID(req.body.name, author);
     if(await getCountry("id", id)){
         return res.status(409).send({msg:"A Country by you and by that name already exists"});
     }else{
+        const leadersArray = Array.isArray(leaders) ? leaders : leaders != null  ?  [leaders] : []
+        if(!charactersExists(leadersArray)){
+            return res.status(404).send({msg:"All Leaders must exist"});
+
+        }
         const country = await createCountry(req.body, author, id);
         if(country){
             return res.json(country)
@@ -127,18 +135,25 @@ countriesRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     const { id } = req.params;
     const username  = req.username;
     const updateData = req.body;
+    const {leaders} = updateData
     if(!updateData){
         return res.status(400).send({ msg: "Missing data to update." });
     }
     else if(!updateData.id || updateData.id !== id ){
         return res.status(400).send({ msg: "ID mismatch. Cannot modify a different Country." });
     }
+    
     const country = await getCountry("id", id);
     if(country){
         if(username !== country.author || updateData.author !== country.author){
             return res.status(401).send({msg:`cannot update country, or field`});
         }
         if(username === country.author){
+            const leadersArray = Array.isArray(leaders) ? leaders : leaders != null  ?  [leaders] : []
+            if(!charactersExists(leadersArray)){
+                return res.status(404).send({msg:"All Leaders must exist"});
+
+            }
             const updateData = req.body;
             const updated = await updateCountry(id, updateData)
             if(updated.msg){
@@ -157,16 +172,15 @@ countriesRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
 
 
 
-async function createCountry(countryData, author, id){
+async function createCountry(countryData, author, id, leaders){
     const countryURL = urlPrefix + id;
     const {name, towns, description, 
         originWorld,
         otherWorlds = [], 
-        leaders = [], authorIsLeader, types,
+        authorIsLeader, types,
          continents, biomes, custom, sections
     } = countryData
     const biomesArray = Array.isArray(biomes) ? biomes : biomes ? [biomes] : []
-    const leadersArray = Array.isArray(leaders) ? leaders : leaders != null  ?  [leaders] : []
     
     const created = new Date().toJSON();
     addTypes(types ?? [])
@@ -178,7 +192,7 @@ async function createCountry(countryData, author, id){
         continents,
         types,
         towns,
-        leaders: leadersArray,
+        leaders,
         authorIsLeader,
         originWorld,
         otherWorlds,

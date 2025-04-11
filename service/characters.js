@@ -16,6 +16,13 @@ async function getCharacter(field, value){
     return null;
 }
 
+async function charactersExists(charactersQuerry = []) {
+    if (!charactersQuerry.length) return true;
+    
+    const results = await Promise.all(charactersQuerry.map(charID => getCharacter("id", charID)));
+    
+    return results.every(character => character != null);
+}
 
 async function getCharacters(queries){
     if(typeof queries === "object"){
@@ -52,7 +59,7 @@ characterRouter.get(`${urlPrefix}options`, async (req, res) => {
         return {
             value: character.id, 
             label: character.name,
-            qualifier: character.roles || []
+            qualifier: character.types || []
         }
     })
     res.send(options)
@@ -146,7 +153,7 @@ characterRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
 
 async function createCharacter(characterData, author, id){
     const characterURL = urlPrefix + id;
-    const {name, titles, roles, description, gender, 
+    const {name, titles, types, description, gender, 
         pronouns, born, died, homeWorld, homeCountry, homeTown,
         otherWorlds = [], otherCountries = [], race, altForms = [], 
         abilities, enemies, allies,
@@ -154,7 +161,7 @@ async function createCharacter(characterData, author, id){
     } = characterData
     
     const created = new Date().toJSON();
-    await addTypes(roles);
+    await addTypes(types);
     const character = {
         id,
         name,
@@ -166,7 +173,7 @@ async function createCharacter(characterData, author, id){
         pronouns,
         born,
         died,
-        roles,
+        types,
         race, //stored for editing
         altForms, //stored for editing,
         races:[race, ...(altForms ?? [])], //stored for querries
@@ -192,10 +199,10 @@ async function createCharacter(characterData, author, id){
     return character
 }
 async function updateCharacter(id, updateData){
-    const {roles, homeWorld, otherWorlds, homeCountry, otherCountries, race, altForms} = updateData
+    const {types, homeWorld, otherWorlds, homeCountry, otherCountries, race, altForms} = updateData
     const character = await getCharacter("id", id);
-    if(JSON.stringify(roles) !== JSON.stringify(character)){
-        await addTypes(roles);
+    if(JSON.stringify(types) !== JSON.stringify(character)){
+        await addTypes(types);
     }
     const newRaces = [race, ...(altForms ?? [])]
     if(JSON.stringify(newRaces) !== JSON.stringify(character.race)){
@@ -293,4 +300,4 @@ characterRouter.patch(`${urlPrefix}:id/:list`, verifyAuth, async (req, res) => {
 
 
 
-module.exports = {characterRouter, modifyCharacter, getCharacter}
+module.exports = {characterRouter, modifyCharacter, getCharacter, charactersExists}

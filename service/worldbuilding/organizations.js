@@ -1,6 +1,6 @@
 const express = require('express');
 const { verifyAuth, createID } = require('./../service.js');
-const {modifyCharacter, getCharacter} = require(`./../characters.js`)
+const {modifyCharacter, getCharacter, charactersExists} = require(`./../characters.js`)
 const urlPrefix = "/worldbuilding/organizations/";
 
 const organizationsRouter = express.Router();
@@ -92,16 +92,23 @@ organizationsRouter.get(`${urlPrefix}:id?`, async (req, res) => {
 
 organizationsRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
     
-    const {name, description} = req.body;
+    const {name, description, leaders} = req.body;
     const author = req.username;
     if(!name || !author || !description){
         return res.status(409).send({msg:"Required fields not filled out"});
     }
+    
+
     const id = createID(req.body.name, author);
     if(await getOrganization("id", id)){
         return res.status(409).send({msg:"A Organization by you and by that name already exists"});
     }else{
-        const organization = await createOrganization(req.body, author, id);
+        const leadersArray = Array.isArray(leaders) ? leaders : leaders != null  ?  [leaders] : []
+
+        if(!charactersExists(leadersArray)){
+            return res.status(404).send({msg:"All Leaders must exist"});
+        }
+        const organization = await createOrganization(req.body, author, id, leadersArray);
         if(organization){
             return res.json(organization)
         }
@@ -114,18 +121,26 @@ organizationsRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     const { id } = req.params;
     const username  = req.username;
     const updateData = req.body;
+    const {leaders} = updateData
     if(!updateData){
         return res.status(400).send({ msg: "Missing data to update." });
     }
     else if(!updateData.id || updateData.id !== id ){
         return res.status(400).send({ msg: "ID mismatch. Cannot modify a different Organization." });
     }
+
+    
+
     const organization = await getOrganization("id", id);
     if(organization){
         if(username !== organization.author || updateData.author !== organization.author){
             res.status(401).send({msg:`cannot update organization, or field`});
         }
         if(username === organization.author){
+            const leadersArray = Array.isArray(leaders) ? leaders : leaders != null  ?  [leaders] : []
+            if(!charactersExists(leadersArray)){
+                return res.status(404).send({msg:"All Leaders must exist"});
+            }
             const updateData = req.body;
             const updated = await updateOrganization(id, updateData)
             if(updated.msg){
@@ -143,16 +158,14 @@ organizationsRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
 
 
 
-async function createOrganization(organizationData, author, id){
+async function createOrganization(organizationData, author, id, leaders){
     const organizationURL = urlPrefix + id;
     const {name, types, description, 
         originWorld,
-        otherWorlds = [], 
-        leaders = [], authorIsLeader,
+        otherWorlds = [], authorIsLeader,
         countries,  custom, sections
     } = organizationData
 
-    const leadersArray = Array.isArray(leaders) ? leaders : leaders != null  ?  [leaders] : []
     
     const created = new Date().toJSON();
     await addTypes(types);
@@ -162,7 +175,7 @@ async function createOrganization(organizationData, author, id){
         url:organizationURL,
         author,
         types,
-        leaders: leadersArray,
+        leaders,
         authorIsLeader,
         originWorld,
         otherWorlds,
@@ -177,7 +190,7 @@ async function createOrganization(organizationData, author, id){
 
     if(Array.isArray(types) && !types.includes("Religion")){
         await Promise.all(
-            leadersArray.map(async (leader) => {
+            leaders.map(async (leader) => {
                 const character = await getCharacter("id", leader);
                 if (character) {
                     await modifyCharacter(character, "organizations", id, "add");

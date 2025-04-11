@@ -206,7 +206,7 @@ async function createCharacter(app){
     const titles = [getRandomName("title")];
     const born = "in more interesting times";
     const died = "in lest intersting times"
-    const roles = ["test-character"];
+    const types = ["test-character"];
     const race = getRandomName('race');
     const altForms = [getRandomName('race')];
     const religion = getRandomName("religion");
@@ -247,7 +247,7 @@ async function createCharacter(app){
         pronouns,
         born,
         died,
-        roles,
+        types,
         race,
         altForms,
         religion,
@@ -278,7 +278,7 @@ async function createCharacter(app){
         pronouns,
         born, 
         died,
-        roles, 
+        types, 
         race,
         altForms,
         religion, 

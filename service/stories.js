@@ -7,8 +7,8 @@ const storiesRouter = express.Router();
 
 let stories = [];
 let chapters = [];
-let genres = [];
-let contentWarnings = [];
+let genreList = [];
+let contentWarningList = [];
 
 //fetch stories
 // storiesRouter.get(urlPrefix, async(req,res) => {
@@ -23,12 +23,12 @@ let contentWarnings = [];
 //         query.author = { ...query.author, $nin: Array.isArray(excludeAuthor) ? excludeAuthor : [excludeAuthor] };
 //     }
 //     if(genre){
-//         const genresArray = Array.isArray(genre) ? genre : [genre];
+//         const genreListArray = Array.isArray(genre) ? genre : [genre];
 //         if(genreAll === "true"){
-//             query.genre = {$all: genresArray}
+//             query.genre = {$all: genreListArray}
 //         }
 //         else{
-//             query.genre = {$in: genresArray}
+//             query.genre = {$in: genreListArray}
 //         }
 //     }
 //     if(excludeGenre){
@@ -48,15 +48,15 @@ let contentWarnings = [];
 //     }
 // })
 storiesRouter.get(`${urlPrefix}genre`, async (_req, res) => {
-    res.send(genres)
+    res.send(genreList)
 })
 storiesRouter.get(`${urlPrefix}contentwarnings`, async (_req, res) => {
-    res.send(contentWarnings)
+    res.send(contentWarningList)
 })
 
 storiesRouter.get(`${urlPrefix}genre/options`, async (_req, res) => {
     
-    const options = genres.map((type) => {
+    const options = genreList.map((type) => {
         return {
             value: type, 
             label: type,
@@ -65,7 +65,7 @@ storiesRouter.get(`${urlPrefix}genre/options`, async (_req, res) => {
     res.send(options)
 })
 storiesRouter.get(`${urlPrefix}contentwarnings/options`, async (_req, res) => {
-    const options = contentWarnings.map((type) => {
+    const options = genreList.map((type) => {
         return {
             value: type, 
             label: type,
@@ -127,8 +127,8 @@ storiesRouter.get(`${urlPrefix}?:storyID`, async (req, res) => {
 
 storiesRouter.post(`${urlPrefix}:storyID?`, verifyAuth, async (req, res) => {
     const { storyID } = req.params;
-    const {Name, author} = req.body
-    const id = createID(Name, author)
+    const {title, author} = req.body
+    const id = createID(title, author)
     if(!storyID){
         if(getStory("id", id)){
             req.status(409).send({msg:"You created a story by this id already"})
@@ -189,6 +189,131 @@ async function getStory(field, value) {
         return stories.find((story) => story[field] === value);
     }
     return null;
+}
+
+async function createStory(storyData, id, author){
+    const {title, description, genres, contentWarnings} = biomeData;
+    const url = urlPrefix + id;
+    const created = new Date().toJSON();
+    await addGenres(genres)
+    await addContentWarnings(contentWarnings)
+    const story = {
+        id: id,
+        title,
+        author,
+        url,
+        genres,
+        contentWarnings,
+        description,
+        created,
+        expanded: created
+    };
+    stories.push(story);
+    return story;
+}
+async function getChapters(queries){
+    if(typeof queries === "object"){
+        let filterChapters = chapters;
+        for(const [key, value] of Object.entries(queries)){
+            if(Array.isArray(value)){
+                filterChapters = filterChapters.filter(((chapter) => 
+                    Array.isArray(chapter[key]) ? chapter[key].some(chap => value.includes(chap)) : value.includes(chapter[key] )))
+            }
+            else{
+                filterChapters = filterChapters.filter(((chapter) => 
+                    Array.isArray(chapter[key]) ? chapter[key].includes(value) : value === chapter[key]))
+            }
+        }
+        return filterChapters;
+    }
+    else{
+        return chapters;
+    }
+}
+async function getChapter(field1, value1, field2, value2){
+    if (value1) {
+        if (value2){
+            const filterChapters = chapters.filter((chapter) => chapter[field1] === value1)
+            return filterChapters.find((chapter) => chapter[field2] === value2);
+        }
+        return chapters.find((chapter) => chapter[field1] === value1);
+    }
+    return null;
+}
+function chapterExists(id){
+    return chapters.some(chap => chap.id === id);
+}
+function chapterExistsInStory(storyID, id){
+    return chapters.some(chap => chap.id === id && chap.storyID === storyID);
+}
+async function createChapter(chapterData, storyID, author){
+    const {title, samePrevious, sameNext, anyPrevious, anyNext, genres, contentWarnings, body} = chapterData
+    const baseID = createID(title, author);
+    
+
+    const url = `${urlPrefix}${storyID}/${chapterID}`;
+    const samePreviousArray = Array.isArray(samePrevious) ? samePrevious : samePrevious != null  ?  [samePrevious] : []
+    const sameNextArray = Array.isArray(sameNext) ? sameNext : sameNext != null  ?  [sameNext] : []
+    const anyPreviousArray = Array.isArray(anyPrevious) ? anyPrevious : anyPrevious != null  ?  [anyPrevious] : []
+    const anyNextArray = Array.isArray(anyNext) ? anyNext : anyNext != null  ?  [anyNext] : []
+    const previous = [...samePreviousArray, ...anyPreviousArray]
+    const next = [...sameNextArray, anyNextArray]
+    const created = new Date().toJSON();
+    await addGenres(genres)
+    await addContentWarnings(contentWarnings)
+    const chapter = {
+        body,
+        id,
+        author,
+        chapterID,
+        url,
+        title,
+        samePrevious: samePreviousArray,
+        anyPrevious: anyPreviousArray,
+        previous,
+        sameNext: sameNextArray,
+        anyNext: anyNextArray,
+        next,
+        created,
+        modified:created
+    }
+    chapters.push(chapter)
+    return chapter
+}
+
+
+
+
+async function addGenres(genre){
+    if(Array.isArray(genre)){
+        genre.forEach((item) => {
+            if(!genreList.includes(item)){
+                genreList.push(item)
+            }
+        })
+    }
+    else{
+        if(!genreList.includes(genre)){
+            genreList.push(genre)
+        }
+    }
+    return "done"
+}
+
+async function addContentWarnings(contentWarning){
+    if(Array.isArray(contentWarning)){
+        contentWarning.forEach((item) => {
+            if(!contentWarningList.includes(item)){
+                contentWarningList.push(item)
+            }
+        })
+    }
+    else{
+        if(!contentWarningList.includes(contentWarning)){
+            contentWarningList.push(contentWarning)
+        }
+    }
+    return "done"
 }
 
 module.exports = storiesRouter;

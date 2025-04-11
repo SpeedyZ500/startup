@@ -59,7 +59,7 @@ test("Test Character Creation", async () => {
         pronouns,
         born, 
         died,
-        roles, 
+        types, 
         race,
         altForms,
         religion, 
@@ -93,7 +93,7 @@ test("Test Character Creation", async () => {
         pronouns,
         born,
         died,
-        roles,
+        types,
         race,
         altForms,
         races,
@@ -199,7 +199,7 @@ test("Filter Characters", async () => {
 test("Get Options", async() => {
     const [ , ,characterReturn] = await createCharacter(app);
     const character = characterReturn.body;
-    await testGetOptions(app, "characters", character, "roles")
+    await testGetOptions(app, "characters", character, "types")
 })
 
 test("Get Filtered Options", async () => {
@@ -226,14 +226,14 @@ test("Add stuff", async () => {
     await testPatchAdd(path, "otherWorlds", app)
     await testPatchAdd(path, "otherCountries", app)
     await testPatchAdd(path, "organizations", app)
-    await testPatchAdd(path, "roles", app)
+    await testPatchAdd(path, "types", app)
     await testPatchAdd(path, "altForms", app)
 
 })
 
 test("Delete stuff", async () => {
     const [ , ,characterReturn,,, , , ,,, ,
-        roles, ,
+        types, ,
         altForms,, 
         organizations,,,,,
         otherWorlds,,
@@ -243,7 +243,7 @@ test("Delete stuff", async () => {
     await testPatchRemove(path,"otherWorlds", otherWorlds[0],app )
     await testPatchRemove(path,"otherCountries", otherCountries[0],app )
     await testPatchRemove(path,"organizations", organizations[0],app )
-    await testPatchRemove(path,"roles", roles[0],app )
+    await testPatchRemove(path,"types", types[0],app )
     await testPatchRemove(path,"altForms", altForms[0],app )
 })
 
@@ -270,7 +270,7 @@ test("Attempt to modify fields that arnt allowed", async () => {
 
 test("Get Character Types optoins", async () => {
     const [ , ,characterReturn,,, , , ,,, ,
-        roles ] = await createCharacter(app);
-    const option = {id:roles[0], name:roles[0]}
+        types ] = await createCharacter(app);
+    const option = {id:types[0], name:types[0]}
     await testGetOptions(app, "characters/types", option);
 })
