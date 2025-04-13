@@ -1,5 +1,6 @@
 const express = require('express');
-const { verifyAuth, createID } = require('./../service.js');
+const { verifyAuth } = require('./../service.js');
+const { createID } = require('./../database.js')
 const {modifyFlora} = require(`./flora.js`)
 const {modifyWildlife} = require(`./wildlife.js`)
 const urlPrefix = "/worldbuilding/biomes/";
@@ -76,7 +77,7 @@ biomesRouter.get(`${urlPrefix}:id?`, async (req, res) => {
 // 🚀 Router: Create a new biome
 biomesRouter.post(`${urlPrefix}`, verifyAuth, async (req, res) => {
     const { name, description, sections } = req.body;
-    const author = req.username;
+    const author = req.usid;
     if(!name || !description || !sections){
         return res.status(409).send({msg:"Required fields not filled out"});
     }
@@ -97,7 +98,7 @@ biomesRouter.post(`${urlPrefix}`, verifyAuth, async (req, res) => {
 biomesRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     
     const { id } = req.params;
-    const { body, username } = req;
+    const { body, usid } = req;
     if(!body){
         return res.status(400).send({ msg: "Missing data to update." });
     }
@@ -111,7 +112,7 @@ biomesRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     }
 
     // Ensure the author is the original author
-    if (biome.author !== username || biome.author !== body.author) {
+    if (biome.author !== usid || biome.author !== body.author) {
         return res.status(401).json({ error: "You do not have permission to update this biome/field." });
     }
 

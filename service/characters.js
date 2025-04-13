@@ -1,5 +1,6 @@
 const express = require('express');
-const { verifyAuth, createID, getUser, authCookieName} = require('./service.js');  
+const { verifyAuth, getUser, authCookieName} = require('./service.js');  
+const{ createID } = require('./database.js')
 const urlPrefix = "/characters/"
 
 const characterRouter = express.Router();
@@ -98,13 +99,18 @@ characterRouter.get(`${urlPrefix}:id?`, async (req, res) => {
 });
 
 characterRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
-    
     const {name, description} = req.body;
-    const author = req.username;
+    const author = req.usid;
     if(!name || !author || !description){
         return res.status(409).send({msg:"Required fields not filled out"});
     }
+
     const id = createID(req.body.name, author);
+    const updateData = req.body;
+    updateData.id = id;
+    updateData.url = `${urlPrefix}${id}`
+    updateData.author = author;
+
     if(await getCharacter("id", id)){
         return res.status(409).send({msg:"A Character by you and by that name already exists"});
     }else{
@@ -119,7 +125,7 @@ characterRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
 
 characterRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     const { id } = req.params;
-    const username  = req.username;
+    const username  = req.usid;
     const updateData = req.body;
     if(!updateData){
         return res.status(400).send({ msg: "Missing data to update." });
@@ -127,6 +133,7 @@ characterRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     else if(!updateData.id || updateData.id !== id ){
         return res.status(400).send({ msg: "ID mismatch. Cannot modify a different Character." });
     }
+    
     const character = await getCharacter("id", id);
     if(character){
         if(username !== character.author || updateData.author !== character.author){

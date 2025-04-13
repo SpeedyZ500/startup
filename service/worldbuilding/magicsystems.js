@@ -1,5 +1,6 @@
 const express = require('express');
-const { verifyAuth, createID } = require('./../service.js');
+const { verifyAuth } = require('./../service.js');
+const { createID } = require('./../database.js');
 const urlPrefix = "/worldbuilding/magicsystems/";
 
 
@@ -92,7 +93,7 @@ magicRouter.get(`${urlPrefix}:id?`, async (req, res) => {
 magicRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
     
     const {name, description} = req.body;
-    const author = req.username;
+    const author = req.usid;
     if(!name || !author || !description){
         return res.status(409).send({msg:"Required fields not filled out"});
     }
@@ -111,7 +112,7 @@ magicRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
 
 magicRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     const { id } = req.params;
-    const username  = req.username;
+    const username  = req.usid;
     const updateData = req.body;
     if(!updateData){
         return res.status(400).send({ msg: "Missing data to update." });

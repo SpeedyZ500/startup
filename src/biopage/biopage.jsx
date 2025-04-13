@@ -1097,3 +1097,4 @@ export function BioPage(props){
         </main>
     )
 }
+

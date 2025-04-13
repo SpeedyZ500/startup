@@ -1,5 +1,6 @@
 const express = require('express');
-const { verifyAuth, createID } = require('./../service.js');
+const { verifyAuth } = require('./../service.js');
+const { createID } = require('./../database.js')
 const { modifyCharacter, getCharacter, charactersExists } = require('./../characters'); // Import modifyCharacters
 const urlPrefix = "/worldbuilding/countries/";
 
@@ -57,7 +58,7 @@ countriesRouter.get(`${urlPrefix}types/options`, async (req, res) => {
     res.send(options)
 })
 countriesRouter.get(`${urlPrefix}towns/options`, async (req, res) => {
-    const countryID = req.query.country
+    const countryID = req.query.filter.id
     const country = await getCountry("id", countryID)
     if(!country){
         return res.status(404).send({msg:"Country not found"})
@@ -107,7 +108,7 @@ countriesRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
     
     const {name, description, leaders} = req.body;
     
-    const author = req.username;
+    const author = req.usid;
 
     if(!name || !author || !description){
         return res.status(409).send({msg:"Required fields not filled out"});
@@ -133,7 +134,7 @@ countriesRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
 
 countriesRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     const { id } = req.params;
-    const username  = req.username;
+    const username  = req.usid;
     const updateData = req.body;
     const {leaders} = updateData
     if(!updateData){

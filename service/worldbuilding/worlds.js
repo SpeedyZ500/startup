@@ -1,5 +1,6 @@
 const express = require('express');
-const { verifyAuth, createID } = require('./../service.js');
+const { verifyAuth, } = require('./../service.js');
+const { createID } = require("./../database.js")
 const urlPrefix = "/worldbuilding/worlds/";
 
 const worldsRouter = express.Router();
@@ -73,7 +74,7 @@ worldsRouter.get(`${urlPrefix}:id?`, async (req, res) => {
 // 🚀 Router: Create a new world
 worldsRouter.post(`${urlPrefix}`, verifyAuth, async (req, res) => {
     const { name, description, sections } = req.body;
-    const author = req.username;
+    const author = req.usid;
     if(!name || !description || !sections){
         return res.status(409).send({msg:"Required fields not filled out"});
     }
@@ -94,7 +95,7 @@ worldsRouter.post(`${urlPrefix}`, verifyAuth, async (req, res) => {
 worldsRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     
     const { id } = req.params;
-    const { body, username } = req;
+    const { body, usid } = req;
     if(!body){
         return res.status(400).send({ msg: "Missing data to update." });
     }
@@ -108,7 +109,7 @@ worldsRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     }
 
     // Ensure the author is the original author
-    if (world.author !== username || world.author !== body.author) {
+    if (world.author !== usid || world.author !== body.author) {
         return res.status(401).json({ error: "You do not have permission to update this world/field." });
     }
 
@@ -130,8 +131,8 @@ worldsRouter.get(`${urlPrefix}:id/continents`, async (req, res) => {
     }
 })
 
-worldsRouter.get(`${urlPrefix}:id/continents/options`, async (req, res) => {
-    const world = await getWorld('id', req.params.id);
+worldsRouter.get(`${urlPrefix}continents/options`, async (req, res) => {
+    const world = await getWorld('id', req.query.filter.id);
     if(world){
         options = world.continents.map((value) => {
             return {
@@ -180,7 +181,7 @@ async function createWorld(worldData, id, author) {
 function createWorldGetterSections(id, continents){
     const getterSections = continents.map(continent => ({
         label: `Countries in ${continent}`,
-        query: `/worldbuilding/countries?worlds=${id}&continents=${encodeURIComponent(continent)}`
+        query: `/worldbuilding/countries?filter[worlds]=${id}&filter[continents]=${encodeURIComponent(continent)}`
     }));
 
     

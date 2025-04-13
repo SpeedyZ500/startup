@@ -1,5 +1,7 @@
 const express = require('express');
-const { verifyAuth, createID} = require('./service.js');  
+const { verifyAuth} = require('./service.js');  
+
+const {createID, getGraph, getCards, getDisplayable, getEditable, connectChapters, expandStory, getOptions} = require('./database.js')
 const urlPrefix = "/stories/"
  
 
@@ -10,58 +12,11 @@ let chapters = [];
 let genreList = [];
 let contentWarningList = [];
 
-//fetch stories
-// storiesRouter.get(urlPrefix, async(req,res) => {
-//     const {author, excludeAuthor, 
-//         genre, genreAll, excludeGenre, 
-//         contentwarnings, warningsAll, excludeWarnings} = req.query;
-//     const query = {}
-//     if(author){
-//         query.author = {$in: Array.isArray(author) ? author : [author] }
-//     }
-//     if(excludeAuthor){
-//         query.author = { ...query.author, $nin: Array.isArray(excludeAuthor) ? excludeAuthor : [excludeAuthor] };
-//     }
-//     if(genre){
-//         const genreListArray = Array.isArray(genre) ? genre : [genre];
-//         if(genreAll === "true"){
-//             query.genre = {$all: genreListArray}
-//         }
-//         else{
-//             query.genre = {$in: genreListArray}
-//         }
-//     }
-//     if(excludeGenre){
-//         query.genre = {...query.genre, $nin: Array.isArray(excludeGenre) ? excludeGenre : [excludeGenre]}
-//     }
-//     if(contentwarnings){
-//         const warningsArray = Array.isArray(contentwarnings) ? contentwarnings : [contentwarnings];
-//         if(warningsAll === "true"){
-//             query.contentwarnings = {$all: warningsArray}
-//         }
-//         else{
-//             query.contentwarnings = {$in: warningsArray}
-//         }
-//     }
-//     if(excludeWarnings){
-//         query.contentwarnings = {...query.contentwarnings, $nin: Array.isArray(excludeWarnings) ? excludeWarnings : [excludeWarnings]}
-//     }
-// })
-storiesRouter.get(`${urlPrefix}genre`, async (_req, res) => {
-    res.send(genreList)
-})
-storiesRouter.get(`${urlPrefix}contentwarnings`, async (_req, res) => {
-    res.send(contentWarningList)
-})
 
-storiesRouter.get(`${urlPrefix}genre/options`, async (_req, res) => {
-    
-    const options = genreList.map((type) => {
-        return {
-            value: type, 
-            label: type,
-        }
-    })
+
+
+storiesRouter.get(`${urlPrefix}genres/options`, async (req, res) => {
+    const options = await getOptions("genres")
     res.send(options)
 })
 storiesRouter.get(`${urlPrefix}contentwarnings/options`, async (_req, res) => {

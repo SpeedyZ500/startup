@@ -78,7 +78,7 @@ async function createWorld(){
 function createGetterSections(continents, id){
     const getterSections = continents.map(continent => ({
         label: `Countries in ${continent}`,
-        query: `/worldbuilding/countries?worlds=${id}&continents=${encodeURIComponent(continent)}`
+        query: `/worldbuilding/countries?filter[worlds]=${id}&filter[continents]=${encodeURIComponent(continent)}`
     }));
 
     
@@ -250,10 +250,10 @@ test("Get Continents options", async () => {
     const [ , ,worldReturn, id, ,continents] = await createWorld();
     const path = worldReturn.body.url;
     const expected = {id:continents[0], name:continents[0], world:id}
-    await testGetOptions(app,`${path}/continents`, expected,"world");
+    await testGetOptions(app,`worldbuilding/worlds/continents`, expected,"world",`filter[id]=${id}`);
 })
 
 test("Fail to get options", async () => {
-    const result = await request(app).get(`/api/worldbuilding/worlds/bad/continents/options`);
+    const result = await request(app).get(`/api/worldbuilding/worlds/continents/options?filter[id]=bad`);
     expect(result.status).toBe(404);
 })

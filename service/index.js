@@ -9,6 +9,7 @@ const {organizationsRouter} = require('./worldbuilding/organizations.js');
 const racesRouter = require('./worldbuilding/races.js');
 const {wildlifeRouter} = require('./worldbuilding/wildlife.js');
 const worldsRouter = require('./worldbuilding/worlds.js');
+const { initializeDatabase } = require("./database.js")
 
 app.use('/api', characterRouter);
 app.use('/api', storiesRouter);
@@ -20,6 +21,8 @@ app.use('/api', organizationsRouter);
 app.use('/api', racesRouter);
 app.use('/api', wildlifeRouter);
 app.use('/api', worldsRouter);
+
+
 
 
 

@@ -4,15 +4,22 @@ const uuid = require('uuid');
 const express = require('express');
 const app = express();
 const authCookieName = 'token';
+const { userCollection, listUserDisplay } = require("./database")
 const { 
     getUserByToken,
     getUserByUsername,
-    getUserByEmail, addUser, /*updateUser*/ } = require('./database');  // Import database functions
+    getUserByEmail, 
+    addUser, 
+    updateUser,
+    getUserById,
+    getOptions
+ } = require('./database');  // Import database functions
 
 app.use(express.json());
 app.use(cookieParser());
 
 async function createUser(email, username, password, displayname) {
+    
     const passwordHash = await bcrypt.hash(password, 10);
 
     const user = {
@@ -28,10 +35,22 @@ async function createUser(email, username, password, displayname) {
     else{
         user.displayname = username;
     }
+    
 
-    users.push(user);
+    return await addUser(user)
+    ;
+}
 
-    return user;
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function isValidId(id) {
+    return id === sanitizeId(id);
+}
+
+function isValidPassword(pass){
+    return typeof password === "string" && password.length >= 8 && /^[^\s<>]*$/.test(password);
 }
 
 app.use(express.static('public'));
@@ -41,9 +60,18 @@ app.use(`/api`, apiRouter);
 
 let users = [];
 
-function getUser(field, value){
-    if (value) {
-        return users.find((user) => user[field] === value);
+async function getUser(field, value){
+    if(field === "username"){
+        return await getUserByUsername(value)
+    }
+    else if(field === "email"){
+        return await getUserByEmail(value);
+    }
+    else if(field === "token"){
+        return await getUserByToken(value);
+    }
+    else if(field === "id"){
+        return await getUserById(value);
     }
     return null;
 }
@@ -52,20 +80,15 @@ function getUser(field, value){
 // Middleware to verify that the user is authorized to call an endpoint
 const verifyAuth = async (req, res, next) => {
     const token = req.cookies[authCookieName];
-
-    const user = await getUser('token', token);
+    const user = await getUserByToken(token)
     if (user) {
-        req.username = user.username;
+        req.usid = user._id;
       next();
     } else {
       res.status(401).send({ msg: 'Unauthorized' });
     }
 };
-async function updateUser(user){
-    const index = users.find(me => me.username === user.username)
-    users[index] = user
-    return user
-}
+
 
 
 
@@ -73,13 +96,13 @@ function sanitizeId(id){
     return id
         .trim()
         .toLowerCase()
+        .replace(/<[^>]*>?/gm, '') // remove HTML tags
         .replace(/\s+/g, "-")
         .replace(/[^\w-]/g, "");
 }
 
-function createID(name, author){
-    return sanitizeId(`${name}_${author}`);
-}
+
+
 
 async function createAdvice(description, author){
     const created = new Date().toJSON();
@@ -95,21 +118,22 @@ apiRouter.post('/writingadvice', verifyAuth, async (req, res) => {
     if (!description){
         return res.status(400).json({ error: 'text is required' });
     }
-    const author = req.username;
+    const author = req.usid;
     const advice = await createAdvice(description, author );
     if(advice){
-        res.send({description:advice.description, author:advice.author});
+        res.send({description:advice.description});
     }
     else{
         res.status(500).send({msg:"error creating advice"});
     }
 });
+
 let writingadvice = [];
 let writingprompts = [];
 async function createPrompt(description, author){
     const created = new Date().toJSON();
     
-    const prompt = { description:description , author:author, created:created};
+    const prompt = { description:description , };
     writingprompts.push(prompt);
 
     return prompt;
@@ -119,7 +143,7 @@ apiRouter.post('/writingprompts', verifyAuth, async (req, res) => {
     if (!description){
         return res.status(400).json({ error: 'text is required' });
     }
-    const output = await createPrompt(description, req.username);
+    const output = await createPrompt(description, req.usid);
     res.status(201).send({description:output.description, author:output.author});
 
 });
@@ -134,6 +158,16 @@ apiRouter.get('/writingprompts', async (_req, res) => {
 
 // Registration
 apiRouter.post('/auth/register', async (req, res) => {
+    if(!isValidId(req.body.username)){
+        return res.status(400).send({msg:"You have invalid characters in your username, no spaces, < > etc"})
+    }
+    if(!isValidPassword(req.body.password)){
+        return res.status(400).send({ msg: "Invalid password. No spaces or < > allowed. Minimum 8 characters." });
+    }
+    if(!isValidEmail(req.body.email)){
+        return res.status(400).send({ msg: "Please provide a valid email." });
+
+    }
     if(req.body.username !== await sanitizeId(req.body.username)){
         return res.status(400).send({ msg: "Your username has invalid characters"});
     }
@@ -145,7 +179,8 @@ apiRouter.post('/auth/register', async (req, res) => {
     } else{
         const user = await createUser(req.body.email, req.body.username, req.body.password, req.body.displayname);
         if(user){
-            setAuthCookie(res, user);
+            await setAuthCookie(res, user);
+
             res.send({email:user.email, username:user.username, displayname:user.displayname, profanityFilter:user.profanityFilter});    
         }
         else{
@@ -162,7 +197,7 @@ apiRouter.put('/auth/login', async (req, res) => {
 
     const user = await getUser(isEmail ? "email" : "username", identifier);
     if (user && (await bcrypt.compare(req.body.password, user.password))){
-        setAuthCookie(res, user);  
+        await setAuthCookie(res, user);  
         res.send({email:user.email, username:user.username, displayname:user.displayname, profanityFilter:user.profanityFilter});
     }
     else{
@@ -175,7 +210,7 @@ apiRouter.delete('/auth/logout', verifyAuth, async (req, res) => {
     const token = req.cookies[authCookieName];
     const user = await getUser('token', token);
     if(user){
-        clearAuthCookie(res, user);
+        await clearAuthCookie(res, user);
         res.send({});
     }
     else{
@@ -194,16 +229,15 @@ apiRouter.get(`/auth`, async (req, res) => {
         res.send({authenticated:false});
     }
 });
-
 apiRouter.get(`/users/options`, async (req, res) =>{
-    const options = users.map((user) => {
-        return {
-            value: user.username, 
-            label: user.displayname,
-        }
-    })
+    const options = await getOptions("users",{query:req.query})
     res.send(options)
 })
+apiRouter.get(`/users`, async (_req, res) =>{
+    const users = await listUserDisplay();
+    res.send(users)
+})
+
 
 apiRouter.get('/user/me', async (req, res) => {
     const token = req.cookies[authCookieName];
@@ -238,7 +272,7 @@ apiRouter.get('/user/:username', async (req, res) => {
 // Update User
 apiRouter.put('/user/prof', verifyAuth, async(req, res) => {
     try {
-        const user = await getUser('username', req.username);
+        const user = await getUser('id', req.usid);
         const profanityFilter  = req.body.profanityFilter;
 
         // Ensure profanityFilter is a boolean
@@ -270,7 +304,7 @@ apiRouter.put('/user/pass', verifyAuth, async(req, res) => {
             return res.status(400).send({ msg: 'New password cannot be the same as the old password' });
         }
 
-        const user = await getUser('username', req.username);
+        const user = await getUser('id', req.usid);
         
         if (user && (await bcrypt.compare(oldPassword, user.password))){
             user.password = await bcrypt.hash(newPassword, 10);
@@ -288,18 +322,21 @@ apiRouter.put('/user/pass', verifyAuth, async(req, res) => {
 });
 
 // Set auth cookie
-function setAuthCookie(res, user){
+async function setAuthCookie(res, user){
     user.token = uuid.v4();
+    await updateUser(user)
     res.cookie('token', user.token, {
         secure: true,
         httpOnly: true,
         sameSite: 'Strict',
+        maxAge: 1000 * 60 * 60 * 24 * 7 
     });
 }
 
 // Clear auth cookie
-function clearAuthCookie(res, user){
+async function clearAuthCookie(res, user){
     delete user.token;
+    await updateUser(user)
     res.clearCookie('token')
 }
 
@@ -307,7 +344,6 @@ module.exports = {
     app,
     verifyAuth,
     sanitizeId,
-    createID,
     getUser,
     apiRouter
 };

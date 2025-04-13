@@ -340,7 +340,7 @@ test("Get Country Town options", async () => {
     ] = await createCountry();
     const option = {id:towns[0], name:towns[0]}
     
-    await testGetOptions(app, "worldbuilding/countries/towns", option, null ,`country=${id}`);
+    await testGetOptions(app, "worldbuilding/countries/towns", option, null ,`filter[id]=${id}`);
 })
 
 test("Get test Country not found Town options", async () => {

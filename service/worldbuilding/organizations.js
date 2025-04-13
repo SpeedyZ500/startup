@@ -1,5 +1,6 @@
 const express = require('express');
-const { verifyAuth, createID } = require('./../service.js');
+const { verifyAuth } = require('./../service.js');
+const { createID } = require('./../database.js')
 const {modifyCharacter, getCharacter, charactersExists} = require(`./../characters.js`)
 const urlPrefix = "/worldbuilding/organizations/";
 
@@ -93,7 +94,7 @@ organizationsRouter.get(`${urlPrefix}:id?`, async (req, res) => {
 organizationsRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
     
     const {name, description, leaders} = req.body;
-    const author = req.username;
+    const author = req.usid;
     if(!name || !author || !description){
         return res.status(409).send({msg:"Required fields not filled out"});
     }
@@ -119,7 +120,7 @@ organizationsRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
 
 organizationsRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     const { id } = req.params;
-    const username  = req.username;
+    const username  = req.usid;
     const updateData = req.body;
     const {leaders} = updateData
     if(!updateData){
