@@ -14,11 +14,11 @@ const {testGetSpecific,
     testNoDataPassed,
     registerUser, 
     getRandomName
-} = require('./testUtils')
-const {app, createID} = require('./service');
+} = require('../testUtils')
+const {app, createID} = require('../service');
 
 
-const worldsRouter = require("./worldbuilding/worlds");
+const worldsRouter = require("../worlds");
 
 app.use('/api', worldsRouter);
 

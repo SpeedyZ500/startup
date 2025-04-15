@@ -1,5 +1,5 @@
 const express = require('express');
-const { verifyAuth, } = require('./../service.js');
+const { verifyAuth, } = require('./service.js');
 const { createID, 
     getDisplayable, 
     getCards, 
@@ -13,7 +13,7 @@ const { createID,
     baseLookupFields,
     baseEditProjectionFields,
     optionsMap
- } = require("./../database.js")
+ } = require("./database.js")
 const urlPrefix = "/worldbuilding/worlds/";
 
 const worldsRouter = express.Router();

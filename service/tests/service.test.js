@@ -1,5 +1,5 @@
 const request = require('supertest');
-const {app} = require('./service');
+const {app} = require('../service');
 const { testGetOptions, registerUser, getRandomName } = require('./testUtils')
 
 

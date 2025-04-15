@@ -1,5 +1,5 @@
 const express = require('express');
-const { verifyAuth } = require('./../service.js');
+const { verifyAuth } = require('./service.js');
 const {
     createID, 
     getCards, 
@@ -16,7 +16,7 @@ const {
     baseFullFields,
     addOne,
     updateOne
-} = require('./../database.js')
+} = require('./database.js')
 const urlPrefix = "/worldbuilding/biomes/";
 
 const biomesRouter = express.Router();

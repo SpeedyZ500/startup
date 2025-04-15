@@ -1,5 +1,5 @@
 const express = require('express');
-const { verifyAuth } = require('./../service.js');  
+const { verifyAuth } = require('./service.js');  
 
 
 const urlPrefix = "/worldbuilding/wildlife/"
@@ -26,7 +26,7 @@ const {
 
 
     
- } = require('./../database.js')
+ } = require('./database.js')
 
 wildlifeRouter.get(`${urlPrefix}types/options`, async (req, res) => {
     const options = await getOptions("wildlifetypes")

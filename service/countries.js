@@ -1,5 +1,5 @@
 const express = require('express');
-const { verifyAuth } = require('./../service.js');
+const { verifyAuth } = require('./service.js');
 const urlPrefix = "/worldbuilding/countries/";
 
 const countriesRouter = express.Router();
@@ -26,7 +26,7 @@ const {
 
 
     
- } = require('./../database.js')
+ } = require('./database.js')
 
  countriesRouter.get(`${urlPrefix}towns/options`, async (req, res) => {
     try {

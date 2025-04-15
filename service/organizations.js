@@ -1,5 +1,5 @@
 const express = require('express');
-const { verifyAuth } = require('./../service.js');
+const { verifyAuth } = require('./service.js');
 const urlPrefix = "/worldbuilding/organizations/";
 
 const organizationsRouter = express.Router();
@@ -25,7 +25,7 @@ const {
 
 
     
- } = require('./../database.js')
+ } = require('./database.js')
 
 organizationsRouter.get(`${urlPrefix}types/options`, async (req, res) => {
     const options = await getOptions("organizationtypes")

@@ -1,6 +1,6 @@
 const request = require('supertest');
-const {app, createID} = require('./service');
-const { floraRouter } = require(`./worldbuilding/flora`)
+const {app, createID} = require('../service');
+const { floraRouter } = require(`../flora`)
 app.use('/api', floraRouter);
 const {testGetSpecific,
     testUpdate,
@@ -24,7 +24,7 @@ const {testGetSpecific,
     testNoDataPassed, 
     registerUser, 
     getRandomName
-} = require('./testUtils')
+} = require('../testUtils')
 
 
 

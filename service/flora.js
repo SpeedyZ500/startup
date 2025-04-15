@@ -1,5 +1,5 @@
 const express = require('express');
-const { verifyAuth } = require('./../service.js');
+const { verifyAuth } = require('./service.js');
 const urlPrefix = "/worldbuilding/flora/"
 
 const floraRouter = express.Router();
@@ -23,7 +23,7 @@ const {
 
 
     
- } = require('./../database.js')
+ } = require('./database.js')
 
 floraRouter.get(`${urlPrefix}types/options`, async (req, res) => {
     const options = await getOptions("floratypes")

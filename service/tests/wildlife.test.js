@@ -1,7 +1,7 @@
 const request = require('supertest');
-const {app, createID} = require('./service');
+const {app, createID} = require('../service');
 
-const {wildlifeRouter} = require(`./worldbuilding/wildlife`);
+const {wildlifeRouter} = require(`../wildlife`);
 app.use('/api', wildlifeRouter);
 const {testGetSpecific,
     testUpdate,
@@ -25,7 +25,7 @@ const {testGetSpecific,
     testNoDataPassed, 
     registerUser, 
     getRandomName
-} = require('./testUtils')
+} = require('../testUtils')
 
 
 

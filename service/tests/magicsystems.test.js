@@ -1,6 +1,6 @@
 const request = require('supertest');
-const {app, createID} = require('./service');
-const { magicRouter } = require(`./worldbuilding/magicsystems`)
+const {app, createID} = require('../service');
+const { magicRouter } = require(`../magicsystems`)
 app.use('/api', magicRouter);
 
 const {testGetSpecific,
@@ -25,7 +25,7 @@ const {testGetSpecific,
     testNoDataPassed, 
     registerUser, 
     getRandomName,
-} = require('./testUtils')
+} = require('../testUtils')
 
 test('get Biomes', async () => {
     await testGetMany(app, "worldbuilding/magicsystems")

@@ -1,7 +1,7 @@
 const request = require('supertest');
-const {app, createID} = require('./service');
-const { countriesRouter } = require(`./worldbuilding/countries`);
-const {characterRouter} = require(`./characters`);
+const {app, createID} = require('../service');
+const { countriesRouter } = require(`../countries`);
+const {characterRouter} = require(`../characters`);
 
 app.use('/api', countriesRouter);
 app.use('/api', characterRouter);
@@ -29,7 +29,7 @@ const {testGetSpecific,
     registerUser, 
     getRandomName,
     createCharacter
-} = require('./testUtils')
+} = require('../testUtils')
 
 test('get Countries', async () => {
     await testGetMany(app, "worldbuilding/countries")

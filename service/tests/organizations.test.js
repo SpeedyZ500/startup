@@ -1,7 +1,7 @@
 const request = require('supertest');
-const {app, createID} = require('./service');
-const {organizationsRouter} = require(`./worldbuilding/organizations`);
-const {characterRouter} = require(`./characters`);
+const {app, createID} = require('../service');
+const {organizationsRouter} = require(`../organizations`);
+const {characterRouter} = require(`../characters`);
 app.use('/api', organizationsRouter);
 app.use('/api', characterRouter);
 
@@ -30,7 +30,7 @@ const {testGetSpecific,
     registerUser, 
     getRandomName,
     createCharacter
-} = require('./testUtils')
+} = require('../testUtils')
 
 
 

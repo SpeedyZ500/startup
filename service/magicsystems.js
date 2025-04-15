@@ -1,5 +1,5 @@
 const express = require('express');
-const { verifyAuth } = require('./../service.js');
+const { verifyAuth } = require('./service.js');
 const urlPrefix = "/worldbuilding/magicsystems/";
 
 
@@ -25,7 +25,7 @@ const {
 
 
     
- } = require('./../database.js')
+ } = require('./database.js')
 
 magicRouter.get(`${urlPrefix}types/options`, async (req, res) => {
     const options = await getOptions("magictypes")

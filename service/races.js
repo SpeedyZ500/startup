@@ -1,5 +1,5 @@
 const express = require('express');
-const { verifyAuth } = require('./../service.js');
+const { verifyAuth } = require('./service.js');
 const urlPrefix = "/worldbuilding/races/";
 
 const racesRouter = express.Router();
@@ -24,7 +24,7 @@ const {
 
 
     
- } = require('./../database.js')
+ } = require('./database.js')
 
 racesRouter.get(`${urlPrefix}types/options`, async (req, res) => {
     const options = await getOptions("racetypes")

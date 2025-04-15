@@ -21,12 +21,12 @@ const {testGetSpecific,
     testNoDataPassed, 
     registerUser, 
     createCharacter
-} = require('./testUtils')
-const {app} = require('./service');
-const {createID} = require('./database')
+} = require('../testUtils')
+const {app} = require('../service');
+const {createID} = require('../database')
 
 
-const characterRouter = require("./characters");
+const characterRouter = require("../characters");
 
 
 
