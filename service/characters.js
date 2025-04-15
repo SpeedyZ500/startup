@@ -1,9 +1,16 @@
 const express = require('express');
 const { verifyAuth, authCookieName} = require('./service.js');  
 const{ createID, getCards, getDisplayable, getEditable, getOptions,
-    createProjection,
-    createMap,
-    addOne, updateOne, modifyMany, ensureArray} = require('./database.js')
+    addOne, updateOne, modifyMany,
+    characterPreProcessing,
+    characterCards,
+    characterCardsLookup,
+    characterBioProjectionFields,
+    characterEditProjectionFields,
+    characterFullFields,
+    characterFullLookupFields,
+    characterProjectionFields,
+} = require('./database.js')
 const urlPrefix = "/characters/"
 
 const characterRouter = express.Router();
@@ -25,86 +32,16 @@ characterRouter.get(`${urlPrefix}options`, async (req, res) => {
     res.send(options)
 })
 
-const characterBaseFields=[
-    "id",
-    "name",
-    "url",
-    "description",
-    "types",
-    "gender",
-    "pronouns",
-    "born",
-    "died",
-    "homeTown"
-]
-const characterBaseLookupFields=[
-    "author",
-    "race",
-    "religion",
-    "homeWorld",
-    "homeCountry",
-]
 
-const characterBaseProjectionFields={
-    author:'$authorDetails.displayname',
-    race:createProjection("race"),
-    religion:createProjection("religion"),
-    homeWorld:createProjection("homeWorld"),
-    homeCountry:createProjection("homeCountry"),
-}
-
-const characterFullFields = [
-    ...characterBaseFields,
-    "titles", 
-    "family",
-    "custom",
-    "sections",
-    "created",
-    "modified"
-]
-const characterFullLookupFields=[
-    ...characterBaseLookupFields,
-    "altForms",
-    "organizations",
-    "abilities",
-    "enemies",
-    "allies",
-    "otherWorlds",
-    "otherCountries",
-]
-const characterBioProjectionFields={
-    ...characterBaseProjectionFields,
-    altForms:createMap("altForms"),
-    organizations:createMap("organizations"),
-    abilities:createMap("abilities"),
-    allies:createMap("allies"),
-    enemies:createMap("enemies"),
-    otherWorlds:createMap("otherWorlds"),
-    otherCountries:createMap("otherCountries"),
-}
-const characterEditProjectionFields={
-    author:'$authorDetails.username',
-    race:createProjection("race"),
-    religion:createProjection("religion", "edit"),
-    homeWorld:createProjection("homeWorld", "edit"),
-    homeCountry:createProjection("homeCountry", "edit"),
-    altForms:createMap("altForms","edit"),
-    organizations:createMap("organizations", "edit"),
-    abilities:createMap("abilities","edit"),
-    allies:createMap("allies","edit"),
-    enemies:createMap("enemies","edit"),
-    otherWorlds:createMap("otherWorlds","edit"),
-    otherCountries:createMap("otherCountries","edit"),
-}
 
 
 characterRouter.get(`${urlPrefix}`, async (req, res) => {
     const query = req.query || {};
     const charactersToSend = await getCards(urlPrefix, {
         query,
-        lookupFields:characterBaseLookupFields,
-        fields:characterBaseFields,
-        projectionFields:characterBaseProjectionFields
+        lookupFields:characterCardsLookup,
+        fields:characterCards,
+        projectionFields:characterProjectionFields
     })
     res.send(charactersToSend)
 })
@@ -151,22 +88,7 @@ characterRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     }
 })
 
-const characterPreProcessing = {
-    otherWorlds:ensureArray,
-    otherCountries:ensureArray,
-    altForms:ensureArray,
-    organizations:ensureArray,
-    abilities:ensureArray,
-    allies:ensureArray,
-    enemies:ensureArray,
-    titles:ensureArray,
-    family:ensureArray,
-    custom:ensureArray,
-    sections:ensureArray,
-    worlds:createCombiner("homeWorld", "otherWorlds"),
-    races:createCombiner("race", "altForms"),
-    countries:createCombiner("homeCountry", "otherCountries")
-}
+
 
 characterRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
     const {name, description} = req.body;

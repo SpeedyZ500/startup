@@ -1,116 +1,130 @@
 const express = require('express');
 const { verifyAuth } = require('./../service.js');
-const { createID } = require('./../database.js')
-const {modifyCharacter, getCharacter} = require(`./../characters.js`)
 const urlPrefix = "/worldbuilding/organizations/";
 
 const organizationsRouter = express.Router();
-let organizations = [];
-let organizationTypes = ["Religion", "Political", "Military", "Social", "Other"];
 
-async function getOrganization(field, value){
-    if (value) {
-        return organizations.find((organization) => organization[field] === value);
-    }
-    return null;
-}
+const { 
+    createID, 
+    baseInstitutionCards,
+    institutionFullFields,
+    organizationsPreProcessing,
+    postProcessLeader,
+    institutionLookups,
+    organizationFullLookups,
+    institutionProjectionFields,
+    organizationBioProjectionFields,
+    organizationEditFields,
+    getOptions,
+    modifyMany,
+    addOne,
+    updateOne,
+    getCards,
+    getDisplayable,
+    getEditable
 
 
-async function getOrganizations(queries){
-    if(typeof queries === "object"){
-        let filterOrganizations = organizations;
-        for(const [key, value] of Object.entries(queries)){
-            if(Array.isArray(value)){
-                filterOrganizations = filterOrganizations.filter(((organization) => 
-                    Array.isArray(organization[key]) ? organization[key].some(char => value.includes(char)) : value.includes(organization[key] )))
-            }
-            else{
-                filterOrganizations = filterOrganizations.filter(((organization) => 
-                    Array.isArray(organization[key]) ? organization[key].includes(value) : value === organization[key]))
-            }
-        }
-        return filterOrganizations;
-    }
-    else{
-        return organizations;
-    }
-}
+    
+ } = require('./../database.js')
 
+organizationsRouter.get(`${urlPrefix}types/options`, async (req, res) => {
+    const options = await getOptions("organizationtypes")
+    res.send(options)
+})
 
 organizationsRouter.get(`${urlPrefix}options`, async (req, res) => {
-    const filteredOrganizations = await getOrganizations(req.query);
-    const options = filteredOrganizations.map((organization) => {
-        return {
-            value: organization.id, 
-            label: organization.name,
-            qualifier: organization.types || []
-        }
-    })
-    res.send(options)
-})
-
-organizationsRouter.get(`${urlPrefix}types/options`, async (_req, res) => {
-    const options = organizationTypes.map((type) => {
-        return {
-            value: type,
-            label: type,
-        }
-    })
+    const options = await getOptions("organizations", {query:req.query})
     res.send(options)
 })
 
 
 
-organizationsRouter.get(`${urlPrefix}:id?`, async (req, res) => {
+
+organizationsRouter.get(`${urlPrefix}`, async (req, res) => {
+    const query = req.query || {};
+    const organizationToSend = await getCards(urlPrefix, {
+        query,
+        lookupFields:institutionLookups,
+        fields:baseInstitutionCards,
+        projectionFields:institutionProjectionFields
+    })
+    res.send(organizationToSend)
+})
+
+organizationsRouter.get(`${urlPrefix}:id/bio`, async (req, res) => {
     const { id } = req.params;
-    const queries = req.query || {};
-    const {author} = req.query || "";
-    if(!id || id === "undefined" || id.trim() === ""){
-        let organizationsToSend = await getOrganizations(queries);
-        res.send(organizationsToSend)
-    }
-    else{
-        if(id == "types"){
-            res.send(organizationTypes);
+    try{
+        const organization = await getDisplayable(urlPrefix, id, {
+            lookupFields:organizationFullLookups,
+            fields:institutionFullFields,
+            projectionFields:organizationBioProjectionFields
+        });
+        if(organization){
+            res.send(organization);
         }
         else{
-            const organization = await getOrganization("id", id);
-            if(organization){
-                if(author){
-                    const isAuthor = author === organization.author;
-                    res.send({isAuthor})
-                }
-                else{
-                    res.send(organization);
-                }
-            }
-            else{
-                res.status(404).json({ error: "Organization not found" });
-            }
+            res.status(404).json({ error: "organization not found" });
         }
     }
+    catch{
+        res.status(500).send({msg:"server error"})
+    }
+    
 });
+organizationsRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
+    const author = req.usid
+    const {id} = req.params
+    try{
+        const organization = await getEditable(urlPrefix, author, id, {
+                lookupFields:organizationFullLookups,
+                fields:institutionFullFields,
+                projectionFields:organizationEditFields
+            }
+        );
+        if(organization){
+            return res.send(organization);
+        }
+        else{
+            return res.status(404).send({msg:"organization not found"})
+        }
+    }
+    catch(e){
+        res.status(e.status || 500).send({msg:e.message})
+    }
+})
+
+
 
 organizationsRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
-    
-    const {name, description, leaders} = req.body;
+    const {name, description} = req.body;
     const author = req.usid;
     if(!name || !author || !description){
         return res.status(409).send({msg:"Required fields not filled out"});
     }
-    
 
     const id = createID(req.body.name, author);
-    if(await getOrganization("id", id)){
-        return res.status(409).send({msg:"A Organization by you and by that name already exists"});
-    }else{
-        const leadersArray = Array.isArray(leaders) ? leaders : leaders != null  ?  [leaders] : []
+    const creationData = req.body;
+    creationData.id = id;
+    creationData.url = `${urlPrefix}${id}`
+    creationData.author = author;
 
-        
-        const organization = await createOrganization(req.body, author, id, leadersArray);
+
+
+    try{
+        const organization = await addOne(urlPrefix, creationData, {
+            preProcessing:organizationsPreProcessing, 
+            postProcessing:postProcessLeader
+        });
         if(organization){
-            return res.json(organization)
+            return res.send({id:organization.id, name:organization.name, url:organization.url})
         }
+        else{
+            return res.status(500).send({msg:"Failed to create Organization"})
+
+        }
+    }
+    catch(e){
+        return res.status(e.status || 500).send({msg:e.message})
     }
 });
 
@@ -118,188 +132,38 @@ organizationsRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
 
 organizationsRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     const { id } = req.params;
-    const username  = req.usid;
+    const userID  = req.usid;
     const updateData = req.body;
-    const {leaders} = updateData
     if(!updateData){
         return res.status(400).send({ msg: "Missing data to update." });
     }
     else if(!updateData.id || updateData.id !== id ){
         return res.status(400).send({ msg: "ID mismatch. Cannot modify a different Organization." });
     }
-
-    
-
-    const organization = await getOrganization("id", id);
-    if(organization){
-        if(username !== organization.author || updateData.author !== organization.author){
-            res.status(401).send({msg:`cannot update organization, or field`});
+    try{
+        const organization = await updateOne(urlPrefix, updateData, userID, {preProcessing:organizationsPreProcessing});
+        if(organization){
+            return res.send({id:organization.id, name:organization.name, url:organization.url})
         }
-        if(username === organization.author){
-            const leadersArray = Array.isArray(leaders) ? leaders : leaders != null  ?  [leaders] : []
-            const updateData = req.body;
-            const updated = await updateOrganization(id, updateData)
-            if(updated.msg){
-                return res.status(500).send(updated.msg);
-            }
-            return res.send(updated);
+        else{
+            return res.status(500).send({msg:"Failed to update Organization"})
         }
-       
     }
-    else{
-        res.status(404).send({msg:`Organization ${id}, not found`});
+    catch(e){
+        return res.status(e.status || 500).send({msg:e.message})
     }
 });
 
-
-
-
-async function createOrganization(organizationData, author, id, leaders){
-    const organizationURL = urlPrefix + id;
-    const {name, types, description, 
-        originWorld,
-        otherWorlds = [], authorIsLeader,
-        countries,  custom, sections
-    } = organizationData
-
-    
-    const created = new Date().toJSON();
-    await addTypes(types);
-    const organization = {
-        id,
-        name,
-        url:organizationURL,
-        author,
-        types,
-        leaders,
-        authorIsLeader,
-        originWorld,
-        otherWorlds,
-        countries,
-        worlds: [originWorld, ...(otherWorlds ?? [])],
-        custom,
-        description,
-        sections,
-        created,
-        modified:created,
+organizationsRouter.patch(`${urlPrefix}:list/:method`, verifyAuth, async (req, res) => {
+    const { list, method } = req.params;
+    const { organizations, id } = req.body;
+    try{
+        await modifyMany(urlPrefix, organizations, list, id, method)
+        return res.send({msg:"success"})
     }
-
-    if(Array.isArray(types) && !types.includes("Religion")){
-        await Promise.all(
-            leaders.map(async (leader) => {
-                const character = await getCharacter("id", leader);
-                if (character) {
-                    await modifyCharacter(character, "organizations", id, "add");
-                }
-            })
-        );
-    }
-    organizations.push(organization)
-
-    return organization
-}
-async function updateOrganization(id, updateData){
-    const {types, originWorld, otherWorlds, leaders } = updateData
-    const organization = await getOrganization("id", id);
-    if(JSON.stringify(types) !== JSON.stringify(organization.types)){
-        await addTypes(types);
-    }
-    if(JSON.stringify(leaders) !== JSON.stringify(organization.leaders)){
-        if(!types.includes("Religion")){
-            await Promise.all(
-                leaders.map(async (leader) => {
-                    const character = await getCharacter("id", leader);
-                    if (character) {
-                        await modifyCharacter(character, "organizations", id, "add");
-                    }
-                })
-            );
-        }
-    }
-    const newWorlds = [originWorld, ...(otherWorlds ?? [])]
-    if(JSON.stringify(newWorlds) !== JSON.stringify(organization.worlds)){
-        updateData.worlds = newWorlds;
-    }
-    return await organizationUpdate(updateData);
-}
-async function organizationUpdate(organization){
-    const index = organizations.findIndex(char => char.id === organization.id);
-    if(index !== -1){
-        organizations[index] = organization;
-        return organization
-    }
-    else {
-        return {msg:"failed to update organization"}
-    }
-}
-
-async function addTypes(type){
-    if(Array.isArray(type)){
-        type.forEach((item) => {
-            if(!organizationTypes.includes(item)){
-                organizationTypes.push(item);
-            }
-        })
-    }
-    else{
-        if(!organizationTypes.includes(type)){
-            organizationTypes.push(type)
-        }
-    }
-    return "done"
-}
-
-async function modifyOrganization(organization, list, data, method) {
-    const restrictedLists = ["worlds", "sections", "custom"];
-    if(restrictedLists.includes(list) || (list === "leaders" && (method === "add" || method === "put"))){
-        return {error: `can't modify ${list} directly use other or alt version` };
-    }
-    if (!organization[list] || !Array.isArray(organization[list])) {
-        return { error: `List '${list}' not found, or not a list.` };
-    }
-    const organizationData = organization[list];
-    
-    
-    // Add or update references
-    if (method === 'add' || method === 'put') {
-        const existsInOrganization = organizationData.includes(data);
-        if (!existsInOrganization) {
-            organizationData.push(data);  // Add to organization object
-        }
-    } 
-    // Delete references
-    else if (method === 'delete') {
-        const organizationIndex = organizationData.findIndex(item => item === data);
-        if (organizationIndex !== -1) {
-            if(organizationIndex === organizationData.length - 1){
-                organizationData.pop()
-            }
-            else{
-                organizationData.splice(organizationIndex, 1);
-            }
-        }
-    }
-    organization[list] = organizationData;
-    return await updateOrganization(organization.id, organization);
-}
-
-// 🚀 Router: Modify a organization field (add/put/delete references)
-organizationsRouter.patch(`${urlPrefix}:id/:list`, verifyAuth, async (req, res) => {
-    const { id, list } = req.params;
-    const { method, data } = req.body;
-    const organization = await getOrganization("id", id)
-    if(!organization){
-        return res.status(404).send({msg:"Error Organization not found"});
-    }
-
-    const result = await modifyOrganization(organization, list, data, method);
-
-    if (result.error) {
-        return res.status(400).send(result);
-    } else {
-        return res.send(result);
+    catch(e){
+        res.status(e.status || 500).send({msg:e.message})
     }
 });
 
-
-module.exports = {organizationsRouter, modifyOrganization};
+module.exports = organizationsRouter;

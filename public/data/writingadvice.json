@@ -7,7 +7,7 @@
     "createBioPage":false,
     "fields":[
         {
-            "label":"Description",
+            "label":"description",
             "type":"text-area",
             "placeholder":"Your Advice",
             "onCard":false,

@@ -1,7 +1,10 @@
-const express = require('express');
-const { verifyAuth} = require('./service.js');  
 
-const {createID, 
+const express = require('express');
+
+const { verifyAuth } = require('./service.js');  
+
+const {
+    createID, 
     getGraph, 
     getCards, 
     getDisplayable, 
@@ -21,18 +24,13 @@ const {createID,
     chaptersPostProcessing,
     chaptersPreProcessing
 
-} = require('./database.js')
+
+} = require('./database.js');
+
 const urlPrefix = "/stories/"
  
 
 const storiesRouter = express.Router();
-
-let stories = [];
-let chapters = [];
-let genreList = [];
-let contentWarningList = [];
-
-
 
 
 storiesRouter.get(`${urlPrefix}genres/options`, async (req, res) => {
@@ -105,7 +103,7 @@ storiesRouter.get(`${urlPrefix}:storyID?`, async (req, res) => {
         const stories = await getCards(urlPrefix,{query, 
             lookupFields:baseLookupFields, 
             projectionFields:baseProjectionFields,
-            fields:sotryFields
+            fields:storyFields
         })
         res.send(stories);
     } else {
@@ -207,7 +205,7 @@ storiesRouter.put(`${urlPrefix}:storyID/:chapterID?`, verifyAuth, async (req, re
     try{
         if(!chapterID){
             if(!updateData.id || updateData.id !== storyID ){
-                return res.status(400).send({ msg: "ID mismatch. Cannot modify a different Character." });
+                return res.status(400).send({ msg: "ID mismatch. Cannot modify a different Story." });
             }
             const story = await updateOne(urlPrefix,updateData, author,{
                 preProcessing:storyPreProcessing,
@@ -218,7 +216,7 @@ storiesRouter.put(`${urlPrefix}:storyID/:chapterID?`, verifyAuth, async (req, re
         }
         else{
             if(!updateData.id || updateData.id !== chapterID ){
-                return res.status(400).send({ msg: "ID mismatch. Cannot modify a different Character." });
+                return res.status(400).send({ msg: "ID mismatch. Cannot modify a different Chapter." });
             }
             const chapter = await updateOne("chapters",updateData, author,{
                 preProcessing:chaptersPreProcessing,

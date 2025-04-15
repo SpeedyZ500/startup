@@ -1,11 +1,11 @@
 const { MongoClient } = require('mongodb');
 const config = require('./dbConfig.json');
-const { pipeline } = require('stream');
-const { sanitizeId } = require('./service');
 
 const url = `mongodb+srv://${config.userName}:${config.password}@${config.hostname}`;
 const client = new MongoClient(url);
 const db = client.db('yggdrasil');
+
+
 
 (async function testConnection() {
     try {
@@ -20,6 +20,15 @@ const db = client.db('yggdrasil');
     }
   })();
 
+  function sanitizeId(id){
+    return id
+        .trim()
+        .toLowerCase()
+        .replace(/<[^>]*>?/gm, '') // remove HTML tags
+        .replace(/\s+/g, "-")
+        .replace(/[^\w-]/g, "");
+}
+
 // Collections
 const userCollection = db.collection('user');
 const worldsCollection = db.collection('worlds');
@@ -32,7 +41,7 @@ const characterTypeCollection = db.collection('characterTypes');
 const racesCollection = db.collection('races');
 const raceTypeCollection = db.collection('raceTypes');
 const organizationsCollection = db.collection('organizations');
-const organizationTypeCollection = db.collection('organizationTypesBios');
+const organizationTypeCollection = db.collection('organizationTypes');
 const magicSystemsCollection = db.collection('magicsystems');
 const magicTypeCollection = db.collection('magicTypes');
 const countriesCollection = db.collection('countries');
@@ -124,7 +133,7 @@ const collectionsMap = {
     floratypes:floraTypeCollection,
 
     wildlife:wildlifeCollection,
-    wildlifetype:wildlifeTypeCollection,
+    wildlifetypes:wildlifeTypeCollection,
 
     characters:charactersCollection,
     character:charactersCollection,
@@ -208,9 +217,8 @@ function normalizeKey(value){
     return value
     .toLowerCase()
     .replace(/^\/worldbuilding\//, "")
-    .replace(/^\//, "")
+    .replace(/\//g, "")
     .replace(/\s+/g, '')
-
 }
 function getCollection(value){
     const key = normalizeKey(value);
@@ -339,9 +347,13 @@ function basicProject(matchField, projectionFields) {
   function ensureArray(input) {
     return input ? Array.isArray(input) ? input : [input] : [];
   }
-  function unArray(original, result) {
-    return Array.isArray(original) ? result : result[0];
-  }
+function unArray(original, result) {
+    if (Array.isArray(original)) {
+      return Array.isArray(result) ? result : [result];
+    } else {
+      return Array.isArray(result) ? result[0] : result;
+    }
+}
 async function convertToDisplayable(source, raw) {
     const collection = getCollection(source);
     const ids = ensureArray(raw)
@@ -710,6 +722,7 @@ async function getCards(collectionKey, {
 } = {}){
     const collection = getCollection(collectionKey)
     const {filter = {}, sort = {}} = query
+    const pipeline = [];
 
     if (Object.keys(filter).length > 0) {
         const processedFilter = await processFilters(filter)
@@ -1057,17 +1070,26 @@ function createProjection(field, type="displayable"){
 }
 
 const createCombiner = (primaryKey, secondaryKey) => (full) => [full[primaryKey], ...(full[secondaryKey] || [])]
-const combinedWorlds = createCombiner(originWorld, otherWorlds)
-const combinedBiomes = createCombiner(originWorld, otherWorlds);
+const combinedWorlds = createCombiner("originWorld", "otherWorlds")
+const combinedBiomes = createCombiner("originBiome", "otherBiomes");
 const preProcessText = (value) => sanitizeText(unArray("whatever", value))
 const preProcessTextArray = (value) => sanitizeText(ensureArray(value))
 const processSingleID = async (value, collectionKey) => await convertIDs(collectionKey, unArray("whatever", value))
 const processIDArray = async (value, collectionKey) => await convertIDs(collectionKey, ensureArray(value))
 
+const processBoolean = (value) => {
+    if (typeof value === "boolean") return value;
+    if (typeof value === "string") {
+        const normalized = value.trim().toLowerCase();
+        return ["true", "on", "1", "yes", "y"].includes(normalized)
+    }
+    if (typeof value === "number") return value === 1;
+    return false
+}
 
 const addLeaders = async (val, full, key) => {
     const modified = new Date().toJSON();
-
+    if(key ==="organizations" && (full.types || []).includes("Religion")) return
     if (!val || val.length === 0) return;
     const updateFilter = key === "countries" ? {
         _id: { $in: val }, 
@@ -1079,6 +1101,7 @@ const addLeaders = async (val, full, key) => {
     } 
         : {$addToSet:{[key]:full._id }, $set: {modified}}
     await chapterCollection.updateMany(updateFilter, updatePayload);
+    return
 }
 
 const expandStory = async (full) => {
@@ -1203,13 +1226,18 @@ const baseFields = [
     "description",
 ]
 
-const baseFullFields = [
-    ...baseFields,
+const bioFields = [
     "sections",
     "custom",
     "created",
     "modified"
 ]
+const baseFullFields = [
+    ...baseFields,
+    ...bioFields
+]
+
+
 
 const baseLookupFields = [
     "author"
@@ -1230,9 +1258,6 @@ const worldFullFields= [
     "continents"
 ]
 
-const leadersPostProcessing = {
-    leaders: async (value, full, collectionKey) => addLeaders(value, full, collectionKey)
-}
 
 const chaptersPostProcessing = {
     storyID: (_value, full, _collectionKey) => expandStory(full),
@@ -1300,13 +1325,356 @@ const biomeProjectionFields = {
 }
  
 const biomeEditProjectionFields = {
-    ...baseProjectionFields,
+    ...baseEditProjectionFields,
     worlds:createMap("worlds", "edit")
 }
 const biomePreProcessing = {
     ...basePreProcessing,
-    worlds: (value, _full) => processIDArray(value, "worlds")
+    worlds: async (value, _full) => await processIDArray(value, "worlds")
 }
+const otherWorldsPreProcessing = {
+    otherWorld: async(value, _full) => await processIDArray(value, "worlds")
+}
+
+const preProcessWithOriginWorld = {
+    originWorld: async (value, _full) => await processSingleID(value, "worlds"),
+    ...otherWorldsPreProcessing,
+    worlds: (_value, full) => combinedWorlds(full)
+}
+const preProcessAbilities = {
+    abilities: async (value, _full) => await processIDArray(value, "magic")
+}
+
+const characterPreProcessing = {
+    ...basePreProcessing,
+    titles : async(value, _full) => preProcessTextArray(value),
+    types: async(value, _full) => processIDArray(value, "charactertypes"),
+    race: async(value, _full) => await processSingleID(value, "races"),
+    altForms: async(value, _full) => await processIDArray(value, "races"),
+    races:(_value, full) => createCombiner("race", "altForms")(full),
+    homeWorld: async(value, _full) => await processSingleID(value, "worlds"),
+    ...otherWorldsPreProcessing,
+    worlds: (_value, full) => combinedWorlds(full),
+    homeTown: (value, _full) => preProcessText(value),
+    homeCountry: async(value, _full) => await processSingleID(value, "countries"),
+    otherCountries: async(value, _full) => await processIDArray(value, "countries"),
+    countries: (_value, full) => createCombiner("homeCountry","otherCountries")(full),
+    family:async(value, _full) => await processFamilyToIDs(value),
+    ...preProcessAbilities,
+    organizations:async(value, _full) => await processIDArray(value, "organizations"),
+    religion:async(value, _full) => await processSingleID(value, "organizations"),
+    allies:async(value, _full) => await processIDArray(value, "characters"),
+    enemies:async(value, _full) => await processIDArray(value, "characters"),
+}
+
+const containsBiomePreProcessing = {
+    ...basePreProcessing,
+    ...preProcessWithOriginWorld,
+    ...preProcessAbilities,
+    originBiome: async(value, _full) => await processSingleID(value, "biomes"),
+    otherBiomes: async(value, _full) => await processIDArray(value, "biomes"),
+    biomes: (_value, full) => combinedBiomes(full),
+    countries: async (value, _full) => processIDArray(value, "countries")
+}
+const preProcessLeaders = {
+    ...basePreProcessing,
+    leaders: async(value, _full ) => await processIDArray(value, "characters"),
+    authorIsLeader: (value, _full) => processBoolean(value),
+    ...preProcessWithOriginWorld, 
+}
+
+const countriesPreProssesing = {
+    ...preProcessLeaders,
+    types: async (value, _full) => await processIDArray(value, "countrytypes"),
+    biomes: async (value, _full) => await processIDArray(value, "biomes"),
+    continents: (value, _full) => preProcessTextArray(value),
+    towns: (value, _full) => preProcessTextArray(value)
+}
+const organizationsPreProcessing = {
+    ...preProcessLeaders,
+    types: async (value, _full) => await processIDArray(value, "organizationtypes"),
+    countries: async (value, _full) => await processIDArray(value, "countries"),
+}
+const postProcessLeader = {
+    leaders: async (value, full, catagoryKey) => await addLeaders(value, full, catagoryKey)
+}
+
+const magicSystemPreProcessing = {
+    ...basePreProcessing,
+    types: async (value, _full) => await processIDArray(value, "magictypes"),
+    ...preProcessWithOriginWorld,
+}
+
+const wildlifePreProcessing = {
+    ...containsBiomePreProcessing,
+    types: async (value, _full) => await processIDArray(value, "wildlifetypes")
+}
+
+const floraPreProcessing = {
+    ...containsBiomePreProcessing,
+    types: async (value, _full) => await processIDArray(value, "floratypes")
+}
+const racePreProcessing = {
+    ...basePreProcessing,
+    ...preProcessWithOriginWorld,
+    ...preProcessAbilities,
+    types: async (value, _full) => await processIDArray(value, "racetypes"),
+    countries: async (value, _full) => await processIDArray(value, "countries"),
+}
+
+
+
+const abilitiesProjectionFields = {
+    abilities:createMap("abilities")
+}
+
+const abilitiesEditProjectionFields = {
+    abilities:createMap("abilities", "edit")
+}
+
+const otherWorldsProjectionFields = {
+    otherWorlds:createMap("otherWorlds")
+}
+
+const otherWorldsEditProjectionFields = {
+    otherWorlds:createMap("otherWorlds", "edit")
+}
+
+
+
+
+
+
+const characterProjectionFields = {
+    ...baseProjectionFields,
+    homeWorld:createProjection("homeWorld"),
+    homeCountry:createProjection("homeCountry"),
+    race:createProjection("race"),
+    religion:createProjection("religion")
+}
+
+const characterBioProjectionFields = {
+    ...characterProjectionFields,
+    ...abilitiesProjectionFields,
+    ...otherWorldsProjectionFields,
+    otherCountries:createMap("otherCountries"),
+    altForms:createMap("altForms"),
+    organizations:createMap("organizations"),
+    allies:createMap("allies"),
+    enemies:createMap("enemies"),
+}
+
+const characterEditProjectionFields = {
+    ...baseEditProjectionFields,
+    homeWorld:createProjection("homeWorld","edit"),
+    homeCountry:createProjection("homeCountry", "edit"),
+    ...otherWorldsEditProjectionFields,
+    otherCountries:createMap("otherCountries", "edit"),
+    ...abilitiesEditProjectionFields,
+    race:createProjection("race", "edit"),
+    altForms:createMap("altForms", "edit"),
+    organizations:createMap("organizations", "edit"),
+    allies:createMap("allies", "edit"),
+    enemies:createMap("enemies", "edit"),
+    religion:createProjection("religion","edit")
+}
+
+const bioWithTypes = [
+    ...bioFields,
+    "types",
+]
+
+const characterCards = [
+    ...baseFields,
+    "gender",
+    "pronouns",
+    "born",
+    "died",
+    "homeTown"
+]
+const characterCardsLookup = [
+    ...baseLookupFields,
+    "race",
+    "religion",
+    "homeWorld",
+    "homeCountry"
+]
+
+const characterFullFields = [
+    ...characterCards,
+    "family",
+    ...bioWithTypes
+]
+
+const characterFullLookupFields = [
+    ...characterCardsLookup,
+    "altForms",
+    "organizations",
+    "abilities",
+    "enemies",
+    "allies",
+    "otherWorlds",
+    "othercountries"
+]
+
+
+const livingThingProjectionFields = {
+    ...baseProjectionFields,
+    originWorld:createProjection("originWorld"),
+    originBiome:createProjection("originBiome"),
+}
+
+const livingThingBioProjectionFields = {
+    ...livingThingProjectionFields,
+    ...abilitiesProjectionFields,
+    ...otherWorldsProjectionFields,
+    otherBiomes:createMap("otherBiomes"),
+    countries:createMap("countries"),
+}
+
+const livingThingEditProjectionFields = {
+    ...baseEditProjectionFields,
+    originWorld:createProjection("originWorld","edit"),
+    originBiome:createProjection("originBiome"),
+    otherBiomes:createMap("otherBiomes", "edit"),
+    ...otherWorldsEditProjectionFields,
+    countries:createMap("countries", "edit"),
+    ...abilitiesEditProjectionFields,
+}
+
+
+const livingThingCardLookups = [
+    ...baseLookupFields,
+    "originWorld",
+    "originBiome",
+]
+
+
+const fullBio = [
+    ...baseFields,
+    ...bioWithTypes
+]
+
+
+
+const livingThingFullLookups = [
+    ...livingThingCardLookups,
+    "otherWorlds",
+    "otherBiomes",
+    "countries",
+    "abilities"
+]
+
+const raceProjectionFields = {
+    ...baseProjectionFields,
+    originWorld:createProjection("originWorld"),
+}
+
+const raceBioProjectionFields = {
+    ...raceProjectionFields,
+    ...abilitiesProjectionFields,
+    ...otherWorldsProjectionFields,
+    countries:createMap("countries"),
+}
+
+const raceEditProjectionFields = {
+    ...baseEditProjectionFields,
+    originWorld:createProjection("originWorld","edit"),
+    ...otherWorldsEditProjectionFields,
+    countries:createMap("countries", "edit"),
+    ...abilitiesEditProjectionFields,
+}
+
+const raceCardLookups = [
+    ...baseLookupFields,
+    "originWorld"
+]
+
+const raceFullLookups = [
+    ...raceCardLookups,
+    "abilities",
+    "otherWorlds",
+    "countries",
+]
+
+const baseInstitutionCards = [
+    baseFields,
+    "authorIsLeader",
+]
+
+const institutionLookups = [
+    ...baseLookupFields,
+    "originWorld",
+]
+
+const magicSystemFullLookups = [
+    ...institutionLookups,
+    "otherWorlds",   
+]
+const institutionFullFields = [
+    ...baseInstitutionCards,
+    ...bioWithTypes,
+]
+
+const institutionFullLookups = [
+    ...institutionLookups,
+    "otherWorlds",   
+    "leaders"
+]
+const institutionProjectionFields = {
+    ...baseProjectionFields,
+    originWorld:createProjection("originWorld"),
+}
+
+const institutionBioProjectionFields = {
+    ...institutionProjectionFields,
+    ...otherWorldsProjectionFields,
+}
+
+const organizationBioProjectionFields = {
+    ...institutionBioProjectionFields,
+    countries:createMap("countries"),
+
+}
+
+const institutionEditProjectionFields = {
+    ...baseEditProjectionFields,
+    originWorld:createProjection("originWorld","edit"),
+    ...otherWorldsEditProjectionFields,
+}
+
+const organizationEditFields = {
+    ...institutionEditProjectionFields,
+    countries:createMap("countries", "edit"),
+}
+
+const countryBioProjectionFields = {
+    ...institutionBioProjectionFields,
+    biomes:createMap("biomes"),
+
+}
+const countryEditFields = {
+    ...institutionEditProjectionFields,
+    biomes:createMap("biomes", "edit"),
+}
+
+const organizationFullLookups = [
+    ...institutionFullLookups,
+    "countries"
+]
+const countryFullFields = [
+    ...institutionFullFields,
+    "continents",
+    "towns"
+]
+const countryFullLookups = [
+    ...institutionFullLookups,
+    "biomes",
+]
+
+
+
+
 
 
 
@@ -1349,7 +1717,6 @@ module.exports = {
     storyPreProcessing,
     chaptersPreProcessing,
     chaptersPostProcessing,
-    leadersPostProcessing,
     storyFields,
     baseEditProjectionFields,
     chapterLookupFields,
@@ -1360,6 +1727,49 @@ module.exports = {
     biomeProjectionFields,
     biomeEditProjectionFields,
     biomePreProcessing,
-    optionsMap
+    optionsMap,
+    characterPreProcessing,
+    countriesPreProssesing,
+    organizationsPreProcessing,
+    postProcessLeader,
+    magicSystemPreProcessing,
+    wildlifePreProcessing,
+    floraPreProcessing,
+    racePreProcessing,
+    characterCards,
+    characterCardsLookup,
+    characterFullFields,
+    characterFullLookupFields,
+    livingThingCardLookups,
+    livingThingFullLookups,
+    raceFullLookups,
+    raceCardLookups,
+    fullBio,
+    baseInstitutionCards,
+    institutionLookups,
+    magicSystemFullLookups,
+    institutionFullFields,
+    institutionFullLookups,
+    organizationFullLookups,
+    countryFullFields,
+    countryFullLookups,
+    characterProjectionFields,
+    characterBioProjectionFields,
+    characterEditProjectionFields,
+    livingThingProjectionFields,
+    livingThingBioProjectionFields,
+    livingThingEditProjectionFields,
+    raceProjectionFields,
+    raceBioProjectionFields,
+    raceEditProjectionFields,
+    institutionProjectionFields,
+    organizationBioProjectionFields,
+    organizationEditFields,
+    countryBioProjectionFields,
+    countryEditFields,
+    raceCardLookups,
+    sanitizeId
     
+
+
 }

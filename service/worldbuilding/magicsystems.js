@@ -1,110 +1,127 @@
 const express = require('express');
 const { verifyAuth } = require('./../service.js');
-const { createID } = require('./../database.js');
 const urlPrefix = "/worldbuilding/magicsystems/";
 
 
 const magicRouter = express.Router();
 
-let magicSystems = [];
-let magicTypes = ["Alchemical", "Dimensional", "Technological", "Elemental", "Transformational"];
+const { 
+    createID, 
+    baseFields,
+    fullBio,
+    magicSystemPreProcessing,
+    institutionLookups,
+    magicSystemFullLookups,
+    institutionProjectionFields,
+    institutionBioProjectionFields,
+    institutionEditProjectionFields,
+    getOptions,
+    modifyMany,
+    addOne,
+    updateOne,
+    getCards,
+    getDisplayable,
+    getEditable
 
-async function getMagicSystem(field, value){
-    if (value) {
-        return magicSystems.find((magicSystem) => magicSystem[field] === value);
-    }
-    return null;
-}
 
+    
+ } = require('./../database.js')
 
-async function getMagicSystems(queries){
-    if(typeof queries === "object"){
-        let filterMagicSystems = magicSystems;
-        for(const [key, value] of Object.entries(queries)){
-            if(Array.isArray(value)){
-                filterMagicSystems = filterMagicSystems.filter(((magicSystem) => 
-                    Array.isArray(magicSystem[key]) ? magicSystem[key].some(magic => value.includes(magic)) : value.includes(magicSystem[key] )))
-            }
-            else{
-                filterMagicSystems = filterMagicSystems.filter(((magicSystem) => 
-                    Array.isArray(magicSystem[key]) ? magicSystem[key].includes(value) : value === magicSystem[key]))
-            }
-        }
-        return filterMagicSystems;
-    }
-    else{
-        return magicSystems;
-    }
-}
-magicRouter.get(`${urlPrefix}types/options`, async (_req, res) => {
-    const options = magicTypes.map((type) => {
-        return {
-            value: type, 
-            label: type,
-        }
-    })
+magicRouter.get(`${urlPrefix}types/options`, async (req, res) => {
+    const options = await getOptions("magictypes")
     res.send(options)
 })
 
 magicRouter.get(`${urlPrefix}options`, async (req, res) => {
-    const filteredmagicSystems = await getMagicSystems(req.query);
-    const options = filteredmagicSystems.map((magicSystem) => {
-        return {
-            value: magicSystem.id, 
-            label: magicSystem.name,
-            qualifier: magicSystem.types || []
-        }
-    })
+    const options = await getOptions("magicsystems", {query:req.query})
     res.send(options)
 })
 
 
 
-magicRouter.get(`${urlPrefix}:id?`, async (req, res) => {
+
+magicRouter.get(`${urlPrefix}`, async (req, res) => {
+    const query = req.query || {};
+    const magicSystemToSend = await getCards(urlPrefix, {
+        query,
+        lookupFields:institutionLookups,
+        fields:baseFields,
+        projectionFields:institutionProjectionFields
+    })
+    res.send(magicSystemToSend)
+})
+
+magicRouter.get(`${urlPrefix}:id/bio`, async (req, res) => {
     const { id } = req.params;
-    const queries = req.query || {};
-    const {author} = req.query || "";
-    if(!id || id === "undefined" || id.trim() === ""){
-        let magicSystemsToSend = await getMagicSystems(queries);
-        res.send(magicSystemsToSend)
-    }
-    else{
-        if(id == "types"){
-            res.send(magicTypes);
+    try{
+        const magicSystem = await getDisplayable(urlPrefix, id, {
+            lookupFields:magicSystemFullLookups,
+            fields:fullBio,
+            projectionFields:institutionBioProjectionFields
+        });
+        if(magicSystem){
+            res.send(magicSystem);
         }
         else{
-            const magicSystem = await getMagicSystem("id", id);
-            if(magicSystem){
-                if(author){
-                    const isAuthor = author === magicSystem.author;
-                    res.send({isAuthor})
-                }
-                else{
-                    res.send(magicSystem);
-                }
-            }
-            else{
-                res.status(404).json({ error: "Magic System not found" });
-            }
+            res.status(404).json({ error: "Magic System not found" });
         }
     }
+    catch{
+        res.status(500).send({msg:"server error"})
+    }
+    
 });
+magicRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
+    const author = req.usid
+    const {id} = req.params
+    try{
+        const magicSystem = await getEditable(urlPrefix, author, id, {
+                lookupFields:magicSystemFullLookups,
+                fields:fullBio,
+                projectionFields:institutionEditProjectionFields
+            }
+        );
+        if(magicSystem){
+            return res.send(magicSystem);
+        }
+        else{
+            return res.status(404).send({msg:"magic system not found"})
+        }
+    }
+    catch(e){
+        res.status(e.status || 500).send({msg:e.message})
+    }
+})
+
+
 
 magicRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
-    
     const {name, description} = req.body;
     const author = req.usid;
     if(!name || !author || !description){
         return res.status(409).send({msg:"Required fields not filled out"});
     }
+
     const id = createID(req.body.name, author);
-    if(await getMagicSystem("id", id)){
-        return res.status(409).send({msg:"A Magic System by you and by that name already exists"});
-    }else{
-        const magicSystem = await createMagicSystem(req.body, author, id);
+    const creationData = req.body;
+    creationData.id = id;
+    creationData.url = `${urlPrefix}${id}`
+    creationData.author = author;
+
+
+
+    try{
+        const magicSystem = await addOne(urlPrefix, creationData, {preProcessing:magicSystemPreProcessing});
         if(magicSystem){
-            return res.json(magicSystem)
+            return res.send({id:magicSystem.id, name:magicSystem.name, url:magicSystem.url})
         }
+        else{
+            return res.status(500).send({msg:"Failed to create Magic System"})
+
+        }
+    }
+    catch(e){
+        return res.status(e.status || 500).send({msg:e.message})
     }
 });
 
@@ -112,7 +129,7 @@ magicRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
 
 magicRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     const { id } = req.params;
-    const username  = req.usid;
+    const userID  = req.usid;
     const updateData = req.body;
     if(!updateData){
         return res.status(400).send({ msg: "Missing data to update." });
@@ -120,149 +137,30 @@ magicRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     else if(!updateData.id || updateData.id !== id ){
         return res.status(400).send({ msg: "ID mismatch. Cannot modify a different Magic System." });
     }
-    const magicSystem = await getMagicSystem("id", id);
-    if(magicSystem){
-        if(username !== magicSystem.author || updateData.author !== magicSystem.author){
-            res.status(401).send({msg:`cannot update Magic System, or field`});
-        }
-        if(username === magicSystem.author){
-            const updateData = req.body;
-            const updated = await updateMagicSystem(id, updateData)
-            if(updated.msg){
-                return res.status(500).send(updated.msg);
-            }
-            return res.send(updated);
+    try{
+        const magicSystem = await updateOne(urlPrefix, updateData, userID, {preProcessing:magicSystemPreProcessing});
+        if(magicSystem){
+            return res.send({id:magicSystem.id, name:magicSystem.name, url:magicSystem.url})
         }
         else{
+            return res.status(500).send({msg:"Failed to update Magic System"})
         }
     }
-    else{
-        res.status(404).send({msg:`Magic System ${id}, not found`});
+    catch(e){
+        return res.status(e.status || 500).send({msg:e.message})
     }
 });
 
-
-
-
-async function createMagicSystem(magicSystemData, author, id){
-    const magicSystemURL = urlPrefix + id;
-    const {name, types, description, 
-        originWorld,
-        otherWorlds = [], custom, sections
-    } = magicSystemData
-    
-    const created = new Date().toJSON();
-    await addTypes(types);
-    const magicSystem = {
-        id,
-        name,
-        url:magicSystemURL,
-        author,
-        types,
-        originWorld,
-        otherWorlds,
-        worlds: [originWorld, ...(otherWorlds ?? [])],
-        custom,
-        description,
-        sections,
-        created,
-        modified:created,
+magicRouter.patch(`${urlPrefix}:list/:method`, verifyAuth, async (req, res) => {
+    const { list, method } = req.params;
+    const { magics, id } = req.body;
+    try{
+        await modifyMany(urlPrefix, magics, list, id, method)
+        return res.send({msg:"success"})
     }
-    magicSystems.push(magicSystem)
-    return magicSystem
-}
-async function updateMagicSystem(id, updateData){
-    const {types, originWorld, otherWorlds, } = updateData
-    const magicSystem = await getMagicSystem("id", id);
-    if(JSON.stringify(types) !== JSON.stringify(types)){
-        await addTypes(types);
-    }
-   
-    const newWorlds = [originWorld, ...(otherWorlds ?? [])]
-    if(JSON.stringify(newWorlds) !== JSON.stringify(magicSystem.worlds)){
-        updateData.worlds = newWorlds;
-    }
-    
-    return await magicSystemUpdate(updateData);
-}
-async function magicSystemUpdate(magicSystem){
-    const index = magicSystems.findIndex(char => char.id === magicSystem.id);
-    if(index !== -1){
-        magicSystems[index] = magicSystem;
-        return magicSystem
-    }
-    else {
-        return {msg:"failed to update Magic System"}
-    }
-}
-
-async function addTypes(type){
-    if(Array.isArray(type)){
-        type.forEach((item) => {
-            if(!magicTypes.includes(item)){
-                magicTypes.push(item);
-            }
-        })
-    }
-    else{
-        if(!magicTypes.includes(type)){
-            magicTypes.push(type)
-        }
-    }
-    return "done"
-}
-
-async function modifyMagicSystem(magicSystem, list, data, method) {
-    const restrictedLists = ["worlds", "sections", "custom"];
-    if(restrictedLists.includes(list)){
-        return {error: `can't modify ${list} directly use other or alt version` };
-    }
-    if (!magicSystem[list] || !Array.isArray(magicSystem[list])) {
-        return { error: `List '${list}' not found, or not a list.` };
-    }
-    const magicSystemList = magicSystem[list];
-    
-    
-    // Add or update references
-    if (method === 'add' || method === 'put') {
-        const existsInMagicSystem = magicSystemList.includes(data);
-        if (!existsInMagicSystem) {
-            magicSystemList.push(data);  // Add to magicSystem object
-        }
-    } 
-    // Delete references
-    else if (method === 'delete') {
-        const magicSystemListIndex = magicSystemList.findIndex(item => item === data);
-        if (magicSystemListIndex !== -1) {
-            if(magicSystemListIndex === magicSystemList.length - 1){
-                magicSystemList.pop()
-            }
-            else{
-                magicSystemList.splice(magicSystemListIndex, 1);
-            }
-        }
-    }
-    magicSystem[list] = magicSystemList;
-    return await updateMagicSystem(magicSystem.id, magicSystem);
-}
-
-// 🚀 Router: Modify a magicSystem field (add/put/delete references)
-magicRouter.patch(`${urlPrefix}:id/:list`, verifyAuth, async (req, res) => {
-    const { id, list } = req.params;
-    const { method, data } = req.body;
-    const magicSystem = await getMagicSystem("id", id)
-    if(!magicSystem){
-        return res.status(404).send({msg:"Error Magic System not found"});
-    }
-
-    const result = await modifyMagicSystem(magicSystem, list, data, method);
-
-    if (result.error) {
-        return res.status(400).send(result);
-    } else {
-        return res.send(result);
+    catch(e){
+        res.status(e.status || 500).send({msg:e.message})
     }
 });
 
-
-module.exports = {magicRouter,modifyMagicSystem};
+module.exports = magicRouter;

@@ -13,7 +13,9 @@ const {
     baseFields,
     baseLookupFields,
     baseProjectionFields,
-    baseFullFields
+    baseFullFields,
+    addOne,
+    updateOne
 } = require('./../database.js')
 const urlPrefix = "/worldbuilding/biomes/";
 
@@ -66,14 +68,14 @@ biomesRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     const { id } = req.params;
     const { author } = req.usid 
     try{
-        const world = await getEditable(urlPrefix, author, id, {
+        const biome = await getEditable(urlPrefix, author, id, {
                 lookupFields:biomeLookupFields,
                 fields:baseFields,
                 projectionFields:biomeEditProjectionFields
             }
         );
-        if(world){
-            return res.send(world);
+        if(biome){
+            return res.send(biome);
         }
         else{
             return res.status(404).send({msg:"Biome not found"})

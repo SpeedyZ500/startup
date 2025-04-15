@@ -1,117 +1,125 @@
 const express = require('express');
 const { verifyAuth } = require('./../service.js');
-const { createID } = require('./../database.js');
 const urlPrefix = "/worldbuilding/flora/"
 
 const floraRouter = express.Router();
-let floraList = [];
-let floraTypes = [
-    "Plant",
-    "Tree",
-    "Flower",
-    "Mushroom",
-    "Magic Tree",
-    "Monster"
-]
-
-async function getFlora(field, value){
-    if (value) {
-        return floraList.find((flora) => flora[field] === value);
-    }
-    return null;
-}
-
-
-async function getFloraList(queries){
-    if(typeof queries === "object"){
-        let filterFloraList = floraList;
-        for(const [key, value] of Object.entries(queries)){
-            if(Array.isArray(value)){
-                filterFloraList = filterFloraList.filter(((flora) => 
-                    Array.isArray(flora[key]) ? flora[key].some(char => value.includes(char)) : value.includes(flora[key] )))
-            }
-            else{
-                filterFloraList = filterFloraList.filter(((flora) => 
-                    Array.isArray(flora[key]) ? flora[key].includes(value) : value === flora[key]))
-            }
-        }
-        return filterFloraList;
-    }
-    else{
-        return floraList;
-    }
-}
+const { 
+    createID, 
+    baseFields,
+    fullBio,
+    floraPreProcessing,
+    livingThingCardLookups,
+    livingThingFullLookups,
+    livingThingProjectionFields,
+    livingThingBioProjectionFields,
+    livingThingEditProjectionFields,
+    getOptions,
+    modifyMany,
+    addOne,
+    updateOne,
+    getCards,
+    getDisplayable,
+    getEditable
 
 
-floraRouter.get(`${urlPrefix}options`, async (req, res) => {
-    const filteredFloraList = await getFloraList(req.query);
-    const options = filteredFloraList.map((flora) => {
-        return {
-            value: flora.id, 
-            label: flora.name,
-            qualifier: flora.types || []
-        }
-    })
-    res.send(options)
-})
+    
+ } = require('./../database.js')
 
 floraRouter.get(`${urlPrefix}types/options`, async (req, res) => {
-    const options = floraTypes.map((type) => {
-        return {
-            value: type,
-            label: type,
-        }
-    })
+    const options = await getOptions("floratypes")
+    res.send(options)
+})
+
+floraRouter.get(`${urlPrefix}options`, async (req, res) => {
+    const options = await getOptions("flora", {query:req.query})
     res.send(options)
 })
 
 
 
-floraRouter.get(`${urlPrefix}:id?`, async (req, res) => {
+
+floraRouter.get(`${urlPrefix}`, async (req, res) => {
+    const query = req.query || {};
+    const floraToSend = await getCards(urlPrefix, {
+        query,
+        lookupFields:livingThingCardLookups,
+        fields:baseFields,
+        projectionFields:livingThingProjectionFields
+    })
+    res.send(floraToSend)
+})
+
+floraRouter.get(`${urlPrefix}:id/bio`, async (req, res) => {
     const { id } = req.params;
-    const queries = req.query || {};
-    const {author} = req.query || "";
-    if(!id || id === "undefined" || id.trim() === ""){
-        let floraListToSend = await getFloraList(queries);
-        res.send(floraListToSend)
-    }
-    else{
-        if(id == "types"){
-            res.send(floraTypes);
+    try{
+        const flora = await getDisplayable(urlPrefix, id, {
+            lookupFields:livingThingFullLookups,
+            fields:fullBio,
+            projectionFields:livingThingBioProjectionFields
+        });
+        if(flora){
+            res.send(flora);
         }
         else{
-            const flora = await getFlora("id", id);
-            if(flora){
-                if(author){
-                    const isAuthor = author === flora.author;
-                    res.send({isAuthor})
-                }
-                else{
-                    res.send(flora);
-                }
-            }
-            else{
-                res.status(404).json({ error: "Flora not found" });
-            }
+            res.status(404).json({ error: "Flora not found" });
         }
     }
+    catch{
+        res.status(500).send({msg:"server error"})
+    }
+    
 });
+floraRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
+    const author = req.usid
+    const {id} = req.params
+    try{
+        const flora = await getEditable(urlPrefix, author, id, {
+                lookupFields:livingThingFullLookups,
+                fields:fullBio,
+                projectionFields:livingThingEditProjectionFields
+            }
+        );
+        if(flora){
+            return res.send(flora);
+        }
+        else{
+            return res.status(404).send({msg:"flora not found"})
+        }
+    }
+    catch(e){
+        res.status(e.status || 500).send({msg:e.message})
+    }
+})
+
+
 
 floraRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
-    
     const {name, description} = req.body;
     const author = req.usid;
     if(!name || !author || !description){
         return res.status(409).send({msg:"Required fields not filled out"});
     }
+
     const id = createID(req.body.name, author);
-    if(await getFlora("id", id)){
-        return res.status(409).send({msg:"A Flora by you and by that name already exists"});
-    }else{
-        const flora = await createFlora(req.body, author, id);
+    const creationData = req.body;
+    creationData.id = id;
+    creationData.url = `${urlPrefix}${id}`
+    creationData.author = author;
+
+
+
+    try{
+        const flora = await addOne(urlPrefix, creationData, {preProcessing:floraPreProcessing});
         if(flora){
-            return res.json(flora)
+            return res.send({id:flora.id, name:flora.name, url:flora.url})
         }
+        else{
+            return res.status(500).send({msg:"Failed to create Flora"})
+
+        }
+    }
+    catch(e){
+        return res.status(e.status || 500).send({msg:e.message})
     }
 });
 
@@ -119,7 +127,7 @@ floraRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
 
 floraRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     const { id } = req.params;
-    const username  = req.usid;
+    const userID  = req.usid;
     const updateData = req.body;
     if(!updateData){
         return res.status(400).send({ msg: "Missing data to update." });
@@ -127,157 +135,37 @@ floraRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     else if(!updateData.id || updateData.id !== id ){
         return res.status(400).send({ msg: "ID mismatch. Cannot modify a different Flora." });
     }
-    const flora = await getFlora("id", id);
-    if(flora){
-        if(username !== flora.author || updateData.author !== flora.author){
-            res.status(401).send({msg:`cannot update flora, or field`});
-        }
-        if(username === flora.author){
-            const updateData = req.body;
-            const updated = await updateFlora(id, updateData)
-            if(updated.msg){
-                return res.status(500).send(updated.msg);
-            }
-            return res.send(updated);
+    try{
+        const flora = await updateOne(urlPrefix, updateData, userID, {preProcessing:floraPreProcessing});
+        if(flora){
+            return res.send({id:flora.id, name:flora.name, url:flora.url})
         }
         else{
+            return res.status(500).send({msg:"Failed to update Flora"})
         }
     }
-    else{
-        res.status(404).send({msg:`Flora ${id}, not found`});
+    catch(e){
+        return res.status(e.status || 500).send({msg:e.message})
     }
 });
 
 
 
 
-async function createFlora(floraData, author, id){
-    const floraURL = urlPrefix + id;
-    const {name, types, description, 
-        originWorld, originBiome,
-        otherWorlds = [],  otherBiomes = [], 
-        abilities, 
-        countries,  custom, sections
-    } = floraData
-    
-    const created = new Date().toJSON();
-    await addTypes(types);
-    const flora = {
-        id,
-        name,
-        url:floraURL,
-        author,
-        types,
-        abilities,
-        originWorld,
-        originBiome,
-        otherWorlds,
-        otherBiomes,
-        countries,
-        biomes:[originBiome, ...(otherBiomes ?? [])],
-        worlds: [originWorld, ...(otherWorlds ?? [])],
-        custom,
-        description,
-        sections,
-        created,
-        modified:created,
-    }
-    floraList.push(flora)
-    return flora
-}
-async function updateFlora(id, updateData){
-    const {types, originWorld, otherWorlds, originBiome, otherBiomes } = updateData
-    const flora = await getFlora("id", id);
-    if(JSON.stringify(types) !== JSON.stringify(flora)){
-        await addTypes(types);
-    }
-    const newBiomes = [originBiome, ...(otherBiomes ?? [])]
-    if(JSON.stringify(newBiomes) !== JSON.stringify(flora.biomes)){
-        updateData.biomes = newBiomes;
-    }
-    const newWorlds = [originWorld, ...(otherWorlds ?? [])]
-    if(JSON.stringify(newWorlds) !== JSON.stringify(flora.worlds)){
-        updateData.worlds = newWorlds;
-    }
-    return await floraUpdate(updateData);
-}
-async function floraUpdate(flora){
-    const index = floraList.findIndex(char => char.id === flora.id);
-    if(index !== -1){
-        floraList[index] = flora;
-        return flora
-    }
-    else {
-        return {msg:"failed to update flora"}
-    }
-}
 
-async function addTypes(type){
-    if(Array.isArray(type)){
-        type.forEach((item) => {
-            if(!floraTypes.includes(item)){
-                floraTypes.push(item);
-            }
-        })
-    }
-    else{
-        if(!floraTypes.includes(type)){
-            floraTypes.push(type)
-        }
-    }
-    return "done"
-}
 
-async function modifyFlora(flora, list, data, method) {
-    const restrictedLists = ["worlds", "biomes", "abilities", "sections", "custom"];
-    if(restrictedLists.includes(list)){
-        return {error: `can't modify ${list} directly use other or alt version` };
-    }
-    if (!flora[list] || !Array.isArray(flora[list])) {
-        return { error: `List '${list}' not found, or not a list.` };
-    }
-    const floraData = flora[list];
-    
-    
-    // Add or update references
-    if (method === 'add' || method === 'put') {
-        const existsInFlora = floraData.includes(data);
-        if (!existsInFlora) {
-            floraData.push(data);  // Add to flora object
-        }
-    } 
-    // Delete references
-    else if (method === 'delete') {
-        const floraListIndex = floraData.findIndex(item => item === data);
-        if (floraListIndex !== -1) {
-            if(floraListIndex === floraData.length - 1){
-                floraData.pop()
-            }
-            else{
-                floraData.splice(floraListIndex, 1);
-            }
-        }
-    }
-    flora[list] = floraData;
-    return await updateFlora(flora.id, flora);
-}
+
 
 // 🚀 Router: Modify a flora field (add/put/delete references)
-floraRouter.patch(`${urlPrefix}:id/:list`, verifyAuth, async (req, res) => {
-    const { id, list } = req.params;
-    const { method, data } = req.body;
-    const flora = await getFlora("id", id)
-    if(!flora){
-        return res.status(404).send({msg:"Error Flora not found"});
+floraRouter.patch(`${urlPrefix}:list/:method`, verifyAuth, async (req, res) => {
+    const { list, method } = req.params;
+    const { flora, id } = req.body;
+    try{
+        await modifyMany(urlPrefix, flora, list, id, method)
+        return res.send({msg:"success"})
     }
-
-    const result = await modifyFlora(flora, list, data, method);
-
-    if (result.error) {
-        return res.status(400).send(result);
-    } else {
-        return res.send(result);
+    catch(e){
+        res.status(e.status || 500).send({msg:e.message})
     }
 });
-
-module.exports = {floraRouter, modifyFlora};
+module.exports = floraRouter;

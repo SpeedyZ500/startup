@@ -502,6 +502,7 @@ export function CategoryPage(props) {
             .then((response) => response.json())
             .then((data) => {
                 setList(data);
+                console.log(JSON.stringify(data))
                 setError(null);
             }).catch ((err) => {
                 setError(err.message);

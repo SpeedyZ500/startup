@@ -15,7 +15,7 @@ const {
     getCards,
     listUserDisplay,
     addWritingAdvice,
-    addWritingPrompt
+    addWritingPrompt,sanitizeId
  } = require('./database');  // Import database functions
 
 app.use(express.json());
@@ -53,7 +53,7 @@ function isValidId(id) {
 }
 
 function isValidPassword(pass){
-    return typeof password === "string" && password.length >= 8 && /^[^\s<>]*$/.test(password);
+    return typeof pass === "string" && pass.length >= 8 && /^[^\s<>]*$/.test(pass);
 }
 
 app.use(express.static('public'));
@@ -95,14 +95,7 @@ const verifyAuth = async (req, res, next) => {
 
 
 
-function sanitizeId(id){
-    return id
-        .trim()
-        .toLowerCase()
-        .replace(/<[^>]*>?/gm, '') // remove HTML tags
-        .replace(/\s+/g, "-")
-        .replace(/[^\w-]/g, "");
-}
+
 
 
 
@@ -352,7 +345,6 @@ async function clearAuthCookie(res, user){
 module.exports = {
     app,
     verifyAuth,
-    sanitizeId,
     getUser,
     apiRouter
 };

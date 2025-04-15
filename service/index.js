@@ -2,12 +2,12 @@ const { app } = require('./service.js');
 const characterRouter = require('./characters.js');
 const storiesRouter = require('./stories.js');
 const biomesRouter = require('./worldbuilding/biomes.js');
-const {countriesRouter} = require('./worldbuilding/countries.js');
-const {floraRouter} = require('./worldbuilding/flora.js');
-const {magicRouter} = require('./worldbuilding/magicsystems.js');
-const {organizationsRouter} = require('./worldbuilding/organizations.js');
-const {racesRouter} = require('./worldbuilding/races.js');
-const {wildlifeRouter} = require('./worldbuilding/wildlife.js');
+const countriesRouter = require('./worldbuilding/countries.js');
+const floraRouter = require('./worldbuilding/flora.js');
+const magicRouter = require('./worldbuilding/magicsystems.js');
+const organizationsRouter = require('./worldbuilding/organizations.js');
+const racesRouter = require('./worldbuilding/races.js');
+const wildlifeRouter = require('./worldbuilding/wildlife.js');
 const worldsRouter = require('./worldbuilding/worlds.js');
 
 app.use('/api', characterRouter);
