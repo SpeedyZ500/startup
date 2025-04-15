@@ -139,14 +139,18 @@ export function CardsRenderer({cards, filters, sort}){
     useEffect(() => {
         async function fetchProfanitySetting() {
             try {
-                const res = await fetch('/api/user/prof', { method: 'GET', credentials:'include'} );
-                const data = await res.json(); // Ensure it's parsed correctly
-                setProfanity(data.profanityFilter);
+                const res = await fetch('/api/user/me', { method: 'GET', credentials: 'include' });
+                if (res.ok) {
+                    const data = await res.json(); // Ensure it's parsed correctly
+                    setProfanity(data.profanityFilter);
+                } else {
+                    setProfanity(true); // Default to true if response is not OK
+                }
             } catch {
-                setProfanity(true);
+                setProfanity(true); // Also default to true on errors
             }
         }
-
+    
         fetchProfanitySetting();
     }, []);
 

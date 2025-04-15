@@ -172,25 +172,9 @@ function filterAndSort(list, filter, sort){
 }
 
 export async function filterProfanity(json, profanityFilterEnabled){
-    if(typeof json === "string" && profanityFilterEnabled !== false){
-        return await applyProfFilter(json);
-    }
-    if(Array.isArray(json)){
-        return await Promise.all(json.map(async (item) => {
-            if(typeof item === 'string' || Array.isArray(item) || typeof item === 'object'){
-                return await filterProfanity(item, profanityFilterEnabled);
-            }
-            return item;
-        }))
-    }
-    else if(typeof json === 'object' && json){
-        const updatedJson = {};
-        if(json.label){
-            Object.assign(updatedJson, json);
-            if(json.label.toLowerCase() === "author"){
-                updatedJson.value = await replaceAuthor(json.value);
-            }
-            updatedJson.value = await filterProfanity(updatedJson.value, profanityFilterEnabled);
+    if(profanityFilterEnabled){
+        if(typeof json === "string"){
+            return await applyProfFilter(json);
         }
         else{
             for(const key in json){
@@ -206,19 +190,11 @@ export async function filterProfanity(json, profanityFilterEnabled){
                 }
             }
         }
-        return updatedJson;
     }
-    return json;
+    return json
 }
 
-export async function replaceAuthor(username) {
-    const res = await fetch(`/api/user/${encodeURIComponent(username)}`, {
-        method: `GET`,
-        headers: { 'Content-Type': 'application/json' }
-    });
-    const data = await res.json();
-    return data.displayname;
-}
+
 
 
 
