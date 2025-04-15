@@ -1,5 +1,5 @@
 const request = require('supertest');
-const {createID } = require('./service')
+const {createID} = require('./database')
 
 async function testGetSpecific(original, app){
     const result = await request(app).get(`/api${original.url}`);

@@ -1,7 +1,7 @@
 const express = require('express');
 const { verifyAuth } = require('./../service.js');
 const { createID } = require('./../database.js')
-const {modifyCharacter, getCharacter, charactersExists} = require(`./../characters.js`)
+const {modifyCharacter, getCharacter} = require(`./../characters.js`)
 const urlPrefix = "/worldbuilding/organizations/";
 
 const organizationsRouter = express.Router();
@@ -106,9 +106,7 @@ organizationsRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
     }else{
         const leadersArray = Array.isArray(leaders) ? leaders : leaders != null  ?  [leaders] : []
 
-        if(!charactersExists(leadersArray)){
-            return res.status(404).send({msg:"All Leaders must exist"});
-        }
+        
         const organization = await createOrganization(req.body, author, id, leadersArray);
         if(organization){
             return res.json(organization)
@@ -139,9 +137,6 @@ organizationsRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
         }
         if(username === organization.author){
             const leadersArray = Array.isArray(leaders) ? leaders : leaders != null  ?  [leaders] : []
-            if(!charactersExists(leadersArray)){
-                return res.status(404).send({msg:"All Leaders must exist"});
-            }
             const updateData = req.body;
             const updated = await updateOrganization(id, updateData)
             if(updated.msg){

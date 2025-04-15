@@ -1,213 +1,162 @@
 const express = require('express');
 const { verifyAuth, } = require('./../service.js');
-const { createID } = require("./../database.js")
+const { createID, 
+    getDisplayable, 
+    getCards, 
+    addOne, 
+    updateOne, 
+    getOptions, 
+    baseFields,
+    worldPreProcessing,
+    worldFullFields,
+    baseProjectionFields,
+    baseLookupFields,
+    baseEditProjectionFields,
+    optionsMap
+ } = require("./../database.js")
 const urlPrefix = "/worldbuilding/worlds/";
 
 const worldsRouter = express.Router();
 
-let worlds = [];
 
-async function getWorld(field, value) {
-    if (value) {
-        return worlds.find((world) => world[field] === value);
-    }
-    return null;
-}
 
-async function getWorlds(queries){
-    if(typeof queries === "object"){
-        let filterWorlds = worlds;
-        for(const [key, value] of Object.entries(queries)){
-            if(Array.isArray(value)){
-                filterWorlds = filterWorlds.filter(((world) => 
-                    Array.isArray(world[key]) ? world[key].some(wor => value.includes(wor)) : value.includes(world[key] )))
-            }
-            else{
-                filterWorlds = filterWorlds.filter(((world) => 
-                    Array.isArray(world[key]) ? world[key].includes(value) : value === world[key]))
-            }
-        }
-        return filterWorlds;
+
+worldsRouter.get(`${urlPrefix}continents/options`, async (req, res) => {
+    try {
+        const worlds = await getCards(urlPrefix, {
+            query:req.query, 
+            projectionFields:{
+                options:optionsMap("continents")
+            },
+            fields:["id"]
+        });
+        const flattened = worlds.flatMap(world =>
+            (world.options || []).map(opt => ({
+                ...opt,
+                qualifier: world.id  // make sure it's still your displayable id
+            }))
+        );
+        res.send(flattened);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({ error: 'Failed to fetch continent options' });
     }
-    else{
-        return worlds;
-    }
-}
+});
+
 
 worldsRouter.get(`${urlPrefix}options`, async (req, res) => {
-    const filteredWorlds = await getWorlds(req.query);
-    const options = filteredWorlds.map((world) => {
-        return {
-            value: world.id, 
-            label: world.name,
-        }
-    })
+    const options = await getOptions(urlPrefix, {query:req.query})
     res.send(options)
 })
 
 // 🚀 Router: Fetch worlds or individual world
-worldsRouter.get(`${urlPrefix}:id?`, async (req, res) => {
-    const { id } = req.params;
-    const { author } = req.query || "";
-    const queries = req.query || {};
+worldsRouter.get(`${urlPrefix}`, async (req, res) => {
+    const query = req.query || {};
+    const worldsToSend = await getCards(urlPrefix, {
+        query,
+        lookupFields:baseLookupFields,
+        fields:baseFields,
+        projectionFields:baseProjectionFields
+    })
+    res.send(worldsToSend)
+})
 
-    if (!id || id === "undefined" || id.trim() === "") {
-        let worldsToSend = await getWorlds(queries);
-        return res.send(worldsToSend);
-    } else {
-        const world = await getWorld("id", id);
-        if (world) {
-            if (author) {
-                const isAuthor = author === world.author;
-                return res.send({ isAuthor });
-            } else {
-                return res.send(world);
-            }
-        } else {
-            return res.status(404).json({ error: "World not found" });
+worldsRouter.get(`${urlPrefix}:id/bio`, async (req, res) => {
+    const { id } = req.params;
+    try{
+        const world = await getDisplayable(urlPrefix, id, {
+            lookupFields:baseLookupFields,
+            fields:worldFullFields,
+            projectionFields:baseProjectionFields
+        });
+        if(world){
+            res.send(world);
+        }
+        else{
+            res.status(404).json({ error: "World not found" });
         }
     }
+    catch{
+        res.status(500).send({msg:"server error"})
+    }
+    
 });
+worldsRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
+    const author = req.usid
+    const {id} = req.params
+    try{
+        const world = await getEditable(urlPrefix, author, id, {
+                lookupFields:baseLookupFields,
+                fields:worldFullFields,
+                projectionFields:baseEditProjectionFields
+            }
+        );
+        if(world){
+            return res.send(world);
+        }
+        else{
+            return res.status(404).send({msg:"world not found"})
+        }
+    }
+    catch(e){
+        res.status(e.status || 500).send({msg:e.message})
+    }
+})
 
 
 
-// 🚀 Router: Create a new world
-worldsRouter.post(`${urlPrefix}`, verifyAuth, async (req, res) => {
-    const { name, description, sections } = req.body;
+
+worldsRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
+    const {name, description} = req.body;
     const author = req.usid;
-    if(!name || !description || !sections){
+    if(!name || !author || !description){
         return res.status(409).send({msg:"Required fields not filled out"});
     }
-    const id = createID(name, author);
-    // Check if the world already exists
-    if (await getWorld("id", id)) {
-        return res.status(409).send({ msg: `A world entry by you with the name "${name}" already exists.` });
+
+    const id = createID(req.body.name, author);
+    const worldData = req.body;
+    worldData.id = id;
+    worldData.url = `${urlPrefix}${id}`
+    worldData.author = author;
+    try{
+        const world = await addOne(urlPrefix, worldData, {preProcessing:worldPreProcessing});
+        if(world){
+            return res.send({id:world.id, name:world.name, url:world.url})
+        }
+        else{
+            return res.status(500).send({msg:"Failed to create World"})
+
+        }
     }
-    
-
-    // Create new world using createWorld function
-    const newWorld = await createWorld(req.body, id, author);
-
-    res.send(newWorld); // Respond with created world
+    catch(e){
+        return res.status(e.status || 500).send({msg:e.message})
+    }
 });
 
-// 🚀 Router: Modify an existing world (author check)
+
+
 worldsRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
-    
     const { id } = req.params;
-    const { body, usid } = req;
-    if(!body){
+    const userID  = req.usid;
+    const worldData = req.body;
+    if(!worldData){
         return res.status(400).send({ msg: "Missing data to update." });
     }
-    else if( !body.id || body.id !== id ){
+    else if(!worldData.id || worldData.id !== id ){
         return res.status(400).send({ msg: "ID mismatch. Cannot modify a different World." });
     }
-    
-    const world = await getWorld("id", id);
-    if (!world) {
-        return res.status(404).json({ error: "World not found" });
+    try{
+        const world = await updateOne(urlPrefix, worldData, userID, {preProcessing:worldPreProcessing});
+        if(world){
+            return res.send({id:world.id, name:world.name, url:world.url})
+        }
+        else{
+            return res.status(500).send({msg:"Failed to update World"})
+        }
     }
-
-    // Ensure the author is the original author
-    if (world.author !== usid || world.author !== body.author) {
-        return res.status(401).json({ error: "You do not have permission to update this world/field." });
+    catch(e){
+        return res.status(e.status || 500).send({msg:e.message})
     }
-
-    // Update world details
-    const update = await updateWorld(body);
-    if(update.msg){
-        return res.status(500).send(update)
-    }
-    res.send(update);
 });
 
-worldsRouter.get(`${urlPrefix}:id/continents`, async (req, res) => {
-    const world = await getWorld('id', req.params.id);
-    if(world){
-        return res.send( world.continents);
-    }
-    else{
-        return res.status(404).send({msg:"World not found"})
-    }
-})
-
-worldsRouter.get(`${urlPrefix}continents/options`, async (req, res) => {
-    const world = await getWorld('id', req.query.filter.id);
-    if(world){
-        options = world.continents.map((value) => {
-            return {
-                value: value, 
-                label: value,
-                qualifier: world.id
-            }
-        });
-        return res.send(options);
-    }
-    else{
-        return res.status(404).send({msg:"World not found"})
-    }
-})
-
-
-// ✅ Create a new world
-async function createWorld(worldData, id, author) {
-    const {name, description, continents, custom, sections} = worldData;
-    const url = urlPrefix + id;
-    const created = new Date().toJSON();
-    const formattedContinents = Array.isArray(continents) ? continents : [continents];
-
-    const getterSections = createWorldGetterSections(id, formattedContinents);
-
-    // Format the world for the list
-    const world = {
-        id: id,
-        name,
-        author,
-        url,
-        continents: formattedContinents,
-        custom,
-        description,
-        sections,
-        getterSections,
-        created,
-        modified: created
-    };
-
-    // Store world in the world list
-    worlds.push(world);
-    return world;
-}
-
-function createWorldGetterSections(id, continents){
-    const getterSections = continents.map(continent => ({
-        label: `Countries in ${continent}`,
-        query: `/worldbuilding/countries?filter[worlds]=${id}&filter[continents]=${encodeURIComponent(continent)}`
-    }));
-
-    
-    return getterSections;
-}
-
-
-async function updateWorld(updateData){
-    const {id, continents} = updateData
-    const world = getWorld('id', id);
-    if(!world){
-        return {msg:"Error updating world"}
-    }
-    const formattedContinents = Array.isArray(continents) ? continents : [continents];
-
-    if(JSON.stringify(formattedContinents) != JSON.stringify(world.continents)){
-        updateData.getterSections = createWorldGetterSections(id, formattedContinents);
-    }
-    updateData.modified = new Date().toJSON();
-    const index = worlds.findIndex(world => world.id === id);
-    if(index !== -1){
-        worlds[index] = updateData;
-        return updateData;
-    }
-    else{
-        return {msg:"Error updating world"} 
-    }
-}
 module.exports = worldsRouter;

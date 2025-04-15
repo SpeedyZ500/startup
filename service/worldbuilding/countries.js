@@ -1,7 +1,7 @@
 const express = require('express');
 const { verifyAuth } = require('./../service.js');
 const { createID } = require('./../database.js')
-const { modifyCharacter, getCharacter, charactersExists } = require('./../characters'); // Import modifyCharacters
+const { modifyCharacter, getCharacter } = require('./../characters'); // Import modifyCharacters
 const urlPrefix = "/worldbuilding/countries/";
 
 const countriesRouter = express.Router();
@@ -119,10 +119,7 @@ countriesRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
         return res.status(409).send({msg:"A Country by you and by that name already exists"});
     }else{
         const leadersArray = Array.isArray(leaders) ? leaders : leaders != null  ?  [leaders] : []
-        if(!charactersExists(leadersArray)){
-            return res.status(404).send({msg:"All Leaders must exist"});
-
-        }
+        
         const country = await createCountry(req.body, author, id);
         if(country){
             return res.json(country)
@@ -151,10 +148,7 @@ countriesRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
         }
         if(username === country.author){
             const leadersArray = Array.isArray(leaders) ? leaders : leaders != null  ?  [leaders] : []
-            if(!charactersExists(leadersArray)){
-                return res.status(404).send({msg:"All Leaders must exist"});
-
-            }
+            
             const updateData = req.body;
             const updated = await updateCountry(id, updateData)
             if(updated.msg){

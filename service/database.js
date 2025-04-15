@@ -248,8 +248,9 @@ async function processFilters(rawFilters){
 }
 
 async function processFamilyToIDs(family){
+    const familyArray = ensureArray(family)
     const newFamily = []
-    for(const relationship of family){
+    for(const relationship of familyArray){
         const value = await convertIDs("characters", relationship.value);
         newFamily.push({label:relationship.label, value})
     }
@@ -257,8 +258,10 @@ async function processFamilyToIDs(family){
 }
 
 async function processFamilyToDisplayable(family){
+    const familyArray = ensureArray(family)
+
     const newFamily = []
-    for(const relationship of family){
+    for(const relationship of familyArray){
         const label = sanitizeText(relationship.label)
         const value = await convertToDisplayable("characters", relationship.value);
         newFamily.push({label, value})
@@ -269,18 +272,13 @@ async function processFamilyToDisplayable(family){
 const textEdits = ["text", "textarea", "text-creatable"]
 
 async function processCustomToIDs(custom){
+    const customArray = ensureArray(custom)
     const newCustom = []
-    for(const field of custom) {
+    for(const field of customArray) {
         const edit = field.edit;
         const label = sanitizeText(field.label)
         if(textEdits.includes(edit)){
-            let value = field.value
-            if(Array.isArray(value)){
-                value = value.map((item) => sanitizeText(item))
-            }
-            else{
-                value = sanitizeText(value)
-            }
+            const value =  sanitizeText(field.value)
             newCustom.push({label, value, edit})
         }
         else if (edit === "super-select"){
@@ -303,9 +301,10 @@ async function processCustomToIDs(custom){
 }
 
 async function processCustomToDisplayable(custom) {
+    const customArray = ensureArray(custom)
     const newCustom = [];
 
-    for (const field of custom) {
+    for (const field of customArray) {
         const edit = field.edit;
 
         if (textEdits.includes(edit)) {
@@ -338,7 +337,7 @@ function basicProject(matchField, projectionFields) {
     ]
   }
   function ensureArray(input) {
-    return Array.isArray(input) ? input : [input];
+    return input ? Array.isArray(input) ? input : [input] : [];
   }
   function unArray(original, result) {
     return Array.isArray(original) ? result : result[0];
@@ -396,8 +395,9 @@ async function convertToEditable(source, raw) {
 }
 
 async function processFamilyToEditable(family){
+    const familyArray = ensureArray(family)
     const newFamily = []
-    for(const relationship of family){
+    for(const relationship of familyArray){
         const value = await convertToEditable("characters", relationship.value);
         newFamily.push({label:relationship.label, value})
     }
@@ -405,9 +405,10 @@ async function processFamilyToEditable(family){
 }
 
 async function processCustomToEditable(custom){
+    const customArray = ensrueArray(custom)
     const newCustom = []
     
-    for(const field of custom) {
+    for(const field of customArray) {
         const { label, value, edit, source } = field;
         if(textEdits.includes(edit)){
             newCustom.push(field)
@@ -433,23 +434,11 @@ async function processCustomToEditable(custom){
 
 
 async function convertIDs(collectionKey, input){
-    if(collectionKey === "custom"){
-        return processCustomToIDs(input)
-    }
-    if(collectionKey === "family"){
-        return processFamilyToIDs(input)
-    }
-    const isArray = Array.isArray(input);
-    const ids = isArray ? input : [input];
-   
+    const ids = ensureArray(input)
     const collection = getCollection(collectionKey)
-    if (ids.length === 0 || !collection ||
-        excludeCollections.includes(collection)  ){
-            return collectionKey !== "password" ? isArray ? input.map((item) => sanitizeText(item))
-            : sanitizeText(input) : input
+    if (ids.length === 0 || !collection || excludeCollections.includes(collection)  ){
+            return sanitizeText(input)
     } 
-    
-
     let found = []
     if(typeCollections.includes(collection)){
         found = await addTypesBatch(collection, ids);
@@ -469,7 +458,7 @@ async function convertIDs(collectionKey, input){
     if (found.length !== ids.length) {
         throw createError(`Missing one or more ${collectionKey}`, 404);
     }
-    return isArray ? found : found[0];
+    return unArray(input, found)
 }
 function createError(message, statusCode = 500) {
     const err = new Error(message);
@@ -669,9 +658,19 @@ async function addUser(user){
 }
 
 async function addWritingPrompt(prompt){
+    prompt.description = sanitizeText(unArray("whatever", prompt.description))
+    const existingPrompt = await writingpromptsCollection.findOne({ description: prompt.description });
+    if(existingPrompt){
+        throw createError("This prompt already exists", 409)
+    }
     return await writingpromptsCollection.insertOne(prompt)
 }
 async function addWritingAdvice(advice){
+    advice.description = sanitizeText(unArray("whatever", advice.description))
+    const existingAdvice = await writingadviceCollection.findOne({ description: advice.description });
+    if(existingAdvice){
+        throw createError("This advice already exists", 409)
+    }
     return await writingadviceCollection.insertOne(advice)
 }
 
@@ -843,25 +842,34 @@ async function addOne(collectionKey, data, {preProcessing = {}, postProcessing =
     else if(existing){
         throw createError("This name already exists in this collecton for this user", 409)
     }
-
-    await Promise.all(
-        Object.keys(data).map(async (key) => {
-            if(key !== "author"){
-                data[key] = await convertIDs(key, data[key]);
-            }
-        })
-    );
+    const preProcessedData = preprocessData(data, preProcessing)
     const created = new Date().toJSON()
-    data.created = created;
-    data.modified = created;
-    for (const key in preProcessing) {
-        data[key] = await preProcessing[key](data[key], data);
-    }
-    const result = await collection.insertOne(data)
+    preProcessedData.created = created;
+    preProcessedData.modified = created;
+    
+    const result = await collection.insertOne(preProcessedData)
     await Promise.all(
         Object.entries(postProcessing).map(([key, fn]) => fn(result[key], result, collectionKey))
     );
     return result
+}
+async function preprocessData(inputData, preProcessing) {
+    const passThroughFields = ['id', 'url', 'author']; // These fields will just be passed through
+
+    let processedData = {};
+
+    for (const key of passThroughFields) {
+        if (inputData.hasOwnProperty(key)) {
+            processedData[key] = inputData[key];
+        }
+    }
+    if (processedData.author && typeof processedData.author === 'string') {
+        processedData.author = convertIDs("author",processedData.author);
+    }
+    for (const key in preProcessing) {
+        processedData[key] = await preProcessing[key](inputData[key], inputData);
+    }
+    return processedData;
 }
 
 async function updateOne(collectionKey, data, author, {preProcessing = {}, postProcessing = {}}){
@@ -875,14 +883,9 @@ async function updateOne(collectionKey, data, author, {preProcessing = {}, postP
     if(!original){
         throw createError("Data does not exist or you are not the Author", 401);
     }
-    
+    const preProcessedData = preprocessData(data, preProcessing)
     data.modified = new Date().toJSON();
-
-    for (const key in preProcessing) {
-        data[key] = await preProcessing[key](data[key], data);
-    }
-   
-    const result = await collection.updateOne({_id: original._id, author:author}, {$set:data})
+    const result = await collection.updateOne({_id: original._id, author:author}, {$set:preProcessedData})
     await Promise.all(
         Object.entries(postProcessing).map(([key, fn]) => fn(result[key], result, collectionKey))
     );
@@ -892,9 +895,175 @@ async function updateOne(collectionKey, data, author, {preProcessing = {}, postP
 
 
 
+
+
+const restrictedKeys = ["custom", "familiy", "abilities", "sections","continents", "towns", "genres", "contentWarnings", "races"]
+
+
+
+const modificationRestrictedCollections = [
+    worldsCollection,
+    writingadviceCollection,
+    writingpromptsCollection,
+    storiesCollection,
+    chapterCollection,
+    edgeCollection,
+    userCollection
+]
+
+async function  modifyMany(collectionKey, ids, list, data, method){
+    if (!["add", "remove"].includes(method)) {
+        throw createError("Unsupported method. Only 'add' and 'remove' are allowed.", 400);
+    }
+    if (!Array.isArray(ids) || !data ||  typeof list !== "string") {
+        throw createError("Invalid Input", 400)
+    }
+    const collection = db.collection(collectionKey)
+    if(modificationRestrictedCollections.includes(collection)){
+        throw createError("This collection cannot be modified in this manner", 400);
+    }
+    if(restrictedKeys.includes(list)){
+        throw createError(`Field ${list} cannot be modified in this manner, it is an author managed list`, 400);
+    }
+    const values = convertIDs(collectionKey, ids);
+    if (!values.length) {
+        throw createError("No valid IDs provided for update", 400);
+    }
+    const sample = await collection.findOne({ _id: values[0] });
+    if (!sample || !Array.isArray(sample[list])) {
+        throw createError(`${list} is not a list on this type`, 400);
+    }
+    let finalList = list
+    const match = list.match(/^other(.+)/);
+    if (!match) {
+        let otherField = `other${list[0].toUpperCase()}${list.slice(1)}`;
+        if (sample[otherField]) {
+            finalList = otherField
+        }
+        else{
+            otherField = `altForms`;
+            if (sample[otherField]) {
+                finalList = otherField
+            }
+        }
+        
+    }
+    const base = finalList === "altForms"
+        ? "races"
+        : finalList.replace(/^other/, "").toLowerCase();
+        
+    const items = ensureArray(convertIDs(base, data));
+    const query = { _id: { $in: values } };
+    const stuffToOperate = {$each: items}
+    const updateOp = method === "add" ? "$addToSet" : "$pull";
+    const payloadPart = {[finalList]:  stuffToOperate}
+    if(base !== finalList){
+        payloadPart[base] = stuffToOperate
+    }
+    if(finalList === "altForms"){
+        query["race"] = {$nin: items}
+    }
+    else if(finalList.startsWith("other") ){
+        const homeKey = `home${base[0].toUpperCase()}${base.slice(1)}`;
+        const originKey = `origin${base[0].toUpperCase()}${base.slice(1)}`;
+        query[homeKey] = { $nin: items };
+        query[originKey] = { $nin: items };
+    }
+    
+    const updatePayload = {
+        [updateOp]: payloadPart,
+        $set: {modified: new Date().toJSON()}
+    }
+    await collection.updateMany(query, updatePayload)
+    return
+}
+
+
+function sanitizeText(text){
+    if(Array.isArray(text)){
+        return text.map((item) => sanitizeText(item))
+    }
+    else if(typeof text === 'object'){
+        const sanitizedObject = {};
+        for (const key in text) {
+            if (text.hasOwnProperty(key)) {
+                sanitizedObject[key] = sanitizeText(text[key]);
+            }
+        }
+        return sanitizedObject;
+    }
+    return String(text)
+    .replace(/<[^>]*>?/gm, '') // remove HTML tags
+    .trim();
+}
+
+
+
+
+
+
+
+
+async function createID(name, author){
+    const username = await getUserById(author).username
+    return sanitizeId(`${name}_${username}`)
+}
+
+
+
+
+
+
+
+function createMap(field, mode = 'display') {
+    return {
+        $map: {
+            input: `$${field}Details`,
+            as: "item",
+            in: mode === 'edit'
+                ? "$$item.id"
+                : {
+                    value: "$$item.name",
+                    url: "$$item.url"
+                }
+        }
+    }
+}
+
+function optionsMap(field){
+    return{
+        $map: {
+            input: `$${field}`,
+            as: "item",
+            in:{
+                value:"$$item",
+                label:"$$item",
+                qualifier:"$id"
+            }
+        }
+    }
+}
+
+function createProjection(field, type="displayable"){
+    if(type == 'edit'){
+        return `$${field}Details.id`
+    }
+    else{
+        return {
+            value:`$${field}Details.name`,
+            url:`$${field}Details.url`
+        }
+    }
+}
+
 const createCombiner = (primaryKey, secondaryKey) => (full) => [full[primaryKey], ...(full[secondaryKey] || [])]
 const combinedWorlds = createCombiner(originWorld, otherWorlds)
 const combinedBiomes = createCombiner(originWorld, otherWorlds);
+const preProcessText = (value) => sanitizeText(unArray("whatever", value))
+const preProcessTextArray = (value) => sanitizeText(ensureArray(value))
+const processSingleID = async (value, collectionKey) => await convertIDs(collectionKey, unArray("whatever", value))
+const processIDArray = async (value, collectionKey) => await convertIDs(collectionKey, ensureArray(value))
+
 
 const addLeaders = async (val, full, key) => {
     const modified = new Date().toJSON();
@@ -1021,101 +1190,123 @@ const connectChapters = async (full) => {
     }
 }
 
-const restrictedKeys = ["custom", "familiy", "abilities", "sections", "towns", "genres", "contentWarnings", "races"]
-
-
-
-const modificationRestrictedCollections = [
-    worldsCollection,
-    writingadviceCollection,
-    writingpromptsCollection,
-    storiesCollection,
-    chapterCollection,
-    edgeCollection,
-    userCollection
+const basePreProcessing = {
+    name:(value, _full) => preProcessText(value),
+    description:(value, _full) => preProcessText(value),
+    sections:(value, _full) => preProcessTextArray(value),
+    custom:(value, _full) => processCustomToIDs(value)
+}
+const baseFields = [
+    "id",
+    "name",
+    "url",
+    "description",
 ]
 
-async function  modifyMany(collectionKey, ids, list, data, method){
-    if (!Array.isArray(ids) || !data ||  typeof list !== "string") {
-        throw createError("Invalid Input", 400)
-    }
-    const collection = db.collection(collectionKey)
-    if(modificationRestrictedCollections.includes(collection)){
-        throw createError("This collection cannot be modified in this manner", 400);
-    }
-    if(restrictedKeys.includes(list)){
-        throw createError(`Field ${list} cannot be modified in this manner, it is an author managed list`, 400);
-    }
-    const values = convertIDs(collectionKey, ids);
-    const sample = await collection.findOne({ _id: values[0] });
-    if (!sample || !Array.isArray(sample[list])) {
-        throw createError(`${list} is not a list on this type`, 400);
-    }
-    let finalList = list
-    const match = list.match(/^other(.+)/);
-    if (!match) {
-        const otherField = `other${list[0].toUpperCase()}${list.slice(1)}`;
-        if (sample[otherField]) {
-            finalList = otherField
-        }
-    }
-    const base = finalList === "altForms"
-        ? "races"
-        : finalList.replace(/^other/, "").toLowerCase();
-        
-    const items = ensureArray(convertIDs(base, data));
-    const query = { _id: { $in: values } };
-    const stuffToOperate = {$each: items}
-    const updateOp = method === "add" ? "$addToSet" : "$pull";
-    const payloadPart = {[finalList]:  stuffToOperate}
-    if(base !== finalList){
-        payloadPart[base] = stuffToOperate
-    }
-    if(finalList === "altForms"){
-        query["race"] = {$nin: items}
-    }
-    else if(finalList.startsWith("other")){
-        const homeKey = `home${base[0].toUpperCase()}${base.slice(1)}`;
-        const originKey = `origin${base[0].toUpperCase()}${base.slice(1)}`;
-        query[homeKey] = { $nin: items };
-        query[originKey] = { $nin: items };
-    }
-    const updatePayload = {
-        [updateOp]: payloadPart,
-        $set: {modified: new Date().toJSON()}
-    }
-    await collection.updateMany(query, updatePayload)
-    return
+const baseFullFields = [
+    ...baseFields,
+    "sections",
+    "custom",
+    "created",
+    "modified"
+]
+
+const baseLookupFields = [
+    "author"
+]
+const baseProjectionFields = {
+    author:'$authorDetails.displayname',
+}
+const baseEditProjectionFields = {
+    author:'$authorDetails.username',
 }
 
+const worldPreProcessing = {
+    ...basePreProcessing,
+    continents:(value, _full) => preProcessTextArray(value),
+}
+const worldFullFields= [
+    ...baseFullFields,
+    "continents"
+]
 
-function sanitizeText(text){
-    return String(text)
-    .replace(/<[^>]*>?/gm, '') // remove HTML tags
-    .trim();
+const leadersPostProcessing = {
+    leaders: async (value, full, collectionKey) => addLeaders(value, full, collectionKey)
 }
 
-
-
-
-
-
-
-
-async function createID(name, author){
-    const username = await getUserById(author).username
-    return sanitizeId(`${name}_${username}`)
+const chaptersPostProcessing = {
+    storyID: (_value, full, _collectionKey) => expandStory(full),
+    connect: (_value, full, _collectionKey) => connectChapters(full)
+}
+const storyPreProcessing = {
+    title:(value, _full) => preProcessText(value),
+    genres:async (value, _full) => processIDArray(value, "genres"),
+    contentWarnings:async (value, _full) => processIDArray(value, "contentwarnings"),
+    body:(value, _full) => preProcessText(value),
+}
+const chaptersPreProcessing = {
+    ...storyPreProcessing,
+    storyID: async (value, _full) => processSingleID(value, "stories"),
+    samePrevious: async(value, _full) => processIDArray(value, "chapters"),
+    anyPrevious: async(value, _full) => processIDArray(value, "chapters"),
+    sameNext: async(value, _full) => processIDArray(value, "chapters"),
+    anyNext: async(value, _full) => processIDArray(value, "chapters"),
+    previous: (_value, full) => combinedPrevious(full),
+    next: (_value, full) => combinedNext(full)
+}
+const storyFields = [
+    "id",
+    "title",
+    "genres",
+    "contentWarnings",
+    "body"
+]
+const chapterLookupFields=[
+    ...baseLookupFields,
+    "storyID",
+    "previous",
+    "next",
+]
+const chapterProjectFields = {
+    ...baseProjectionFields,
+    storyID:createProjection("storyID"),
+    previous:createMap("previous"),
+    next:createMap("next"),
+}
+const chapterEditLookupFields=[
+    ...baseLookupFields,
+    "samePrevious",
+    "sameNext",
+    "anyPrevious",
+    "anyNext",
+]
+const chapterEditProjectFields = {
+    ...baseEditProjectionFields,
+    storyID:createProjection("storyID","edit"),
+    samePrevious:createMap("samePrevious", "edit"),
+    anyPrevious:createMap("anyPrevious", "edit"),
+    sameNext:createMap("sameNext", "edit"),
+    anyNext:createMap("anyNext", "edit")
 }
 
+const biomeLookupFields = [
+    ...baseLookupFields,
+    "worlds"
+]
 
-
-
-
-
-
-
-
-
+const biomeProjectionFields = {
+    ...baseProjectionFields,
+    worlds:createMap("worlds")
+}
+ 
+const biomeEditProjectionFields = {
+    ...baseProjectionFields,
+    worlds:createMap("worlds", "edit")
+}
+const biomePreProcessing = {
+    ...basePreProcessing,
+    worlds: (value, _full) => processIDArray(value, "worlds")
+}
 
 
 
@@ -1146,5 +1337,29 @@ module.exports = {
     addWritingAdvice,
     addWritingPrompt,
     getGraph,
-    listUserDisplay
+    listUserDisplay,
+    createMap,
+    createProjection,
+    ensureArray,
+    baseFields,
+    worldPreProcessing,
+    worldFullFields,
+    baseProjectionFields,
+    baseLookupFields,
+    storyPreProcessing,
+    chaptersPreProcessing,
+    chaptersPostProcessing,
+    leadersPostProcessing,
+    storyFields,
+    baseEditProjectionFields,
+    chapterLookupFields,
+    chapterProjectFields,
+    chapterEditLookupFields,
+    chapterEditProjectFields,
+    biomeLookupFields,
+    biomeProjectionFields,
+    biomeEditProjectionFields,
+    biomePreProcessing,
+    optionsMap
+    
 }

@@ -1,75 +1,88 @@
 const express = require('express');
 const { verifyAuth } = require('./../service.js');
-const { createID } = require('./../database.js')
-const {modifyFlora} = require(`./flora.js`)
-const {modifyWildlife} = require(`./wildlife.js`)
+const {
+    createID, 
+    getCards, 
+    getDisplayable, 
+    getEditable, 
+    getOptions,
+    biomeLookupFields,
+    biomeProjectionFields, 
+    biomeEditProjectionFields,
+    biomePreProcessing, 
+    baseFields,
+    baseLookupFields,
+    baseProjectionFields,
+    baseFullFields
+} = require('./../database.js')
 const urlPrefix = "/worldbuilding/biomes/";
 
 const biomesRouter = express.Router();
 
 // Temporary store for biomes
-let biomes = [];
 
-async function getBiome(field, value) {
-    if (value) {
-        return biomes.find((biome) => biome[field] === value);
-    }
-    return null;
-}
 
-async function getBiomes(queries){
-    if(typeof queries === "object"){
-        let filterBiomes = biomes;
-        for(const [key, value] of Object.entries(queries)){
-            if(Array.isArray(value)){
-                filterBiomes = filterBiomes.filter(((biome) => 
-                    Array.isArray(biome[key]) ? biome[key].some(bio => value.includes(bio)) : value.includes(biome[key] )))
-            }
-            else{
-                filterBiomes = filterBiomes.filter(((biome) => 
-                    Array.isArray(biome[key]) ? biome[key].includes(value) : value === biome[key]))
-            }
-        }
-        return filterBiomes;
-    }
-    else{
-        return biomes;
-    }
-}
+
 
 biomesRouter.get(`${urlPrefix}options`, async (req, res) => {
-    const filteredBiomes = await getBiomes(req.query);
-    const options = filteredBiomes.map((biome) => {
-        return {
-            value: biome.id, 
-            label: biome.name,
-        }
-    })
+    const options = await getOptions(urlPrefix, {query:req.query})
     res.send(options)
 })
 
-// 🚀 Router: Fetch biomes or individual biome
-biomesRouter.get(`${urlPrefix}:id?`, async (req, res) => {
-    const { id } = req.params;
-    const { author } = req.query || "";
-    const queries = req.query || {};
+biomesRouter.get(urlPrefix, async (req, res) =>{
+    const query = req.query || {};
+    const biomesToSend = await getCards(urlPrefix,{
+        query,
+        lookupFields:baseLookupFields,
+        fields:baseFields,
+        projectionFields:baseProjectionFields
+    })
+    res.send(biomesToSend)
+})
 
-    if (!id || id === "undefined" || id.trim() === "") {
-        let biomesToSend = await getBiomes(queries);
-        return res.send(biomesToSend);
-    } else {
-        const biome = await getBiome("id", id);
-        if (biome) {
-            if (author) {
-                const isAuthor = author === biome.author;
-                return res.send({ isAuthor });
-            } else {
-                return res.send(biome);
-            }
-        } else {
-            return res.status(404).json({ error: "Biome not found" });
+biomesRouter.get(`${urlPrefix}:id/bio`, async (req, res) => {
+    const { id } = req.params;
+    try{
+        const character = await getDisplayable(urlPrefix, id, {
+            lookupFields:biomeLookupFields,
+            fields:baseFullFields,
+            projectionFields:biomeProjectionFields
+        });
+        if(character){
+            res.send(character);
+        }
+        else{
+            res.status(404).json({ error: "Character not found" });
         }
     }
+    catch{
+        res.status(500).send({msg:"server error"})
+    }
+    
+});
+
+// 🚀 Router: Fetch biomes or individual biome
+biomesRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
+    const { id } = req.params;
+    const { author } = req.usid 
+    try{
+        const world = await getEditable(urlPrefix, author, id, {
+                lookupFields:biomeLookupFields,
+                fields:baseFields,
+                projectionFields:biomeEditProjectionFields
+            }
+        );
+        if(world){
+            return res.send(world);
+        }
+        else{
+            return res.status(404).send({msg:"Biome not found"})
+        }
+    }
+    catch(e){
+        res.status(e.status || 500).send({msg:e.message})
+    }
+    
 });
 
 
@@ -82,21 +95,26 @@ biomesRouter.post(`${urlPrefix}`, verifyAuth, async (req, res) => {
         return res.status(409).send({msg:"Required fields not filled out"});
     }
     const id = createID(name, author);
-    // Check if the biome already exists
-    if (await getBiome("id", id)) {
-        return res.status(409).send({ msg: `A biome entry by you with the name "${name}" already exists.` });
+    const biomeData = req.body;
+    biomeData.id = id;
+    biomeData.url = `${urlPrefix}${id}`
+    biomeData.author = author;
+    try{
+        const biome = await addOne(urlPrefix, biomeData, {preProcessing:biomePreProcessing});
+        if(biome){
+            return res.send({id:biome.id, name:biome.name, url:biome.url})
+        }
+        else{
+            return res.status(500).send({msg:"Failed to create Biome"})
+        }
     }
-    
-
-    // Create new biome using createBiome function
-    const newBiome = await createBiome(req.body, id, author);
-
-    res.send(newBiome); // Respond with created biome
+    catch(e){
+        return res.status(e.status || 500).send({msg:e.message})
+    }
 });
 
 // 🚀 Router: Modify an existing biome (author check)
 biomesRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
-    
     const { id } = req.params;
     const { body, usid } = req;
     if(!body){
@@ -105,127 +123,34 @@ biomesRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     else if( !body.id || body.id !== id ){
         return res.status(400).send({ msg: "ID mismatch. Cannot modify a different Biome." });
     }
-    
-    const biome = await getBiome("id", id);
-    if (!biome) {
-        return res.status(404).json({ error: "Biome not found" });
+    try{
+        const biome = await updateOne(urlPrefix, body, usid, {preProcessing:biomePreProcessing});
+        if(biome){
+            return res.send({id:biome.id, name:biome.name, url:biome.url})
+        }
+        else{
+            return res.status(500).send({msg:"Failed to update Biome"})
+        }
     }
-
-    // Ensure the author is the original author
-    if (biome.author !== usid || biome.author !== body.author) {
-        return res.status(401).json({ error: "You do not have permission to update this biome/field." });
+    catch(e){
+        return res.status(e.status || 500).send({msg:e.message})
     }
-
-    // Update biome details
-    const update = await updateBiome(body);
-    if(update.msg){
-        return res.status(500).send(update)
-    }
-    res.send(update);
 });
 
 
-
-
-// ✅ Create a new biome
-async function createBiome(biomeData, id, author) {
-    const {name, description, worlds, custom, sections} = biomeData;
-    const url = urlPrefix + id;
-    const created = new Date().toJSON();
-
-
-    // Format the biome for the list
-    const biome = {
-        id: id,
-        name,
-        author,
-        url,
-        worlds: Array.isArray(worlds) ? worlds : worlds ? [worlds] : [],
-        custom,
-        description,
-        sections,
-        created,
-        modified: created
-    };
-
-    // Store biome in the biome list
-    biomes.push(biome);
-    return biome;
-}
-
-
-
-
-async function updateBiome(updateData){
-    const {id } = updateData
-    const biome = await getBiome('id', id);
-    if(!biome){
-        return {msg:"Error updating biome"}
-    }
-
-    
-    updateData.modified = new Date().toJSON();
-    const index = biomes.findIndex(biome => biome.id === id);
-    if(index !== -1){
-        biomes[index] = updateData;
-        return updateData;
-    }
-    else{
-        return {msg:"Error updating biome"} 
-    }
-}
-
-async function modifyBiome(biome, list, data, method) {
-    const restrictedLists = ["sections", "custom"];
-    if(restrictedLists.includes(list) ){
-        return {error: `can't modify ${list} directly use other or alt version` };
-    }
-    if (!biome[list] || !Array.isArray(biome[list])) {
-        return { error: `List '${list}' not found, or not a list.` };
-    }
-    const biomeData = biome[list];
-    
-    
-    // Add or update references
-    if (method === 'add' || method === 'put') {
-        const existsInBiome = biomeData.includes(data);
-        if (!existsInBiome) {
-            biomeData.push(data);  // Add to country object
-        }
-    } 
-    // Delete references
-    else if (method === 'delete') {
-        const biomeIndex = biomeData.findIndex(item => item === data);
-        if (biomeIndex !== -1) {
-            if(biomeIndex === biomeData.length - 1){
-                biomeData.pop()
-            }
-            else{
-                biomeData.splice(biomeIndex, 1);
-            }
-        }
-    }
-    biome[list] = biomeData;
-    return await updateBiome(biome);
-}
 
 // 🚀 Router: Modify a country field (add/put/delete references)
-biomesRouter.patch(`${urlPrefix}:id/:list`, verifyAuth, async (req, res) => {
-    const { id, list } = req.params;
-    const { method, data } = req.body;
-    const biome = await getBiome("id", id)
-    if(!biome){
-        return res.status(404).send({msg:"Error Biome not found"});
+biomesRouter.patch(`${urlPrefix}:list/:method`, verifyAuth, async (req, res) => {
+    const { list, method } = req.params;
+    const { biomes, id } = req.body;
+    try{
+        await modifyMany(urlPrefix, biomes, list, id, method)
+        return res.send({msg:"success"})
     }
-
-    const result = await modifyBiome(biome, list, data, method);
-
-    if (result.error) {
-        return res.status(400).send(result);
-    } else {
-        return res.send(result);
+    catch(e){
+        res.status(e.status || 500).send({msg:e.message})
     }
 });
 
 
-module.exports = {biomesRouter,modifyBiome};
+module.exports = biomesRouter;

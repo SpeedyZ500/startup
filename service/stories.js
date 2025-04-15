@@ -1,7 +1,27 @@
 const express = require('express');
 const { verifyAuth} = require('./service.js');  
 
-const {createID, getGraph, getCards, getDisplayable, getEditable, connectChapters, expandStory, getOptions} = require('./database.js')
+const {createID, 
+    getGraph, 
+    getCards, 
+    getDisplayable, 
+    getEditable, 
+    getOptions, 
+    baseLookupFields, 
+    baseProjectionFields, 
+    storyFields, 
+    baseEditProjectionFields,
+    chapterLookupFields,
+    chapterProjectFields,
+    chapterEditLookupFields,
+    chapterEditProjectFields,
+    storyPreProcessing,
+    addOne,
+    updateOne,
+    chaptersPostProcessing,
+    chaptersPreProcessing
+
+} = require('./database.js')
 const urlPrefix = "/stories/"
  
 
@@ -20,255 +40,197 @@ storiesRouter.get(`${urlPrefix}genres/options`, async (req, res) => {
     res.send(options)
 })
 storiesRouter.get(`${urlPrefix}contentwarnings/options`, async (_req, res) => {
-    const options = genreList.map((type) => {
-        return {
-            value: type, 
-            label: type,
-        }
-    })
+    const options = await getOptions("contentwarnings")
+    res.send(options)
+
     res.send(options)
 })
 
 //stories chapters
-storiesRouter.get(`${urlPrefix}:storyID/chapters/options`, async (req, res) => {
-    const { storyID } = req.params;
+storiesRouter.get(`${urlPrefix}/chapters/options`, async (req, res) => {
+    const query = req.query;
 
-    if (!storyID) {
-        res.send(stories);
-    } else {
-        const story = await getStory("id", storyID);
-        if (story) {
-            res.send(story);
+    try {
+        const options = await getOptions("chapters", { query });
+
+        if (options) {
+            res.send(options);
         } else {
-            res.status(404).send({ error: "Story not found" });
+            res.status(404).send({ msg: "No chapters were found" });
         }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ msg: "Server error while fetching chapter options" });
     }
 });
 //stories chapters
 storiesRouter.get(`${urlPrefix}:storyID/chapters`, async (req, res) => {
     const { storyID } = req.params;
-
-    if (!storyID) {
-        res.send(stories);
-    } else {
-        const story = await getStory("id", storyID);
-        if (story) {
-            res.send(story);
-        } else {
-            res.status(404).send({ error: "Story not found" });
-        }
-    }
-});
-
-//individual story
-storiesRouter.get(`${urlPrefix}?:storyID`, async (req, res) => {
-    const { storyID } = req.params;
-
-    if (!storyID) {
-        res.send(stories);
-    } else {
-        const story = await getStory("id", storyID);
-        if (story) {
-            res.send(story);
-        } else {
-            res.status(404).send({ error: "Story not found" });
-        }
-    }
-});
-
-
-
-
-
-storiesRouter.post(`${urlPrefix}:storyID?`, verifyAuth, async (req, res) => {
-    const { storyID } = req.params;
-    const {title, author} = req.body
-    const id = createID(title, author)
-    if(!storyID){
-        if(getStory("id", id)){
-            req.status(409).send({msg:"You created a story by this id already"})
-        }
+    const { filter } = req.query
+    const graph = await getGraph(storyID, filter)
+    if(graph){
+        res.send(graph)
     }
     else{
+        res.status(404).send({msg:"Graph not found"})
+    }
+});
+storiesRouter.get(`${urlPrefix}:storyID/edit`, verifyAuth, async (req, res) => {
+    const { storyID } = req.params;
+    try{
+        const story = await getEditable(urlPrefix,req.params.usid,storyID,{ 
+            lookupFields:baseLookupFields, 
+            projectionFields:baseEditProjectionFields,
+            fields:storyFields
+        })
+        if(story){
+            res.send(story)
+        }
+        else{
+            res.status(404).send({msg:"Story not found"})
+        }
+    }
+    catch(e){
+        res.status(e.status || 500).send({msg:e.message})
 
     }
 })
 
-async function getStory(field, value){
-    if (value) {
-        return stories.find((story) => story[field] === value);
-    }
-    return null;
-}
 
-
-async function getStories(queries){
-    if(typeof queries === "object"){
-        let filterStories = stories;
-        for(const [key, value] of Object.entries(queries)){
-            if(Array.isArray(value)){
-                filterStories = filterStories.filter(((story) => 
-                    Array.isArray(story[key]) ? story[key].some(st => value.includes(st)) : value.includes(story[key] )))
-            }
-            else{
-                filterStories = filterStories.filter(((story) => 
-                    Array.isArray(story[key]) ? story[key].includes(value) : value === character[key]))
-            }
-        }
-        return filterStories;
-    }
-    else{
-        return stories;
-    }
-}
-
-// 🚀 Router: Add a chapter to an existing story
-storiesRouter.patch(`${urlPrefix}:storyID`, verifyAuth, async (req, res) => {
+//individual story
+storiesRouter.get(`${urlPrefix}:storyID?`, async (req, res) => {
     const { storyID } = req.params;
-    const { data } = req.body; // Expect the chapter data to be in req.body.data
-
-    const story = await getStory("id", storyID);
-    if (!story) {
-        return res.status(404).json({ error: "Story not found" });
+    const  query  = req.query;
+    if (!storyID) {
+        const stories = await getCards(urlPrefix,{query, 
+            lookupFields:baseLookupFields, 
+            projectionFields:baseProjectionFields,
+            fields:sotryFields
+        })
+        res.send(stories);
+    } else {
+        const story = await getDisplayable(urlPrefix,storyID,{ 
+            lookupFields:baseLookupFields, 
+            projectionFields:baseProjectionFields,
+            fields:storyFields
+        })
+        if (story) {
+            res.send(story);
+        } else {
+            res.status(404).send({ error: "Story not found" });
+        }
     }
-
-    // Add the chapter to the story's chapters list
-    story.chapters.push(data);
-
-    res.status(200).json({ message: `Chapter added successfully to story ${storyID}` });
 });
 
-// Helper function to fetch a story by a field and value
-async function getStory(field, value) {
-    if (value) {
-        return stories.find((story) => story[field] === value);
-    }
-    return null;
-}
-
-async function createStory(storyData, id, author){
-    const {title, description, genres, contentWarnings} = biomeData;
-    const url = urlPrefix + id;
-    const created = new Date().toJSON();
-    await addGenres(genres)
-    await addContentWarnings(contentWarnings)
-    const story = {
-        id: id,
-        title,
-        author,
-        url,
-        genres,
-        contentWarnings,
-        description,
-        created,
-        expanded: created
-    };
-    stories.push(story);
-    return story;
-}
-async function getChapters(queries){
-    if(typeof queries === "object"){
-        let filterChapters = chapters;
-        for(const [key, value] of Object.entries(queries)){
-            if(Array.isArray(value)){
-                filterChapters = filterChapters.filter(((chapter) => 
-                    Array.isArray(chapter[key]) ? chapter[key].some(chap => value.includes(chap)) : value.includes(chapter[key] )))
-            }
-            else{
-                filterChapters = filterChapters.filter(((chapter) => 
-                    Array.isArray(chapter[key]) ? chapter[key].includes(value) : value === chapter[key]))
-            }
-        }
-        return filterChapters;
+storiesRouter.get(`${urlPrefix}chapter/:chapterID/read`, async (req, res) => {
+    const {chapterID} = req.params;
+    const chapter = await getDisplayable("chapters", chapterID, {
+        fields:storyFields,
+        lookupFields:chapterLookupFields,
+        projectionFields:chapterProjectFields,
+    })
+    if(chapter){
+        res.send(chapter);
     }
     else{
-        return chapters;
+        res.status(404).send({msg:"Chapter not found"})
     }
-}
-async function getChapter(field1, value1, field2, value2){
-    if (value1) {
-        if (value2){
-            const filterChapters = chapters.filter((chapter) => chapter[field1] === value1)
-            return filterChapters.find((chapter) => chapter[field2] === value2);
-        }
-        return chapters.find((chapter) => chapter[field1] === value1);
-    }
-    return null;
-}
-function chapterExists(id){
-    return chapters.some(chap => chap.id === id);
-}
-function chapterExistsInStory(storyID, id){
-    return chapters.some(chap => chap.id === id && chap.storyID === storyID);
-}
-async function createChapter(chapterData, storyID, author){
-    const {title, samePrevious, sameNext, anyPrevious, anyNext, genres, contentWarnings, body} = chapterData
-    const baseID = createID(title, author);
+})
+
+storiesRouter.get(`${urlPrefix}chapter/:chapterID`, verifyAuth, async (req, res) => {
+    const {chapterID} = req.params;
     
-
-    const url = `${urlPrefix}${storyID}/${chapterID}`;
-    const samePreviousArray = Array.isArray(samePrevious) ? samePrevious : samePrevious != null  ?  [samePrevious] : []
-    const sameNextArray = Array.isArray(sameNext) ? sameNext : sameNext != null  ?  [sameNext] : []
-    const anyPreviousArray = Array.isArray(anyPrevious) ? anyPrevious : anyPrevious != null  ?  [anyPrevious] : []
-    const anyNextArray = Array.isArray(anyNext) ? anyNext : anyNext != null  ?  [anyNext] : []
-    const previous = [...samePreviousArray, ...anyPreviousArray]
-    const next = [...sameNextArray, anyNextArray]
-    const created = new Date().toJSON();
-    await addGenres(genres)
-    await addContentWarnings(contentWarnings)
-    const chapter = {
-        body,
-        id,
-        author,
-        chapterID,
-        url,
-        title,
-        samePrevious: samePreviousArray,
-        anyPrevious: anyPreviousArray,
-        previous,
-        sameNext: sameNextArray,
-        anyNext: anyNextArray,
-        next,
-        created,
-        modified:created
-    }
-    chapters.push(chapter)
-    return chapter
-}
-
-
-
-
-async function addGenres(genre){
-    if(Array.isArray(genre)){
-        genre.forEach((item) => {
-            if(!genreList.includes(item)){
-                genreList.push(item)
-            }
+    try{
+        const chapter = await getEditable("chapters", req.usid, chapterID, {
+            fields:storyFields,
+            lookupFields:chapterEditLookupFields,
+            projectionFields:chapterEditProjectFields,
         })
-    }
-    else{
-        if(!genreList.includes(genre)){
-            genreList.push(genre)
+        if(chapter){
+            res.send(chapter);
+        }
+        else{
+            res.status(404).send({msg:"Chapter not found"})
         }
     }
-    return "done"
-}
-
-async function addContentWarnings(contentWarning){
-    if(Array.isArray(contentWarning)){
-        contentWarning.forEach((item) => {
-            if(!contentWarningList.includes(item)){
-                contentWarningList.push(item)
-            }
-        })
+    catch(e){
+        res.status(e.status || 500).send({msg:e.message})
     }
-    else{
-        if(!contentWarningList.includes(contentWarning)){
-            contentWarningList.push(contentWarning)
+})
+
+
+storiesRouter.post(`${urlPrefix}:storyID?`, verifyAuth, async (req, res) => {
+    const { storyID } = req.params;
+    const {title} = req.body
+    const author = req.usid
+    const createData = req.body
+    try{
+        createData.author = author
+        if(!storyID){
+            const id = await createID(title, author)
+            createData.id = id
+            createData.url = `${urlPrefix}${id}`
+            const story = await addOne(urlPrefix,createData,{
+                preProcessing:storyPreProcessing,
+            })
+            if(story){
+                res.send({title:story.title, url:story.url, id:story.id})
+            }
+        }
+        else{
+            createData.storyID = storyID
+            const id = await createID(`${storyID}_${title}`, author)
+            createData.id = id
+            createData.url = `${urlPrefix}${storyID}/${id}`
+            const chapter = await addOne("chapters",createData,{
+                preProcessing:chaptersPreProcessing,
+                postProcessing:chaptersPostProcessing
+            })
+            res.send({title:chapter.title, url:chapter.url, id:chapter.id})
         }
     }
-    return "done"
-}
+    catch(e){
+        res.status(e.status || 500).send({msg:e.message})
+    }
+})
+
+
+
+// 🚀 Router: Add a chapter to an existing story
+storiesRouter.put(`${urlPrefix}:storyID/:chapterID?`, verifyAuth, async (req, res) => {
+    const { storyID, chapterID} = req.params;
+    const author = req.usid
+    const updateData = req.body
+    if(!updateData){
+        return res.status(400).send({ msg: "Missing data to update." });
+    }
+    try{
+        if(!chapterID){
+            if(!updateData.id || updateData.id !== storyID ){
+                return res.status(400).send({ msg: "ID mismatch. Cannot modify a different Character." });
+            }
+            const story = await updateOne(urlPrefix,updateData, author,{
+                preProcessing:storyPreProcessing,
+            })
+            if(story){
+                res.send({title:story.title, url:story.url, id:story.id})
+            }
+        }
+        else{
+            if(!updateData.id || updateData.id !== chapterID ){
+                return res.status(400).send({ msg: "ID mismatch. Cannot modify a different Character." });
+            }
+            const chapter = await updateOne("chapters",updateData, author,{
+                preProcessing:chaptersPreProcessing,
+                postProcessing:chaptersPostProcessing
+            })
+            res.send({title:chapter.title, url:chapter.url, id:chapter.id})
+        }
+    }
+    catch(e){
+        res.status(e.status || 500).send({msg:e.message})
+    }});
+
+// Helper function to fetch a story by a field and value
 
 module.exports = storiesRouter;

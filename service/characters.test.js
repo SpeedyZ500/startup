@@ -22,10 +22,11 @@ const {testGetSpecific,
     registerUser, 
     createCharacter
 } = require('./testUtils')
-const {app, createID} = require('./service');
+const {app} = require('./service');
+const {createID} = require('./database')
 
 
-const {characterRouter} = require("./characters");
+const characterRouter = require("./characters");
 
 
 

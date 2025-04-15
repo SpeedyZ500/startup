@@ -4,7 +4,6 @@ const uuid = require('uuid');
 const express = require('express');
 const app = express();
 const authCookieName = 'token';
-const { userCollection, listUserDisplay } = require("./database")
 const { 
     getUserByToken,
     getUserByUsername,
@@ -12,7 +11,11 @@ const {
     addUser, 
     updateUser,
     getUserById,
-    getOptions
+    getOptions,
+    getCards,
+    listUserDisplay,
+    addWritingAdvice,
+    addWritingPrompt
  } = require('./database');  // Import database functions
 
 app.use(express.json());
@@ -104,14 +107,7 @@ function sanitizeId(id){
 
 
 
-async function createAdvice(description, author){
-    const created = new Date().toJSON();
-    
-    const advice = { description:description , author:author, created:created};
-    writingadvice.push(advice);
 
-    return advice;
-}
 
 apiRouter.post('/writingadvice', verifyAuth, async (req, res) => {
     const description = req.body.description;
@@ -119,41 +115,54 @@ apiRouter.post('/writingadvice', verifyAuth, async (req, res) => {
         return res.status(400).json({ error: 'text is required' });
     }
     const author = req.usid;
-    const advice = await createAdvice(description, author );
-    if(advice){
-        res.send({description:advice.description});
+    try{
+        const created = new Date().toJSON();
+        const advice = await addWritingAdvice({description, author, created});
+        if(advice){
+            res.send({description:advice.description});
+        }
+        else{
+            res.status(500).send({msg:"error creating advice"});
+        }
+    
     }
-    else{
-        res.status(500).send({msg:"error creating advice"});
+    catch(e){
+        res.status(e.status || 500).send({msg:e.message});
+
     }
 });
 
-let writingadvice = [];
-let writingprompts = [];
-async function createPrompt(description, author){
-    const created = new Date().toJSON();
-    
-    const prompt = { description:description , };
-    writingprompts.push(prompt);
 
-    return prompt;
-}
+
 apiRouter.post('/writingprompts', verifyAuth, async (req, res) => {
     const description = req.body.description;
     if (!description){
         return res.status(400).json({ error: 'text is required' });
     }
-    const output = await createPrompt(description, req.usid);
-    res.status(201).send({description:output.description, author:output.author});
-
+    const author = req.usid;
+    try{
+        const created = new Date().toJSON();
+        const prompt = await addWritingPrompt({description, author, created});
+        if(prompt){
+            res.send({description:prompt.description});
+        }
+        else{
+            res.status(500).send({msg:"error creating Prompt"});
+        }
+    }
+    catch(e){
+        res.status(e.status || 500).send({msg:e.message});
+    }
 });
 
-apiRouter.get('/writingadvice', async (_req, res) => {
+apiRouter.get('/writingadvice', async (req, res) => {
+    const writingadvice = await getCards("writingadvice", {query:req.query})
     res.send(writingadvice);
 });
 
-apiRouter.get('/writingprompts', async (_req, res) => {
-    res.send(writingprompts);
+apiRouter.get('/writingprompts', async (req, res) => {
+    const writingPrompts = await getCards("writingprompts", {query:req.query})
+    res.send(writingPrompts);
 });
 
 // Registration
