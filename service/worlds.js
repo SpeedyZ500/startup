@@ -49,7 +49,6 @@ worldsRouter.get(`${urlPrefix}options`, async (req, res) => {
     res.send(options)
 })
 
-// 🚀 Router: Fetch worlds or individual world
 worldsRouter.get(`${urlPrefix}`, async (req, res) => {
     const query = req.query || {};
     const worldsToSend = await getCards(urlPrefix, {

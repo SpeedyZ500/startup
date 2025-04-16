@@ -1672,8 +1672,133 @@ const countryFullLookups = [
     "biomes",
 ]
 
+const cardsMap = {
+    stories:{
+        lookupFields:baseLookupFields, 
+        projectionFields:baseProjectionFields,
+        fields:storyFields
+    },
+    worlds:{
+        lookupFields:baseLookupFields,
+        fields:baseFields,
+        projectionFields:baseProjectionFields
+    },
+    wildlife:{
+        lookupFields:livingThingCardLookups,
+        fields:baseFields,
+        projectionFields:livingThingProjectionFields
+    },
+    flora:{
+        lookupFields:livingThingCardLookups,
+        fields:baseFields,
+        projectionFields:livingThingProjectionFields
+    },
+    races:{
+        lookupFields:raceCardLookups,
+        fields:baseFields,
+        projectionFields:raceProjectionFields
+    },
+    organizations:{
+        lookupFields:institutionLookups,
+        fields:baseInstitutionCards,
+        projectionFields:institutionProjectionFields
+    },
+    magicsystems:{
+        lookupFields:institutionLookups,
+        fields:baseFields,
+        projectionFields:institutionProjectionFields
+    },
+    countries:{
+        lookupFields:institutionLookups,
+        fields:baseInstitutionCards,
+        projectionFields:institutionProjectionFields
+    },
+    characters:{
+        lookupFields:characterCardsLookup,
+        fields:characterCards,
+        projectionFields:characterProjectionFields
+    },
+    biomes:{
+        lookupFields:baseLookupFields,
+        fields:baseFields,
+        projectionFields:baseProjectionFields
+    }
+}
 
+const displayableMap = {
+    stories:{
+        lookupFields:baseLookupFields, 
+        projectionFields:baseProjectionFields,
+        fields:storyFields
+    },
+    chapter:{
+        fields:storyFields,
+        lookupFields:chapterLookupFields,
+        projectionFields:chapterProjectFields,
+    },
+    worlds:{
+        lookupFields:baseLookupFields,
+        fields:worldFullFields,
+        projectionFields:baseProjectionFields
+    },
+    wildlife:{
+        lookupFields:livingThingFullLookups,
+        fields:fullBio,
+        projectionFields:livingThingBioProjectionFields
+    },
+    flora:{
+        lookupFields:livingThingCardLookups,
+        fields:baseFields,
+        projectionFields:livingThingProjectionFields
+    },
+    races:{
+        lookupFields:raceFullLookups,
+        fields:fullBio,
+        projectionFields:raceBioProjectionFields
+    },
+    organizations:{
+        lookupFields:organizationFullLookups,
+        fields:institutionFullFields,
+        projectionFields:organizationBioProjectionFields
+    },
+    magicsystems:{
+        lookupFields:magicSystemFullLookups,
+        fields:fullBio,
+        projectionFields:institutionBioProjectionFields
+    },
+    countries:{
+        lookupFields:countryFullLookups,
+        fields:institutionFullFields,
+        projectionFields:countryBioProjectionFields
+    },
+    characters:{
+        lookupFields:characterFullLookupFields,
+        fields:characterFullFields,
+        projectionFields:characterBioProjectionFields
+    },
+    biomes:{
+        lookupFields:baseLookupFields,
+        fields:baseFields,
+        projectionFields:baseProjectionFields
+    }
+}
 
+const mapOptionsMap = {
+    continents:{
+        collection:"worlds",
+        projectionFields:{
+            options:optionsMap("continents")
+        },
+        fields:["id"]
+    },
+    towns:{
+        collection:"countries",
+        projectionFields:{
+            options:optionsMap("towns")
+        },
+        fields:["id"]
+    }
+}
 
 
 
@@ -1768,7 +1893,10 @@ module.exports = {
     countryBioProjectionFields,
     countryEditFields,
     raceCardLookups,
-    sanitizeId
+    sanitizeId,
+    mapOptionsMap,
+    cardsMap,
+    displayableMap
     
 
 

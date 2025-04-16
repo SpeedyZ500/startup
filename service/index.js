@@ -1,4 +1,6 @@
 const { app } = require('./service.js');
+const { peerProxy } = require('./peerProxy.js');
+
 const characterRouter = require('./characters.js');
 const storiesRouter = require('./stories.js');
 const biomesRouter = require('./biomes.js');
@@ -33,6 +35,9 @@ app.use('/api', worldsRouter);
 
 const port = process.argv.length > 2 ? process.argv[2] : 4000;
 
-app.listen(port, function () {
+const httpService = app.listen(port, function () {
     console.log(`Listening on port ${port}`);
   });
+
+
+peerProxy(httpService)
