@@ -9,6 +9,7 @@ const socketHandlers = {
                 return socket.send(JSON.stringify({
                     type:message.type,
                     requestId: message.requestId,
+                    commandId:message.commandId,
                     success:false,
                     error: `Cant map cards for ${message.collection}`
                 }))
@@ -22,6 +23,7 @@ const socketHandlers = {
             socket.send(JSON.stringify({
                 type: message.type,
                 requestId: message.requestId,
+                commandId:message.commandId,
                 success: true,
                 data,
               }));
@@ -31,6 +33,7 @@ const socketHandlers = {
             socket.send(JSON.stringify({
                 type:message.type,
                 requestId: message.requestId,
+                commandId:message.commandId,
                 success:false,
                 error: err.message
             }))
@@ -43,6 +46,7 @@ const socketHandlers = {
                 return socket.send(JSON.stringify({
                     type:message.type,
                     requestId: message.requestId,
+                    commandId:message.commandId,
                     success:false,
                     error: `Cant map displayable for ${message.collection}`
                 }))
@@ -55,6 +59,7 @@ const socketHandlers = {
             socket.send(JSON.stringify({
                 type: message.type,
                 requestId: message.requestId,
+                commandId:message.commandId,
                 success: true,
                 data,
               }));
@@ -64,6 +69,7 @@ const socketHandlers = {
             socket.send(JSON.stringify({
                 type:message.type,
                 requestId: message.requestId,
+                commandId:message.commandId,
                 success:false,
                 error: err.message
             })
@@ -76,6 +82,7 @@ const socketHandlers = {
             socket.send(JSON.stringify({
                 type: message.type,
                 requestId: message.requestId,
+                commandId:message.commandId,
                 success: true,
                 data,
               }));
@@ -85,6 +92,7 @@ const socketHandlers = {
             socket.send(JSON.stringify({
                 type:message.type,
                 requestId: message.requestId,
+                commandId:message.commandId,
                 success:false,
                 error: err.message
             }))
@@ -100,6 +108,7 @@ const socketHandlers = {
             socket.send(JSON.stringify({
                 type: message.type,
                 requestId: message.requestId,
+                commandId:message.commandId,
                 success: true,
                 data,
               }));
@@ -109,6 +118,7 @@ const socketHandlers = {
             socket.send(JSON.stringify({
                 type:message.type,
                 requestId: message.requestId,
+                commandId:message.commandId,
                 success:false,
                 error: err.message
             }))
@@ -121,6 +131,7 @@ const socketHandlers = {
                 return socket.send(JSON.stringify({
                     type:message.type,
                     requestId: message.requestId,
+                    commandId:message.commandId,
                     success:false,
                     error: `Cant map options for ${message.collection}`
                 }))
@@ -139,6 +150,7 @@ const socketHandlers = {
             socket.send(JSON.stringify({
                 type: message.type,
                 requestId: message.requestId,
+                commandId:message.commandId,
                 success: true,
                 flattened,
               }));
@@ -148,6 +160,7 @@ const socketHandlers = {
             socket.send(JSON.stringify({
                 type:message.type,
                 requestId: message.requestId,
+                commandId:message.commandId,
                 success:false,
                 error: err.message
             }))
@@ -161,6 +174,7 @@ function peerProxy(httpServer) {
 
   socketServer.on('connection', (socket) => {
     socket.isAlive = true;
+    socket.subscriptions = new Map();
 
     // Forward messages to everyone except the sender
     socket.on('message', function message(data) {
@@ -171,28 +185,51 @@ function peerProxy(httpServer) {
         catch (error){
             console.error('Invalid JSON received:', error);
             return; // Early exit if message is invalid    
+        }  
+        const { url, commandId } = parsedMessage;
+        if (parsedMessage.type === "UNSUBSCRIBE"){
+            const subs = socket.subscriptions.get(url);
+            if(subs){
+                if(commandId){
+                    subs.delete(commandId);
+                    if (subs.size === 0) socket.subscriptions.delete(url);
+                }
+                else{
+                    socket.subscriptions.delete(url)
+                }
+            }
+            else{
+                socket.subscriptions.clear()
+            }
         }
-        if(socketHandlers[parsedMessage.type]){
+        else if(socketHandlers[parsedMessage.type]){
+            if(!socket.subscriptions.has(url)){
+                socket.subscriptions.set(url, new Map());
+            }
+            socket.subscriptions.get(url).set(commandId, data)
             socketHandlers[parsedMessage.type](socket, parsedMessage, socketServer);
-        }else {
+        }
+        else {
             if (parsedMessage.type === 'POST' || parsedMessage.type === 'PUT' || parsedMessage.type === 'PATCH') {
                 socketServer.clients.forEach((client) => {
                     if (client !== socket && client.readyState === WebSocket.OPEN) {
                         // Check the client's path or any other relevant conditions here
                         // For example, we check if client is subscribed to the same path/endpoint
-                        if (client.path === parsedMessage.collection ||  
-                            (parsedMessage.storyID && client.path === `/${parsedMessage.collection}/${parsedMessage.storyID}` && parsedMessage.type === 'POST') ||
-                            (parsedMessage.storyID && parsedMessage.chapterID && client.path === `/${parsedMessage.collection}/${parsedMessage.storyID}` && parsedMessage.type === 'PUT'  )
-
-                        ) {
-                            client.send({msg:"REDRAW"})
-                        }
-                        else if(client.path === `/${parsedMessage.collection}/${parsedMessage.id}`){
-                            client.send(data);
+                        for (const [url, commands] of client.subscriptions || []){
+                            if (urlMatchesUpdate(url, parsedMessage)){
+                                for (const [commandId, commandData] of commands) {
+                                    const parsedData = JSON.parse(commandData)
+                                    if(socketHandlers[parsedData.type]){ //technically redundant safety check
+                                        parsedData.requestId = parsedMessage.requestId; // Ensure it's set or valid if needed
+                                        socketHandlers[parsedData.type](client, parsedData, socketServer);
+                                    }
+                                }
+                            }
                         }
                     }
                 });
-            } else {
+            } 
+            else {
                 // For any other type of message (non-update), just forward it to all other clients
                 socketServer.clients.forEach((client) => {
                     if (client !== socket && client.readyState === WebSocket.OPEN) {
@@ -220,6 +257,15 @@ function peerProxy(httpServer) {
       client.ping();
     });
   }, 10000);
+}
+
+function urlMatchesUpdate(url, updateMessage){
+    const { collection, id, storyID, chapterID } = updateMessage;
+    if (url === `/${collection}`) return true;
+    if (id && url === `/${collection}/${id}`) return true;
+    if (storyID && url === `/${collection}/${storyID}`) return true;
+    if (storyID && chapterID && url === `/${collection}/${storyID}/${chapterID}`) return true;
+    return false
 }
 
 module.exports = { peerProxy };

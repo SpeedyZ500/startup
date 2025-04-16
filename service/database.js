@@ -1722,6 +1722,15 @@ const cardsMap = {
         lookupFields:baseLookupFields,
         fields:baseFields,
         projectionFields:baseProjectionFields
+    },
+    users:{
+        fields:["displayname"]
+    },
+    writingadvice:{
+        fields:["description"]
+    },
+    writingprompts:{
+        fields:["description"]
     }
 }
 
