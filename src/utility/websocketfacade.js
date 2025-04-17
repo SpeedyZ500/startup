@@ -4,7 +4,7 @@ export class WebSocketFacade {
         this.handlers = new Map();
         this.queue = [];
         const protocol = window.location.protocol === 'http:' ? 'ws' : 'wss';
-        this.socket = new WebSocket(`${protocol}://${window.location.hostname}:4000/ws`);
+        this.socket = new WebSocket(`${protocol}://${window.location.hostname}:${port}/ws`);
         this.socket.onopen = () => {
             // flush queued messages
             for (const message of this.queue) {
