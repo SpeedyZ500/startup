@@ -1,0 +1,87 @@
+{
+    "title":"Wildlife",
+    "description":"This is all about the creatures, critters and monsters you create, their abilities and natural habitats.",
+    "buttonLabel":"New Wildlife",
+    "form":{
+        "title":"New Wildlife",
+        "fields":[
+            {
+                "label": "Name",
+                "required": true,
+                "type": "text"
+            },
+            {
+                "label":"Type",
+                "type":"creatable",
+                "source":"/worldbuilding/wildlife/types",
+                "key":"type"
+            },
+            {
+                "label":"Description",
+                "type":"text-area",
+                "placeholder":"Describe your Wildlife",
+                "key":"description"
+            },
+            {
+                "label1":"Origin World",
+                "type":"select-plus",
+                "type1":"select",
+                "source1":"/worldbuilding/worlds",
+                "key1":"originWorld",
+                "label2":"Origin Biome",
+                "type2":"iteration-select",
+                "source2":"originBiome",
+                "key2":"originBiome"
+            },
+            {
+                "label":"Other Worlds",
+                "type":"multi-select",
+                "source":"/worldbuilding/worlds",
+                "key":"otherWorlds"
+            },
+            {
+                "label":"Abilities",
+                "type":"multi-select",
+                "source":"/worldbuilding/magicsystems"
+
+            },
+            {
+                "label":"Other Biomes",
+                "type":"multi-select",
+                "key":"otherBiomes"
+            },
+            {
+                "label":"Sections",
+                "type":"section-adder"
+            }
+        ]
+    },
+
+    "sort":[
+        {
+            "label":"New to Old",
+            "value":{"category":"created", "az":false}
+        },
+        {
+            "label":"Old to New",
+            "value":{"category":"created", "az":true}
+        },
+        {
+            "label":"A-Z Name",
+            "value":{"category":"Name", "az":true}
+        },
+        {
+            "label":"Z-A Name",
+            "value":{"category":"Name", "az":false}
+        },
+        {
+            "label":"A-Z Author",
+            "value":{"category":"Author", "az":true}
+        },
+        {
+            "label":"Z-A Author",
+            "value":{"category":"Author", "az":false}
+        }
+    ]
+
+}
