@@ -196,13 +196,9 @@ export function CategoryPage(props) {
                             <button onClick={handleClose}type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                         </OffcanvasHeader>
                         <OffcanvasBody className="new">
-                            <form onSubmit={handleSubmit} className="form-container">
-                                <FormGenerator handleClose={handleClose} setError={setError}/>
-                                <div className="btn-group">
-                                    <button className="btn btn-primary" type="submit">Create</button>
-                                    <button onClick={handleClose} type="button" className="btn btn-secondary cancel" data-bs-dismiss="offcanvas" aria-label="Close">Cancel</button>
-                                </div>
-                            </form>
+                            <FormGenerator handleClose={handleClose} setError={setError}/>
+
+                            
                         </OffcanvasBody>
                     </Offcanvas>
                     
