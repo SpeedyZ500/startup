@@ -35,7 +35,7 @@ app.use('/api', worldsRouter);
 
 const port = process.argv.length > 2 ? process.argv[2] : 4000;
 
-const httpService = app.listen(port, function () {
+const httpService = app.listen(port,  () => {
     console.log(`Listening on port ${port}`);
   });
 

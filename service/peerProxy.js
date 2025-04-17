@@ -177,17 +177,17 @@ const socketHandlers = {
 function peerProxy(httpServer) {
   // Create a websocket object
   //const socketServer = new WebSocketServer({ server: httpServer });
-  const socketServer = new WebSocketServer({ noServer:true });
+  const socketServer = new WebSocketServer({ server:httpServer });
 
-  httpServer.on('upgrade', (req, socket, head) => {
-    if (req.url === '/ws') {
-      socketServer.handleUpgrade(req, socket, head, (ws) => {
-        socketServer.emit('connection', ws, req);
-      });
-    } else {
-      socket.destroy();
-    }
-  });
+//   httpServer.on('upgrade', (req, socket, head) => {
+//     if (req.url === '/ws') {
+//       socketServer.handleUpgrade(req, socket, head, (ws) => {
+//         socketServer.emit('connection', ws, req);
+//       });
+//     } else {
+//       socket.destroy();
+//     }
+//   });
 
   socketServer.on('connection', (socket) => {
     socket.isAlive = true;
