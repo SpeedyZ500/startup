@@ -77,6 +77,7 @@ export function CategoryPage(props) {
         if (!paths.startsWith("/")) {
             paths = "/" + paths.replace(/\/$/, '').trim();
         }
+        paths = paths.replace(/\/$/, '').trim()
         const jsonPath = `${paths}.json`;
     
         // Use async function to handle multiple async calls sequentially
