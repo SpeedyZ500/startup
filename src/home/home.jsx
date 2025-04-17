@@ -2,7 +2,7 @@ import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
 import { useState, useEffect, Fragment } from 'react';
-import { CardsRenderer } from '../utility/utility.jsx';
+import {CardsRenderer, useWebSocketFacade} from '../utility/utility.jsx'
 import { SortOptions, FilterOptions} from '../utility/utility';
 
 import Button from 'react-bootstrap/Button';
@@ -17,19 +17,10 @@ export function Home() {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
     const path = window.location.pathname;
-
+    const socket = useWebSocketFacade()
     
     useEffect(() => {
-        fetch('/api/stories', {
-            method:"GET",             
-            headers: {'Content-Type': 'application/json'},
-        }).then((res) => res.json()).then((data) => setStories(data))
         
-        .catch((err) => setError(err.message));
-        fetch('/api/writingprompts/', {
-            method:"GET",             
-            headers: {'Content-Type': 'application/json'},
-        }).then((res) => res.json()).then((data) => setPrompts(data));
     }, [])
     return (
     <main>
