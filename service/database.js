@@ -397,12 +397,13 @@ async function convertToEditable(source, raw) {
             { $match: { _id: { $in: ids } } },
             {
                 $project: {
-                    id:1
+                    label:{ $ifNull: ["$name", "$title"] },
+                    value:"$id",
+                    qualifier:"$types"
                 }
             }
         ]).toArray()
     }
-    const mapped = results.map((result) => result.id)
     return unArray(raw, results)
 }
 
@@ -1035,8 +1036,13 @@ function createMap(field, mode = 'display') {
             as: "item",
             in: mode === 'edit'
                 ? "$$item.id"
+                // {
+                //     label: "$$item.name" || "$$item.title",
+                //     value: "$$item.id",
+                //     qualifier: "$$item.types"
+                // }
                 : {
-                    value: "$$item.name",
+                    value: "$$item.name" || "$$item.title",
                     url: "$$item.url"
                 }
         }
@@ -1060,10 +1066,15 @@ function optionsMap(field){
 function createProjection(field, type="displayable"){
     if(type == 'edit'){
         return `$${field}Details.id`
+        // {
+        //     value:`$${field}Details.id`,
+        //     label: `$${field}Details.name` || `$${field}Details.title`,
+        //     qualifier: `$${field}Details.types`
+        // }
     }
     else{
         return {
-            value:`$${field}Details.name`,
+            value:`$${field}Details.name` || `$${field}Details.title`,
             url:`$${field}Details.url`
         }
     }

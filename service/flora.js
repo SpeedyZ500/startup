@@ -159,9 +159,9 @@ floraRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
 // 🚀 Router: Modify a flora field (add/put/delete references)
 floraRouter.patch(`${urlPrefix}:list/:method`, verifyAuth, async (req, res) => {
     const { list, method } = req.params;
-    const { flora, id } = req.body;
+    const { ids, id } = req.body;
     try{
-        await modifyMany(urlPrefix, flora, list, id, method)
+        await modifyMany(urlPrefix, ids, list, id, method)
         return res.send({msg:"success"})
     }
     catch(e){

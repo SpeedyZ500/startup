@@ -15,7 +15,7 @@ const socketHandlers = {
                 }))
             }
             const data = await getCards(message.collection, {
-                query:message.query,
+                //query:message.query,
                 projectionFields:params.projectionFields,
                 fields:params.fields,
                 lookupFields:params.lookupFields,

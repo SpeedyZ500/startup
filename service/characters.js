@@ -156,9 +156,9 @@ characterRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
 // 🚀 Router: Modify a character field (add/put/delete references)
 characterRouter.patch(`${urlPrefix}:list/:method`, verifyAuth, async (req, res) => {
     const { list, method } = req.params;
-    const { characters, id } = req.body;
+    const { ids, id } = req.body;
     try{
-        await modifyMany(urlPrefix, characters, list, id, method)
+        await modifyMany(urlPrefix, ids, list, id, method)
         return res.send({msg:"success"})
     }
     catch(e){

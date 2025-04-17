@@ -160,9 +160,9 @@ racesRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
 // 🚀 Router: Modify a race field (add/put/delete references)
 racesRouter.patch(`${urlPrefix}:list/:method`, verifyAuth, async (req, res) => {
     const { list, method } = req.params;
-    const { races, id } = req.body;
+    const { ids, id } = req.body;
     try{
-        await modifyMany(urlPrefix, races, list, id, method)
+        await modifyMany(urlPrefix, ids, list, id, method)
         return res.send({msg:"success"})
     }
     catch(e){

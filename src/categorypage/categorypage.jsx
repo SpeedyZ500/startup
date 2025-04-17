@@ -1,16 +1,20 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useState, useEffect, Fragment } from 'react';
+import { useState, useEffect, useRef, Fragment } from 'react';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { OffcanvasBody, OffcanvasHeader } from 'react-bootstrap';
 import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
 import {genFilter, updateFilter, sortList, SortOptions, FilterOptions, FilterItem, sanitizeId, filterProfanity} from '../utility/utility.js'
-import {CardsRenderer} from '../utility/utility.jsx'
+import {CardsRenderer, useWebSocketFacade} from '../utility/utility.jsx'
 import Select from 'react-select'
 import Creatable from 'react-select/creatable';
 import Table from 'react-bootstrap/Table';
 import { AuthState } from '../login/authState.js';
+import { FormGenerator } from '../utility/form';
+
+import { WebSocketFacade, webSocket } from '../utility/websocketfacade.js';
+
 
 
 function FilterGenerator({filters, onFilterChange}){
@@ -163,7 +167,7 @@ const SuperSelect = ({data, options, onCategoriesChange}) => {
     
 }
 
-function FormGenerator({form, sections, setSections, onCategoriesChange, onSelectionChange, profanity}){
+function FormsGenerator({form, sections, setSections, onCategoriesChange, onSelectionChange, profanity}){
     const [optionsMap, setOptionsMap] = useState({});
     const [selections, setSelections] = useState([]);
     const getKey = (data) => {
@@ -376,6 +380,24 @@ function FormGenerator({form, sections, setSections, onCategoriesChange, onSelec
 export function CategoryPage(props) {
     const [visible, setVisibility] = useState(false);
     const [selections, onSelectionChange] = useState([]);
+    const socket = useWebSocketFacade()
+
+    const wsRef = useRef(null);
+    
+        useEffect(() => {
+            // Initialize on mount
+            wsRef.current = new WebSocketFacade();
+    
+            // Clean up on unmount
+            return () => {
+            if (wsRef.current) {
+                //wsRef.current.cleanup();
+                wsRef.current = null;
+            }
+            };
+        }, []);
+    
+    
     const handleSubmit = async (event) =>{
 
         event.preventDefault();
@@ -498,21 +520,25 @@ export function CategoryPage(props) {
                 setError(`Page Data Error: ${err.message}`);
 
             }
-            fetch(`/api${paths}`)
-            .then((response) => response.json())
-            .then((data) => {
-                setList(data);
-                console.log(JSON.stringify(data))
-                setError(null);
-            }).catch ((err) => {
-                setError(err.message);
-            }).finally (() => {
-                setLoading(false); // Make sure loading state is reset
-            })
+            setLoading(false); // Make sure loading state is reset
+
         };
     
         fetchData(); // Call the async function
     }, [path]);
+
+    useEffect(() => {
+        const collection = path.startsWith("/worldbuilding/")
+        ? path.replace("/worldbuilding/", "")
+        : path.replace(/^\//, "");   
+        webSocket.subscribe({url:path, type:"getCards", collection, commandId:"getCards", query:{filter},setData:setList})
+        console.log(JSON.stringify(list))
+
+    }, [path, filter, sortOptions])
+    useEffect(() => {
+        console.log(JSON.stringify(list))
+
+    },[list])
     const [profanity, setProfanity] = useState(true);
     
     useEffect(() => {
@@ -555,6 +581,10 @@ export function CategoryPage(props) {
     
         applyProfanityFilter();
     }, [list, profanity]);
+
+    useEffect(() => {
+        
+    }, [socket, ])
     
     if(loading){
         <main>
@@ -582,7 +612,7 @@ export function CategoryPage(props) {
                         </OffcanvasHeader>
                         <OffcanvasBody className="new">
                             <form onSubmit={handleSubmit} className="form-container">
-                                <FormGenerator form={page.form.fields} sections={sections} setSections={setSections} onCategoriesChange={onCategoriesChange} onSelectionChange={onSelectionChange} profanity={profanity}/>
+                                <FormGenerator handleClose={handleClose} setError={setError}/>
                                 <div className="btn-group">
                                     <button className="btn btn-primary" type="submit">Create</button>
                                     <button onClick={handleClose} type="button" className="btn btn-secondary cancel" data-bs-dismiss="offcanvas" aria-label="Close">Cancel</button>
@@ -616,7 +646,7 @@ export function CategoryPage(props) {
         
                        
                     </div>
-                    <CardsRenderer cards={list} filters ={filter.filters} sort={sortOptions.value}/>
+                    <CardsRenderer cards={list}/>
                     
                     
             </main>

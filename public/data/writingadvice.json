@@ -5,23 +5,14 @@
   "form":{
     "title":"New Advice",
     "createBioPage":false,
-    "fields":[
-        {
-            "label":"description",
+    "fields":{
+        "description":{
+            "label":"Description",
             "type":"text-area",
-            "placeholder":"Your Advice",
-            "onCard":false,
-            "inList":true,
-            "filter":false,
-            "location":"body"
-        },
-        {
-            "label":"Author",
-            "inList":true,
-            "hidden":true,
-            "filter":false
+            "placeholder":"Your Advice"
+
         }
-    ]
+    }
 
   },
   "sort":[

@@ -8,7 +8,7 @@ import Overlay from 'react-bootstrap/Overlay';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Popover from 'react-bootstrap/Popover';
 import Select from 'react-select'
-
+import { WebSocketFacade }  from './websocketfacade.js';
 
 
 import {
@@ -77,43 +77,14 @@ function renderCard(cards){
     
     return (
         cards.map((card, index) => {
-        
+            console.log(JSON.stringify({card, index}))
 
-            if(!Array.isArray(card.details)){
-                return;
-            }
-            const headerData = card.details.filter(item => item.location === "head")
-    
-            const footerData = card.details.filter(item =>  item.location === "footer")
-    
-            const bodyData = card.details.filter(item => !item.location || item.location === "body")
             return(<Card key={index} style={{width:"18rem"}}>
-                <Card.Header className="theme-c adaptive">
-                    <Fragment>
-                        {headerData.map((item, index) =>(
-                            <Fragment key={index}>
-                                {renderItem(item, card.id)}
-                            </Fragment>
-                        ))}
-                    </Fragment>
-                </Card.Header>
+                
                 <Card.Body className="theme adaptive">
-                    <Fragment>
-                        {bodyData.map((item, index) =>(
-                            <Fragment key={index}>
-                                {renderItem(item, card.id)}
-                            </Fragment>
-                        ))}
-                    </Fragment>
-                    {card.description && <p>{card.description}</p>}
+                     <p>{card.description || ""}</p>
                 </Card.Body>
-                <Card.Footer className="theme-c adaptive">
-                    {footerData.map((item, index) =>(
-                            <Fragment key={index}>
-                                {renderItem(item, card.id)}
-                            </Fragment>
-                    ))}
-                </Card.Footer>
+                
 
             </Card>)
 
@@ -123,16 +94,15 @@ function renderCard(cards){
 
 
 }
-export function CardsRenderer({cards, filters, sort}){
+export function CardsRenderer({cards}){
     //const currSort = useEffect(() => console.log(JSON.stringify(sort)), [sort]);
     
     
-    const filteredAndSorted = useMemo(() => filterAndSort(cards, filters, sort), [cards, filters, sort]);
     
     const [profanity, setProfanity] = useState(true);
-    const [cleanCards, setCleanCards] = useState(filteredAndSorted);
+    const [cleanCards, setCleanCards] = useState(cards);
 
-    const prevFilteredAndSorted = useRef(filteredAndSorted);
+    const prevCards = useRef(cards);
     const prevProfanity = useRef(profanity);
 
 
@@ -155,19 +125,18 @@ export function CardsRenderer({cards, filters, sort}){
     }, []);
 
     useEffect(() => {
-        if (prevFilteredAndSorted.current === filteredAndSorted && prevProfanity.current === profanity) {
+        if (prevCards.current === cards && prevProfanity.current === profanity) {
             return; // No changes, avoid unnecessary updates
         }
-        prevFilteredAndSorted.current = filteredAndSorted;
         prevProfanity.current = profanity;
 
         async function cleanData() {
-            const cleaned = await filterProfanity(filteredAndSorted, profanity);
+            const cleaned = await filterProfanity(cards, profanity);
             setCleanCards(cleaned);
         }
 
         cleanData();
-    }, [filteredAndSorted, profanity]);
+    }, [cards, profanity]);
       
 
     const renderCards = useMemo(() => renderCard(cleanCards), [cleanCards]);
@@ -182,3 +151,22 @@ export function CardsRenderer({cards, filters, sort}){
 
     );
 }
+
+export const useWebSocketFacade = () => {
+    const wsRef = useRef(null);
+
+    useEffect(() => {
+        // Initialize on mount
+        wsRef.current = new WebSocketFacade();
+
+        // Clean up on unmount
+        return () => {
+        if (wsRef.current) {
+            //wsRef.current.cleanup();
+            wsRef.current = null;
+        }
+        };
+    }, []);
+
+    return wsRef.current;
+};

@@ -906,6 +906,9 @@ export function BioPage(props){
         console.log(editing)
 
     }
+    const handleStopEditing = () => {
+        setEditing(false)
+    }
     function reloadPage(){
         window.location.reload;
     }

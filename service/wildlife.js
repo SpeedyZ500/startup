@@ -162,9 +162,9 @@ wildlifeRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
 // 🚀 Router: Modify a wildlife field (add/put/delete references)
 wildlifeRouter.patch(`${urlPrefix}:list/:method`, verifyAuth, async (req, res) => {
     const { list, method } = req.params;
-    const { wildlife, id } = req.body;
+    const { ids, id } = req.body;
     try{
-        await modifyMany(urlPrefix, wildlife, list, id, method)
+        await modifyMany(urlPrefix, ids, list, id, method)
         return res.send({msg:"success"})
     }
     catch(e){

@@ -177,6 +177,8 @@ export async function filterProfanity(json, profanityFilterEnabled){
             return await applyProfFilter(json);
         }
         else{
+            const updatedJson = json
+
             for(const key in json){
                 if(key.toLowerCase() === "author"){
                     updatedJson[key] = await filterProfanity(await replaceAuthor(json[key]));
@@ -189,6 +191,7 @@ export async function filterProfanity(json, profanityFilterEnabled){
                     updatedJson[key] = await filterProfanity(json[key])
                 }
             }
+            return updatedJson
         }
     }
     return json

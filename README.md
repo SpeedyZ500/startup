@@ -166,8 +166,8 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] **Backend listens for WebSocket connection** - I did not complete this part of the deliverable.
-- [ ] **Frontend makes WebSocket connection** - I did not complete this part of the deliverable.
-- [ ] **Data sent over WebSocket connection** - I did not complete this part of the deliverable.
-- [ ] **WebSocket data displayed** - I did not complete this part of the deliverable.
+- [x] **Backend listens for WebSocket connection** - have the backend listen for websoket connections so it can send requested data.
+- [x] **Frontend makes WebSocket connection** - On my catagories pages, story pages, and chapter pages, and bio-pages establish websoket connections.
+- [x] **Data sent over WebSocket connection** - Send my various things over websoket, I know that isn't descriptive but whatever
+- [X] **WebSocket data displayed** - Make my cards format to the websoket data, and the bio-pages, and have it draw graphs
 - [ ] **Application is fully functional** - I did not complete this part of the deliverable.

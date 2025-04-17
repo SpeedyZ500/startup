@@ -179,9 +179,9 @@ countriesRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
 
 countriesRouter.patch(`${urlPrefix}:list/:method`, verifyAuth, async (req, res) => {
     const { list, method } = req.params;
-    const { countries, id } = req.body;
+    const { ids, id } = req.body;
     try{
-        await modifyMany(urlPrefix, countries, list, id, method)
+        await modifyMany(urlPrefix, ids, list, id, method)
         return res.send({msg:"success"})
     }
     catch(e){

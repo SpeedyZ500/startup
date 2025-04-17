@@ -153,9 +153,9 @@ magicRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
 
 magicRouter.patch(`${urlPrefix}:list/:method`, verifyAuth, async (req, res) => {
     const { list, method } = req.params;
-    const { magics, id } = req.body;
+    const { ids, id } = req.body;
     try{
-        await modifyMany(urlPrefix, magics, list, id, method)
+        await modifyMany(urlPrefix, ids, list, id, method)
         return res.send({msg:"success"})
     }
     catch(e){

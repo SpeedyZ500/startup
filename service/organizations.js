@@ -156,9 +156,9 @@ organizationsRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
 
 organizationsRouter.patch(`${urlPrefix}:list/:method`, verifyAuth, async (req, res) => {
     const { list, method } = req.params;
-    const { organizations, id } = req.body;
+    const { ids, id } = req.body;
     try{
-        await modifyMany(urlPrefix, organizations, list, id, method)
+        await modifyMany(urlPrefix, ids, list, id, method)
         return res.send({msg:"success"})
     }
     catch(e){

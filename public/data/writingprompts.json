@@ -5,23 +5,14 @@
     "form":{
         "title":"New Prompt",
         "createBioPage":false,
-        "fields":[
-            {
-                "label":"Description",
-                "type":"text-area",
-                "placeholder":"Your Prompt",
-                "onCard":false,
-                "inList":true,
-                "filter":false,
-                "location":"body"
-            },
-            {
-                "label":"Author",
-                "inList":true,
-                "hidden":true,
-                "filter":false
-            }
-        ]
+        "fields":{
+        "description":{
+            "label":"Description",
+            "type":"text-area",
+            "placeholder":"Your Advice"
+
+        }
+    }
 
 
     },
