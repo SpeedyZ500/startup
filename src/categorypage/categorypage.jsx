@@ -391,7 +391,7 @@ export function CategoryPage(props) {
             // Clean up on unmount
             return () => {
             if (wsRef.current) {
-                //wsRef.current.cleanup();
+                wsRef.current.cleanup();
                 wsRef.current = null;
             }
             };

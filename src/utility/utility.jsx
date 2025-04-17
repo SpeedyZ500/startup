@@ -161,10 +161,10 @@ export const useWebSocketFacade = () => {
 
         // Clean up on unmount
         return () => {
-        if (wsRef.current) {
-            //wsRef.current.cleanup();
-            wsRef.current = null;
-        }
+            if (wsRef.current) {
+                wsRef.current.cleanup();
+                wsRef.current = null;
+            }
         };
     }, []);
 
