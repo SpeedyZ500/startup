@@ -44,7 +44,7 @@ function FilterGenerator({filters, onFilterChange, socket}){
 export function CategoryPage(props) {
     const [visible, setVisibility] = useState(false);
     const [selections, onSelectionChange] = useState([]);
-    const socket = useWebSocketFacade()
+    const [socket, setWebsocket] = useState(useWebSocketFacade())
 
     
     
@@ -110,7 +110,7 @@ export function CategoryPage(props) {
         const collection = path.startsWith("/worldbuilding/")
         ? path.replace("/worldbuilding/", "")
         : path.replace(/^\//, "");   
-        webSocket.subscribe({url:path, type:"getCards", collection, commandId:"getCards", query:{ sort:sortOptions.value},setData:setList})
+        socket.subscribe({url:path, type:"getCards", collection, commandId:"getCards", query:{ sort:sortOptions.value},setData:setList})
         console.log(JSON.stringify(list))
 
     }, [path, filter, sortOptions])
