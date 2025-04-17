@@ -77,14 +77,10 @@ export function CategoryPage(props) {
             paths = "/" + paths.replace(/\/$/, '').trim();
         }
         paths = paths.replace(/\/$/, '').trim()
-        const jsonPath = `${paths}.json`;
+        const jsonPath = `/api${paths}.json`;
+        console.log(jsonPath)
         fetch(jsonPath)
-        .then(async (res) => {
-            if(!res.ok){
-                 throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return await res.json()
-        })
+        .then((res) => res.json())
         .then((data) =>{
             console.log(JSON.stringify(data));
             setPage(data);
@@ -93,7 +89,7 @@ export function CategoryPage(props) {
         }).catch(e => {
             setError(`Page Data Error: ${e.message}`);
         })
-        .finally(setLoading(false))
+        .finally(() => setLoading(false))
     
     }, [path]);
 
