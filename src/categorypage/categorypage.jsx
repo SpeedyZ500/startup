@@ -46,20 +46,7 @@ export function CategoryPage(props) {
     const [selections, onSelectionChange] = useState([]);
     const socket = useWebSocketFacade()
 
-    const wsRef = useRef(null);
     
-        useEffect(() => {
-            // Initialize on mount
-            wsRef.current = new WebSocketFacade();
-    
-            // Clean up on unmount
-            return () => {
-            if (wsRef.current) {
-                //wsRef.current.cleanup();
-                wsRef.current = null;
-            }
-            };
-        }, []);
     
     
     
@@ -206,7 +193,7 @@ export function CategoryPage(props) {
                         
                         <form className="filterAndSort theme-h adaptive" action="" method="get">
                             <h4>Filter:</h4>
-                            <FilterGenerator filters={filters} onFilterChange={handleFilterChange} socket={wsRef}/>
+                            <FilterGenerator filters={filters} onFilterChange={handleFilterChange} socket={socket}/>
         
                             
                             <div className="input-group mb-3">

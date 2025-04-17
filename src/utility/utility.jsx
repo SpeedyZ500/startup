@@ -152,18 +152,13 @@ export function CardsRenderer({cards}){
 }
 
 export const useWebSocketFacade = () => {
-    const wsRef = useRef(null);
+    const [instance] = useState(() => new WebSocketFacade()); // ✅ Create once
+    const wsRef = useRef(instance);
 
     useEffect(() => {
-        // Initialize on mount
-        wsRef.current = new WebSocketFacade();
-
-        // Clean up on unmount
         return () => {
-            if (wsRef.current) {
-                wsRef.current.cleanup();
-                wsRef.current = null;
-            }
+            // 🧹 Clean up only when the component fully unmounts
+            wsRef.current?.cleanup?.();
         };
     }, []);
 
