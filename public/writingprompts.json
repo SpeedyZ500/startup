@@ -1,0 +1,38 @@
+{
+    "title":"Writing Prompts",
+    "description":"Need ideas for a story? here are some ideas",
+    "buttonLabel":"New Prompt",
+    "form":{
+        "title":"New Prompt",
+        "createBioPage":false,
+        "fields":{
+        "description":{
+            "label":"Description",
+            "type":"text-area",
+            "placeholder":"Your Advice"
+
+        }
+    }
+
+
+    },
+    "sort":[
+    {
+        "label":"New to Old",
+        "value":{"created":"decc"}
+    },
+    {
+        "label":"Old to New",
+        "value":{"created":"acc"}
+    },
+    {
+        "label":"A-Z Author",
+        "value":{"author":"acc"}
+    },
+    {
+        "label":"Z-A Author",
+        "value":{"author":"decc"}
+    }
+]
+
+}
