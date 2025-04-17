@@ -97,7 +97,7 @@ export function CategoryPage(props) {
         const collection = path.startsWith("/worldbuilding/")
         ? path.replace("/worldbuilding/", "")
         : path.replace(/^\//, "");   
-        socket.subscribe({url:path, type:"getCards", collection, commandId:"getCards", query:{ sort:sortOptions.value},setData:setList})
+        webSocket.subscribe({url:path, type:"getCards", collection, commandId:"getCards", query:{ sort:sortOptions.value},setData:setList})
         console.log(JSON.stringify(list))
     }, [path, filter, sortOptions])
     useEffect(() => {
