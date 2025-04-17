@@ -170,7 +170,18 @@ const socketHandlers = {
 
 function peerProxy(httpServer) {
   // Create a websocket object
-  const socketServer = new WebSocketServer({ server: httpServer });
+  //const socketServer = new WebSocketServer({ server: httpServer });
+  const socketServer = new WebSocketServer({ server });
+
+  httpServer.on('upgrade', (req, socket, head) => {
+    if (req.url === '/ws') {
+      socketServer.handleUpgrade(req, socket, head, (ws) => {
+        socketServer.emit('connection', ws, req);
+      });
+    } else {
+      socket.destroy();
+    }
+  });
 
   socketServer.on('connection', (socket) => {
     socket.isAlive = true;
@@ -212,7 +223,7 @@ function peerProxy(httpServer) {
         else {
             if (parsedMessage.type === 'POST' || parsedMessage.type === 'PUT' || parsedMessage.type === 'PATCH') {
                 socketServer.clients.forEach((client) => {
-                    if (client !== socket && client.readyState === WebSocket.OPEN) {
+                    if (client.readyState === WebSocket.OPEN) {
                         // Check the client's path or any other relevant conditions here
                         // For example, we check if client is subscribed to the same path/endpoint
                         for (const [url, commands] of client.subscriptions || []){
@@ -261,10 +272,10 @@ function peerProxy(httpServer) {
 
 function urlMatchesUpdate(url, updateMessage){
     const { collection, id, storyID, chapterID } = updateMessage;
-    if (url === `/${collection}`) return true;
-    if (id && url === `/${collection}/${id}`) return true;
-    if (storyID && url === `/${collection}/${storyID}`) return true;
-    if (storyID && chapterID && url === `/${collection}/${storyID}/${chapterID}`) return true;
+    if (url === `${collection}`) return true;
+    if (id && url === `${collection}/${id}`) return true;
+    if (storyID && url === `${collection}/${storyID}`) return true;
+    if (storyID && chapterID && url === `${collection}/${storyID}/${chapterID}`) return true;
     return false
 }
 

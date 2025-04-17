@@ -139,11 +139,11 @@ export function CardsRenderer({cards}){
     }, [cards, profanity]);
       
 
-    const renderCards = useMemo(() => renderCard(cleanCards), [cleanCards]);
+    const renderCards = useMemo(() => renderCard(cards), [cards]);
     
     useEffect(() => {
         console.log("CardsRenderer re-rendered");
-    }, [cleanCards, renderCards]);
+    }, [cards, renderCards]);
     return(
         <div className="card-columns my-container scrollable" data-bs-spy="scroll">
             {renderCards}

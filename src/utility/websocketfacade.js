@@ -12,12 +12,14 @@ export class WebSocketFacade {
             }
             this.queue = [];
         };
-        this.socket.onmessage = this.handleMessage.bind(this);
+        this.socket.onmessage = this.handleMessage.bind(this)
 
     }
 
     _safeSend(dataObj) {
+
         const message = JSON.stringify(dataObj);
+        console.log(message)
         if (this.socket.readyState === WebSocket.OPEN) {
             this.socket.send(message);
         } else {
@@ -43,7 +45,7 @@ export class WebSocketFacade {
         const data = JSON.parse(event.data);
         const handler = this.handlers.get(data.commandId);
         if (handler) {
-            console.log(JSON.stringify(data))
+            console.log(JSON.stringify(data.data))
           handler(data.data);
         }
     }
