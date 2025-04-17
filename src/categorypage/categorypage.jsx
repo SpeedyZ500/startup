@@ -44,8 +44,7 @@ function FilterGenerator({filters, onFilterChange, socket}){
 export function CategoryPage(props) {
     const [visible, setVisibility] = useState(false);
     const [selections, onSelectionChange] = useState([]);
-    const [socket, setWebsocket] = useState(useWebSocketFacade())
-
+    const socket = useWebSocketFacade()
     
     
     
@@ -79,32 +78,23 @@ export function CategoryPage(props) {
         }
         paths = paths.replace(/\/$/, '').trim()
         const jsonPath = `${paths}.json`;
-    
-        // Use async function to handle multiple async calls sequentially
-        const fetchData = async () => {
-            setLoading(true);
-            try {
-                // Fetch the page data
-                const res = await fetch(jsonPath);
-                if(!res.ok){
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-
-                }
-                const pageData = await res.json();
-                console.log(JSON.stringify(pageData));
-                setPage(pageData);
-                setSortOptions(pageData.sort?.[0] || null);
-                setError(null);
+        fetch(jsonPath)
+        .then(async (res) => {
+            if(!res.ok){
+                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-            catch (err){
-                setError(`Page Data Error: ${err.message}`);
-
-            }
-            setLoading(false); // Make sure loading state is reset
-
-        };
+            return await res.json()
+        })
+        .then((data) =>{
+            console.log(JSON.stringify(data));
+            setPage(data);
+            setSortOptions(data.sort?.[0] || null);
+            setError(null);
+        }).catch(e => {
+            setError(`Page Data Error: ${e.message}`);
+        })
+        .finally(setLoading(false))
     
-        fetchData(); // Call the async function
     }, [path]);
 
     useEffect(() => {
@@ -113,7 +103,6 @@ export function CategoryPage(props) {
         : path.replace(/^\//, "");   
         socket.subscribe({url:path, type:"getCards", collection, commandId:"getCards", query:{ sort:sortOptions.value},setData:setList})
         console.log(JSON.stringify(list))
-
     }, [path, filter, sortOptions])
     useEffect(() => {
         console.log(JSON.stringify(list))
@@ -173,14 +162,13 @@ export function CategoryPage(props) {
             <main>
                 
                 <div className="theme-h adaptive textbody">
-                        <h1>{page.title}</h1>
-                        <p>{page.description}</p>
+                        <h1>{page && page.title}</h1>
+                        <p>{page && page.description}</p>
                 </div>
-                    <button onClick={handleOpen} disabled={props.authState !== AuthState.Authenticated}className="btn btn-primary button-align"  data-bs-toggle="offcanvas" data-bs-target="#offcanvas" aria-controls="offcanvas">{page.buttonLabel}</button>
+                    <button onClick={handleOpen} disabled={props.authState !== AuthState.Authenticated}className="btn btn-primary button-align"  data-bs-toggle="offcanvas" data-bs-target="#offcanvas" aria-controls="offcanvas">{page && page.buttonLabel || "new"}</button>
                     <Offcanvas show={visible} className="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabIndex="-1" id="offcanvas" aria-labelledby="offcanvasLabel">
                         
                         <OffcanvasHeader className="offcanvas-header">
-                            <h4 className="offcanvas-title" id="offcanvasLabel">{page.form.title}</h4>
                             <button onClick={handleClose}type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                         </OffcanvasHeader>
                         <OffcanvasBody className="new">
@@ -200,7 +188,7 @@ export function CategoryPage(props) {
                             <div className="input-group mb-3">
                                 <label className="input-group-text" htmlFor="sort" name="varSort" >Sort </label>
                                 <Select 
-                                    options={page.sort}
+                                    options={page &&page.sort}
                                     value={sortOptions}
                                     className="form-control" 
                                     id="sort" 
