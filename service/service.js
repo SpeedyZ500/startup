@@ -22,7 +22,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use(express.static('public'));
-app.use('/api',express.static('data'));
+app.use('/api',express.static('public/data'));
 
 
 async function createUser(email, username, password, displayname) {
