@@ -33,34 +33,9 @@ const urlPrefix = "/stories/"
 const storiesRouter = express.Router();
 
 
-storiesRouter.get(`${urlPrefix}genres/options`, async (req, res) => {
-    const options = await getOptions("genres")
-    res.send(options)
-})
-storiesRouter.get(`${urlPrefix}contentwarnings/options`, async (_req, res) => {
-    const options = await getOptions("contentwarnings")
-    res.send(options)
-
-    res.send(options)
-})
 
 //stories chapters
-storiesRouter.get(`${urlPrefix}/chapters/options`, async (req, res) => {
-    const query = req.query;
 
-    try {
-        const options = await getOptions("chapters", { query });
-
-        if (options) {
-            res.send(options);
-        } else {
-            res.status(404).send({ msg: "No chapters were found" });
-        }
-    } catch (error) {
-        console.error(error);
-        res.status(500).send({ msg: "Server error while fetching chapter options" });
-    }
-});
 //stories chapters
 storiesRouter.get(`${urlPrefix}:storyID/chapters`, async (req, res) => {
     const { storyID } = req.params;
@@ -73,7 +48,7 @@ storiesRouter.get(`${urlPrefix}:storyID/chapters`, async (req, res) => {
         res.status(404).send({msg:"Graph not found"})
     }
 });
-storiesRouter.get(`${urlPrefix}:storyID/edit`, verifyAuth, async (req, res) => {
+storiesRouter.get(`${urlPrefix}:storyID`, verifyAuth, async (req, res) => {
     const { storyID } = req.params;
     try{
         const story = await getEditable(urlPrefix,req.params.usid,storyID,{ 
@@ -95,45 +70,7 @@ storiesRouter.get(`${urlPrefix}:storyID/edit`, verifyAuth, async (req, res) => {
 })
 
 
-//individual story
-storiesRouter.get(`${urlPrefix}:storyID?`, async (req, res) => {
-    const { storyID } = req.params;
-    const  query  = req.query;
-    if (!storyID) {
-        const stories = await getCards(urlPrefix,{query, 
-            lookupFields:baseLookupFields, 
-            projectionFields:baseProjectionFields,
-            fields:storyFields
-        })
-        res.send(stories);
-    } else {
-        const story = await getDisplayable(urlPrefix,storyID,{ 
-            lookupFields:baseLookupFields, 
-            projectionFields:baseProjectionFields,
-            fields:storyFields
-        })
-        if (story) {
-            res.send(story);
-        } else {
-            res.status(404).send({ error: "Story not found" });
-        }
-    }
-});
 
-storiesRouter.get(`${urlPrefix}chapter/:chapterID/read`, async (req, res) => {
-    const {chapterID} = req.params;
-    const chapter = await getDisplayable("chapters", chapterID, {
-        fields:storyFields,
-        lookupFields:chapterLookupFields,
-        projectionFields:chapterProjectFields,
-    })
-    if(chapter){
-        res.send(chapter);
-    }
-    else{
-        res.status(404).send({msg:"Chapter not found"})
-    }
-})
 
 storiesRouter.get(`${urlPrefix}chapter/:chapterID`, verifyAuth, async (req, res) => {
     const {chapterID} = req.params;

@@ -26,50 +26,12 @@ const {
     
  } = require('./database.js')
 
-racesRouter.get(`${urlPrefix}types/options`, async (req, res) => {
-    const options = await getOptions("racetypes")
-    res.send(options)
-})
-
-racesRouter.get(`${urlPrefix}options`, async (req, res) => {
-    const options = await getOptions("race", {query:req.query})
-    res.send(options)
-})
 
 
 
 
-racesRouter.get(`${urlPrefix}`, async (req, res) => {
-    const query = req.query || {};
-    const raceToSend = await getCards(urlPrefix, {
-        query,
-        lookupFields:raceCardLookups,
-        fields:baseFields,
-        projectionFields:raceProjectionFields
-    })
-    res.send(raceToSend)
-})
 
-racesRouter.get(`${urlPrefix}:id/bio`, async (req, res) => {
-    const { id } = req.params;
-    try{
-        const race = await getDisplayable(urlPrefix, id, {
-            lookupFields:raceFullLookups,
-            fields:fullBio,
-            projectionFields:raceBioProjectionFields
-        });
-        if(race){
-            res.send(race);
-        }
-        else{
-            res.status(404).json({ error: "Race not found" });
-        }
-    }
-    catch{
-        res.status(500).send({msg:"server error"})
-    }
-    
-});
+
 racesRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     const author = req.usid
     const {id} = req.params

@@ -4,6 +4,7 @@ const { getCards, getDisplayable, getGraph, getOptions, mapOptionsMap, displayab
 const socketHandlers = {
     async getCards(socket, message){
         try{
+            const collection = message.collection.replace(/\//g, '');
             const params = cardsMap[message.collection]
             if(!params){
                 return socket.send(JSON.stringify({
@@ -41,7 +42,9 @@ const socketHandlers = {
     },
     async getDisplayable(socket, message){
         try{
-            const params = displayableMap[message.collection]
+            const collection = message.collection.replace(/\//g, '');
+
+            const params = displayableMap[collection]
             if(!params){
                 return socket.send(JSON.stringify({
                     type:message.type,
@@ -100,8 +103,9 @@ const socketHandlers = {
     },
     async getOptions(socket, message){
         try{
-            
-            const data = await getOptions(message.collection, {
+            const collection = message.collection.replace(/\//g, '');
+
+            const data = await getOptions(collection, {
                 query:message.query,
                 
             })
@@ -126,7 +130,9 @@ const socketHandlers = {
     },
     async mapOptions(socket, message){
         try{
-            const map = mapOptionsMap[message.collection]
+            const collection = message.collection.replace(/\//g, '');
+
+            const map = mapOptionsMap[collection]
             if(!map){
                 return socket.send(JSON.stringify({
                     type:message.type,

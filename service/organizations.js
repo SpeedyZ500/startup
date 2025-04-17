@@ -27,50 +27,10 @@ const {
     
  } = require('./database.js')
 
-organizationsRouter.get(`${urlPrefix}types/options`, async (req, res) => {
-    const options = await getOptions("organizationtypes")
-    res.send(options)
-})
-
-organizationsRouter.get(`${urlPrefix}options`, async (req, res) => {
-    const options = await getOptions("organizations", {query:req.query})
-    res.send(options)
-})
 
 
 
 
-organizationsRouter.get(`${urlPrefix}`, async (req, res) => {
-    const query = req.query || {};
-    const organizationToSend = await getCards(urlPrefix, {
-        query,
-        lookupFields:institutionLookups,
-        fields:baseInstitutionCards,
-        projectionFields:institutionProjectionFields
-    })
-    res.send(organizationToSend)
-})
-
-organizationsRouter.get(`${urlPrefix}:id/bio`, async (req, res) => {
-    const { id } = req.params;
-    try{
-        const organization = await getDisplayable(urlPrefix, id, {
-            lookupFields:organizationFullLookups,
-            fields:institutionFullFields,
-            projectionFields:organizationBioProjectionFields
-        });
-        if(organization){
-            res.send(organization);
-        }
-        else{
-            res.status(404).json({ error: "organization not found" });
-        }
-    }
-    catch{
-        res.status(500).send({msg:"server error"})
-    }
-    
-});
 organizationsRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     const author = req.usid
     const {id} = req.params

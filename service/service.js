@@ -148,16 +148,6 @@ apiRouter.post('/writingprompts', verifyAuth, async (req, res) => {
     }
 });
 
-apiRouter.get('/writingadvice', async (req, res) => {
-    const writingadvice = await getCards("writingadvice", {query:req.query})
-    res.send(writingadvice);
-});
-
-apiRouter.get('/writingprompts', async (req, res) => {
-    const writingPrompts = await getCards("writingprompts", {query:req.query})
-    res.send(writingPrompts);
-});
-
 // Registration
 apiRouter.post('/auth/register', async (req, res) => {
     if(!isValidId(req.body.username)){
