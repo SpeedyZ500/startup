@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo} from 'react';
 import {useWebSocketFacade} from './utility.jsx'
 import Select from 'react-select'
 import Creatable from 'react-select/creatable';
@@ -101,6 +101,8 @@ export function FormGenerator({handleClose}){
     const {url, id} = extractIDfromURL();
     const [form, setForm] = useState({})
     const [formData, setData] = useState({})
+    const memoizedFields = useMemo(() => form.fields, [form]);
+
 
     useEffect(() => {
         fetch(`/api/user/me`, {
@@ -191,7 +193,7 @@ export function FormGenerator({handleClose}){
             <div>
                 <h1>Modify {formData.name}</h1>
                  <ButtonGroup>
-                    <GenerateForm formData={formData} form={form.fields} socket={socket} setData={setData} currUrl={url}/>
+                    <GenerateForm formData={formData} form={memoizedFields} socket={socket} setData={setData} currUrl={url}/>
                     <Button onClick={handleSubmit} variant='primary'>Submit</Button>
                     <Button onClick={handleClose} variant='secondary'>Close</Button>
                 </ButtonGroup>
@@ -203,7 +205,7 @@ export function FormGenerator({handleClose}){
         <div>
             <h1>{form &&form.title || ""}</h1>
              <ButtonGroup>
-                <GenerateForm formData={formData} form={form.fields} socket={socket} setData={setData} currUrl={url}/>
+                <GenerateForm formData={formData} form={memoizedFields} socket={socket} setData={setData} currUrl={url}/>
                 <Button onClick={handleSubmit} variant='primary'>Submit</Button>
                 <Button onClick={handleClose} variant='secondary'>Close</Button>
             </ButtonGroup>

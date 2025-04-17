@@ -17,22 +17,22 @@
 
     },
     "sort":[
-        {
-            "label":"New to Old",
-            "value":{"category":"created", "az":false}
-        },
-        {
-            "label":"Old to New",
-            "value":{"category":"created", "az":true}
-        },
-        {
-            "label":"A-Z Author",
-            "value":{"category":"Author", "az":true}
-        },
-        {
-            "label":"Z-A Author",
-            "value":{"category":"Author", "az":false}
-        }
-    ]
+    {
+        "label":"New to Old",
+        "value":{"created":"decc"}
+    },
+    {
+        "label":"Old to New",
+        "value":{"created":"acc"}
+    },
+    {
+        "label":"A-Z Author",
+        "value":{"author":"acc"}
+    },
+    {
+        "label":"Z-A Author",
+        "value":{"author":"decc"}
+    }
+]
 
 }

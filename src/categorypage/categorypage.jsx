@@ -17,15 +17,16 @@ import { WebSocketFacade, webSocket } from '../utility/websocketfacade.js';
 
 
 
-function FilterGenerator({filters, onFilterChange}){
+function FilterGenerator({filters, onFilterChange, socket}){
     const handleChange = (selectedOptions, attribute) => {
         onFilterChange(attribute, selectedOptions.map(option => option.value));
     };
-    return filters.map((filter, index) => {
+    return Object.keys(filters).map((key) => {
         return(
-            <div className="input-group" key={index}>
-                <label className="input-group-text" htmlFor={filter.attribute}>
-                    {filter.attribute}
+            <div className="input-group" key={key}>
+
+                <label className="input-group-text" htmlFor={key}>
+                    {key}
                 </label>
                 <Select 
                     isMulti 
@@ -391,7 +392,7 @@ export function CategoryPage(props) {
             // Clean up on unmount
             return () => {
             if (wsRef.current) {
-                wsRef.current.cleanup();
+                //wsRef.current.cleanup();
                 wsRef.current = null;
             }
             };
@@ -475,8 +476,8 @@ export function CategoryPage(props) {
     const [list, setList] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [filter, setFilter] = useState(new FilterOptions());
-    const [filters, setFilters] = useState([])
+    const [filter, setFilter] = useState({});
+    const [filters, setFilters] = useState({})
     const [sections, setSections] = useState([]);
     const [categories, setCategories] = useState([])
     const path = window.location.pathname;
@@ -484,12 +485,12 @@ export function CategoryPage(props) {
         setCategories(event)
     }
 
-    const [sortOptions, setSortOptions ] = useState();
+    const [sortOptions, setSortOptions ] = useState({});
     const handleFilterChange = (attribute, values) => {
-        const temp = new FilterOptions(filters.filter); 
+
         const selected = values.map(value => value);
-        temp.updateFilter(attribute, selected);
-        setFilter(temp);
+        
+        setFilter({...filter, [attribute]:selected});
     };
    
     
@@ -531,7 +532,7 @@ export function CategoryPage(props) {
         const collection = path.startsWith("/worldbuilding/")
         ? path.replace("/worldbuilding/", "")
         : path.replace(/^\//, "");   
-        webSocket.subscribe({url:path, type:"getCards", collection, commandId:"getCards", query:{filter},setData:setList})
+        webSocket.subscribe({url:path, type:"getCards", collection, commandId:"getCards", query:{ sort:sortOptions.value},setData:setList})
         console.log(JSON.stringify(list))
 
     }, [path, filter, sortOptions])
@@ -540,6 +541,16 @@ export function CategoryPage(props) {
 
     },[list])
     const [profanity, setProfanity] = useState(true);
+
+    useEffect(() => {
+        if(page && typeof page === "object"){
+            if(page.filter){
+                setFilters(page.filter)
+            }
+            
+
+        }
+    }, [page])
     
     useEffect(() => {
         async function fetchProfanitySetting() {
@@ -556,27 +567,10 @@ export function CategoryPage(props) {
     }, []);
     useEffect(() => {
         async function applyProfanityFilter() {
-            let newFilter = new FilterOptions();
     
-            for (const card of list) {
-                if (!Array.isArray(card.details)) {
-                    continue;
-                }
+            
     
-                for (const detail of card.details) {
-                    if (detail.filter !== false && detail.label && detail.value) {
-                        const cleanedLabel = await filterProfanity(detail.label, profanity);
-                        newFilter.addOption(cleanedLabel, detail.value);
-                    }
-                }
-            }
-    
-            const filterTemp = newFilter.filters.map(filter => ({
-                attribute: filter.attribute,
-                value: filter.values.map(value => ({ label: value, value }))
-            }));
-    
-            setFilters(filterTemp);
+           
         }
     
         applyProfanityFilter();
@@ -625,7 +619,7 @@ export function CategoryPage(props) {
                         
                         <form className="filterAndSort theme-h adaptive" action="" method="get">
                             <h4>Filter:</h4>
-                            <FilterGenerator filters={filters} onFilterChange={handleFilterChange}/>
+                            <FilterGenerator filters={filters} onFilterChange={handleFilterChange} socket={wsRef}/>
         
                             
                             <div className="input-group mb-3">

@@ -171,7 +171,7 @@ const socketHandlers = {
 function peerProxy(httpServer) {
   // Create a websocket object
   //const socketServer = new WebSocketServer({ server: httpServer });
-  const socketServer = new WebSocketServer({ server });
+  const socketServer = new WebSocketServer({ noServer:true });
 
   httpServer.on('upgrade', (req, socket, head) => {
     if (req.url === '/ws') {

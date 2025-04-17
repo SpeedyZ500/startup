@@ -508,7 +508,7 @@ async function processSort(rawSort){
     const processedKeys = new Set();
 
     for (const [key, direction] of Object.entries(rawSort)) {
-        const dir = direction === 'abc' ? 1 : -1
+        const dir = direction === 'acc' ? 1 : -1
         if(key === "created" || key === "modified" || key === "expanded"){
             sortFields[key] = dir;
         }
@@ -731,7 +731,7 @@ async function getCards(collectionKey, {
     }
     if (Object.keys(sort).length > 0) {
         const processedSort = await processSort(sort)
-        pipeline.push({ $sort: processedSort });
+        pipeline.push(processedSort);
     }
     for (const field of lookupFields) {
         ensureLookup(pipeline, field);

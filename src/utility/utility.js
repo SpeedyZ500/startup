@@ -37,7 +37,7 @@ class FilterOptions{
             this.filters = [new FilterItem(attributeOrItems, value)];
         } 
         else{
-            this.filters = [];
+            this.filters = {};
         }
     }
     addOption(attribute, value){

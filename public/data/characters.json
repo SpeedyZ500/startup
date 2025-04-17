@@ -216,27 +216,27 @@
     "sort":[
         {
             "label":"New to Old",
-            "value":{"key":"created", "az":false}
+            "value":{"created":"decc"}
         },
         {
             "label":"Old to New",
-            "value":{"key":"created", "az":true}
+            "value":{"created":"acc"}
         },
         {
             "label":"A-Z Name",
-            "value":{"key":"name", "az":true}
+            "value":{"name":"acc"}
         },
         {
             "label":"Z-A Name",
-            "value":{"key":"name", "az":false}
+            "value":{"name":"decc"}
         },
         {
             "label":"A-Z Author",
-            "value":{"key":"author", "az":true}
+            "value":{"author":"acc"}
         },
         {
             "label":"Z-A Author",
-            "value":{"key":"author", "az":false}
+            "value":{"author":"decc"}
         }
     ]
 

@@ -70,10 +70,9 @@ function renderItem(item, cardId){
 
 function renderCard(cards){
     
-    
-
-
-
+    if(!cards){
+        return null;
+    }
     
     return (
         cards.map((card, index) => {
