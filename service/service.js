@@ -21,6 +21,9 @@ const {
 app.use(express.json());
 app.use(cookieParser());
 
+app.use(express.static('public'));
+
+
 async function createUser(email, username, password, displayname) {
     
     const passwordHash = await bcrypt.hash(password, 10);
@@ -56,7 +59,7 @@ function isValidPassword(pass){
     return typeof pass === "string" && pass.length >= 8 && /^[^\s<>]*$/.test(pass);
 }
 
-app.use(express.static('public'));
+
 
 var apiRouter = express.Router();
 app.use(`/api`, apiRouter);

@@ -75,16 +75,16 @@ export function CategoryPage(props) {
     useEffect(() => {
         let paths = path;
         if (!paths.startsWith("/")) {
-            paths = "/" + paths;
+            paths = "/" + paths.replace(/\/$/, '').trim();
         }
-        const jsonPath = `/data${paths}`;
+        const jsonPath = `${paths}.json`;
     
         // Use async function to handle multiple async calls sequentially
         const fetchData = async () => {
             setLoading(true);
             try {
                 // Fetch the page data
-                const res = await fetch(`${jsonPath}.json`);
+                const res = await fetch(jsonPath);
                 if(!res.ok){
                     throw new Error(`HTTP error! Status: ${response.status}`);
 
