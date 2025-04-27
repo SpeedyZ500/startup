@@ -10,20 +10,16 @@ import { Link, useNavigate} from 'react-router-dom';
 
 
 export function Login(props) {
-    const [username, setUsername] = React.useState(props.user ? props.user.username : '');
+    const [username, setUsername] = React.useState('');
 
     const [password, setPassword] = React.useState('');
     const [displayError, setDisplayError] = React.useState(null);
     const navigate = useNavigate();
 
-    function handleLogin() {
+    async function handleLogin() {
         const json = ({username:username, password:password});
-        createAuth('PUT', json, "login", setDisplayError, navigate, props.onLogin);
+        await createAuth('PUT', json, "login", setDisplayError, navigate, props.onLogin);
     }
-
-    
-  
-    
     return (
         <main className="container-fluid text-center">
             <fieldset className="theme-l adaptive">
@@ -39,7 +35,7 @@ export function Login(props) {
                     
                     
                         <div className="btn-group">
-                            <button onClick={() => handleLogin()} className="btn btn-primary" disabled={!username || !password} >Login</button>
+                            <button onClick={handleLogin} className="btn btn-primary" disabled={!username || !password} >Login</button>
                             <button className="btn btn-secondary" onClick={()=> navigate('/login/register') }>Create</button>
                         </div>
                     
@@ -57,7 +53,6 @@ export function Login(props) {
 
 
 async function createAuth(method, json, path, setDisplayError, navigate, onLogin){
-    
     try{
         const res = await fetch(`/api/auth/${path}`, {
             method: method,
@@ -66,23 +61,19 @@ async function createAuth(method, json, path, setDisplayError, navigate, onLogin
         });
         if(res.ok){
             const user = await res.json();
-            localStorage.setItem('user', JSON.stringify(user));
+            console.log(JSON.stringify(user))
             onLogin(user);
-      
             navigate('/');
         }
         else{
             let errorMessage = "An unknown error occurred";
-
+            console.log(errorMessage)
             // Ensure response has JSON data before parsing
             if (res.headers.get("content-type")?.includes("application/json")) {
                 const body = await res.json();
                 errorMessage = body.msg || errorMessage;
             }
-
             setDisplayError(`Error: ${errorMessage}`);
-    
-    
         }
     }
     catch (e){
@@ -103,8 +94,11 @@ export function Register(props){
 
     async function handleRegister() {
         if(password === confirm){
-            const json = ({email:email, username:username, password:password, displayname:displayname});
-            createAuth('POST', json, "register", setDisplayError, navigate, props.onLogin);    
+            const json = ({email, username, password, displayname});
+            await createAuth('POST', json, "register", setDisplayError, navigate, props.onLogin);
+        }
+        else{
+            setDisplayError("Your passwords don't match")
         }
     }
 
@@ -135,7 +129,7 @@ export function Register(props){
                     
                     
                         <div className="btn-group">
-                            <Button onClick={() => handleRegister()} variant="primary" disabled={!username || !password || password !== confirm || !email} >
+                            <Button onClick={handleRegister} variant="primary" disabled={!username || !password || password !== confirm || !email} >
                                 Register
                             </Button>
                             <Button variant="secondary" onClick={()=> navigate('/login') }>Cancel</Button>
@@ -152,6 +146,4 @@ export function Register(props){
             </fieldset>
         </main>
         );
-   
-
 }

@@ -18,7 +18,7 @@ const db = client.db('yggdrasil');
       console.log(`Unable to connect to database with ${url} because ${ex.message}`);
       process.exit(1);
     }
-  })();
+  });
 
   function sanitizeId(id){
     return id
@@ -502,7 +502,7 @@ async function addTypesBatch(collection, ids) {
     return existingItems;
 }
 
-async function processSort(rawSort){
+async function processSort(pipeline, rawSort){
     const processed = []
     const sortFields = {};
     const processedKeys = new Set();
@@ -667,7 +667,7 @@ function getUserByToken(token){
 }
 
 async function addUser(user){
-    return await userCollection.insertOne(user)
+    await userCollection.insertOne(user)
 }
 
 async function addWritingPrompt(prompt){
@@ -730,8 +730,7 @@ async function getCards(collectionKey, {
         pipeline.push({ $match: processedFilter });
     }
     if (Object.keys(sort).length > 0) {
-        const processedSort = await processSort(sort)
-        pipeline.push(processedSort);
+        await processSort(pipeline,sort)
     }
     for (const field of lookupFields) {
         ensureLookup(pipeline, field);
@@ -861,7 +860,11 @@ async function addOne(collectionKey, data, {preProcessing = {}, postProcessing =
     preProcessedData.created = created;
     preProcessedData.modified = created;
     
-    const result = await collection.insertOne(preProcessedData)
+    const resultStuff = await collection.insertOne(preProcessedData)
+    if(!resultStuff.acknowledged){
+        throw createError("An Error occured", 500)
+    }
+    const result = await collection.findOne({ _id: resultStuff.insertedId })
     await Promise.all(
         Object.entries(postProcessing).map(([key, fn]) => fn(result[key], result, collectionKey))
     );
@@ -899,7 +902,7 @@ async function updateOne(collectionKey, data, author, {preProcessing = {}, postP
     }
     const preProcessedData = preprocessData(data, preProcessing)
     data.modified = new Date().toJSON();
-    const result = await collection.updateOne({_id: original._id, author:author}, {$set:preProcessedData})
+    const result = await collection.findOneAndUpdate({_id: original._id, author:author}, {$set:preProcessedData}, {returnDocument: 'after'})
     await Promise.all(
         Object.entries(postProcessing).map(([key, fn]) => fn(result[key], result, collectionKey))
     );

@@ -26,15 +26,12 @@ app.use('/api',express.static('public/data'));
 
 
 async function createUser(email, username, password, displayname) {
-    
     const passwordHash = await bcrypt.hash(password, 10);
-
     const user = {
         email: email,
         username:username,
         password: passwordHash,
         profanityFilter:true,
-
     };
     if(displayname && displayname !== ''){
         user.displayname = displayname;
@@ -42,10 +39,9 @@ async function createUser(email, username, password, displayname) {
     else{
         user.displayname = username;
     }
-    
-
-    return await addUser(user)
-    ;
+    user.token = uuid.v4();
+    await addUser(user);
+    return user
 }
 
 function isValidEmail(email) {
@@ -152,6 +148,9 @@ apiRouter.post('/writingprompts', verifyAuth, async (req, res) => {
     }
 });
 
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+
 // Registration
 apiRouter.post('/auth/register', async (req, res) => {
     if(!isValidId(req.body.username)){
@@ -175,15 +174,16 @@ apiRouter.post('/auth/register', async (req, res) => {
     } else{
         const user = await createUser(req.body.email, req.body.username, req.body.password, req.body.displayname);
         if(user){
-            await setAuthCookie(res, user);
-
-            res.send({email:user.email, username:user.username, displayname:user.displayname, profanityFilter:user.profanityFilter});    
+            await setAuthCookie(res, user.token);
+            await delay(500);
+            return res.send({email:user.email, username:user.username, displayname:user.displayname, profanityFilter:user.profanityFilter});    
         }
         else{
-            res.status(500).send({ msg: "User creation failed" });
+            return res.status(500).send({ msg: "User creation failed" });
         }
     }
 });
+
 
 // Login
 apiRouter.put('/auth/login', async (req, res) => {
@@ -193,7 +193,9 @@ apiRouter.put('/auth/login', async (req, res) => {
 
     const user = await getUser(isEmail ? "email" : "username", identifier);
     if (user && (await bcrypt.compare(req.body.password, user.password))){
-        await setAuthCookie(res, user);  
+        user.token = uuid.v4();
+        await updateUser(user)
+        await setAuthCookie(res, user.token);  
         res.send({email:user.email, username:user.username, displayname:user.displayname, profanityFilter:user.profanityFilter});
     }
     else{
@@ -233,7 +235,9 @@ apiRouter.get(`/users`, async (_req, res) =>{
     const users = await listUserDisplay();
     res.send(users)
 })
-
+app.use((_req, res) => {
+    res.sendFile('index.html', { root: 'public' });
+});
 
 apiRouter.get('/user/me', async (req, res) => {
     const token = req.cookies[authCookieName];
@@ -318,10 +322,8 @@ apiRouter.put('/user/pass', verifyAuth, async(req, res) => {
 });
 
 // Set auth cookie
-async function setAuthCookie(res, user){
-    user.token = uuid.v4();
-    await updateUser(user)
-    res.cookie('token', user.token, {
+async function setAuthCookie(res, token){
+    res.cookie(authCookieName, token, {
         secure: true,
         httpOnly: true,
         sameSite: 'Strict',

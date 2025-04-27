@@ -93,35 +93,18 @@ function renderCard(cards){
 
 
 }
-export function CardsRenderer({cards}){
+export function CardsRenderer({cards, profanity}){
     //const currSort = useEffect(() => console.log(JSON.stringify(sort)), [sort]);
     
     
     
-    const [profanity, setProfanity] = useState(true);
     const [cleanCards, setCleanCards] = useState(cards);
 
     const prevCards = useRef(cards);
     const prevProfanity = useRef(profanity);
 
 
-    useEffect(() => {
-        async function fetchProfanitySetting() {
-            try {
-                const res = await fetch('/api/user/me', { method: 'GET', credentials: 'include' });
-                if (res.ok) {
-                    const data = await res.json(); // Ensure it's parsed correctly
-                    setProfanity(data.profanityFilter);
-                } else {
-                    setProfanity(true); // Default to true if response is not OK
-                }
-            } catch {
-                setProfanity(true); // Also default to true on errors
-            }
-        }
-    
-        fetchProfanitySetting();
-    }, []);
+   
 
     useEffect(() => {
         if (prevCards.current === cards && prevProfanity.current === profanity) {

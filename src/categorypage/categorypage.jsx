@@ -77,7 +77,7 @@ export function CategoryPage(props) {
             paths = "/" + paths.replace(/\/$/, '').trim();
         }
         paths = paths.replace(/\/$/, '').trim()
-        const jsonPath = `/api${paths}.json`;
+        const jsonPath = `/data${paths}.json`;
         console.log(jsonPath)
         fetch(jsonPath)
         .then((res) => res.json())

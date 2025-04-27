@@ -11,7 +11,7 @@ import Card from 'react-bootstrap/Card';
 
 
 
-export function Home() {
+export function Home(props) {
     const [stories, setStories] = useState([])
     const [prompts, setPrompts] = useState([])
     const [error, setError] = useState(null);
@@ -29,19 +29,19 @@ export function Home() {
             <hr />
             <h2 className="theme-h adaptive text-center expanded">Writing Prompts</h2>
             <div id="prompts" >
-                <CardsRenderer cards={prompts} filters ={new FilterOptions().filters} sort={new SortOptions("created", false)}/>
+                <CardsRenderer cards={prompts} profanity={props.profanityFilter}/>
                 
             </div>
             <hr />
             <h2 className="theme-h adaptive text-center expanded ">Stories</h2>
             <h2 className="theme-h adaptive text-center expanded">New</h2>
             <div className ="new">
-                <CardsRenderer cards={stories} filters ={new FilterOptions().filters} sort={new SortOptions("created", false)}/>
+                <CardsRenderer cards={stories} profanity={props.profanityFilter}/>
 
             </div>
             <h2 className="theme-h adaptive expanded">Popular</h2>
             <div className="popular" >
-                <CardsRenderer cards={stories} filters ={new FilterOptions().filters} sort={new SortOptions("created", false)}/>
+                <CardsRenderer cards={stories} profanity={props.profanityFilter}/>
 
             </div>
     </main>);
