@@ -235,9 +235,7 @@ apiRouter.get(`/users`, async (_req, res) =>{
     const users = await listUserDisplay();
     res.send(users)
 })
-app.use((_req, res) => {
-    res.sendFile('index.html', { root: 'public' });
-});
+
 
 apiRouter.get('/user/me', async (req, res) => {
     const token = req.cookies[authCookieName];

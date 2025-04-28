@@ -165,7 +165,7 @@ const collectionsMap = {
     country: countriesCollection,
     countries: countriesCollection,
     homecountry: countriesCollection,
-    otherCountries: countriesCollection,
+    othercountries: countriesCollection,
     countrytypes: countryTypeCollection,
     
 
@@ -490,7 +490,7 @@ async function addTypesBatch(collection, ids) {
     const missingValues = sanitizedIds.filter(id => !existingValues.includes(id));
 
     // Insert missing values
-    if (missingValues.length > 0) {
+    if (missingValues.length) {
         const insertDocs = missingValues.map(value => ({ value }));
         await collection.insertMany(insertDocs);
 
@@ -501,40 +501,78 @@ async function addTypesBatch(collection, ids) {
 
     return existingItems;
 }
+const allowedSortFields = [
+    "title",
+    "name",
+    "author",
+    "homeWorld",
+    "originWorld",
+    "otherWorlds",
+    "worlds",
+    "homeCountry",
+    "otherCountries",
+    "countries",
+    "originBiome",
+    "otherBiomes",
+    "biomes",
+    "towns",
+    "homeTown",
+    "continents",
+    "types",
+    "titles",
+    "created",
+    "modified",
+    "expanded",
+    "genres",
+    "contentWarnings",
+    "abilities",
+    "race",
+    "altForms",
+    "races",
+    "leaders",
+    "enemies",
+    "allies",
+    "organizations",
+    "religion",
+    "gender",
+    "pronouns",
+    "born",
+    "died",
+]
 
+
+const requireUnwinding = [
+    "types",
+    "titles",
+    "otherCountries",
+    "countries",
+    "otherWorlds",
+    "otherBiomes",
+    "biomes",
+    "worlds",
+    "genres",
+    "towns",
+    "continents",
+    "contentWarnings",
+    "abilities",
+    "altForms",
+    "races",
+    "leaders",
+    "enemies",
+    "allies",
+    "organizations"
+]
 async function processSort(pipeline, rawSort){
-    const processed = []
     const sortFields = {};
-    const processedKeys = new Set();
-
-    for (const [key, direction] of Object.entries(rawSort)) {
-        const dir = direction === 'acc' ? 1 : -1
-        if(key === "created" || key === "modified" || key === "expanded"){
-            sortFields[key] = dir;
+    const toUnwind = new Set()
+    for(const [key, direction] of Object.entries(rawSort)){
+        if(!allowedSortFields.includes(key)){
+            continue;
         }
-        else{
-            const collection = getCollection(key);
-            if(!collection || excludeCollections.includes(collection)){
-                continue;
-            }
-            else if(!processedKeys.has(collection)){
-                processedKeys.add(key)
-                processed.push({
-                    "$lookup": {
-                        from: collection.collectionName,
-                        localField:key,
-                        foreignField: '_id',
-                        as:`${key}Details`
-                    }
-                })
-                processed.push({
-                    "$unwind": {
-                        path:`$${key}Details`,
-                        preserveNullAndEmptyArrays: true
-                    }
-                })
-                
-            }
+        const collection = getCollection(key);
+        const lookup = !!collection
+        if(lookup){
+            ensureLookup(pipeline, key)
             let sortField
             if(collection === userCollection){
                 sortField = `${key}Details.displayname`
@@ -545,14 +583,40 @@ async function processSort(pipeline, rawSort){
             else {
                 sortField = `${key}Details.name`
             }
-            sortFields[sortField] = dir;
-           
+            sortFields[sortField] = direction;
+        }
+        else{
+            sortFields[key] = direction;
+        }
+        if(requireUnwinding.includes(key)){
+            toUnwind.add(lookup ? `${key}Details` : `${key}`);
         }
     }
-    if(Object.keys(sortFields).length > 0){
-        processed.push({$sort: sortFields})
+    const grouper = {
+        _id : "$_id",
+        doc: {$first : "$$ROOT"}
     }
-    return processed
+    const merger = {}
+    for(const key of toUnwind){
+        pipeline.push({
+            $unwind:{
+                path:`$${key}`,
+                preserveNullAndEmptyArrays: true
+            }
+        })
+        grouper[key] = {$addToSet:`$${key}`}
+        merger[key] = `$${key}`
+    }
+    if(Object.keys(sortFields).length){
+        pipeline.push({$sort: sortFields})
+    }
+    if(toUnwind.size){
+        pipeline.push({$group: grouper})
+        pipeline.push({$replaceRoot:{
+            newRoot:{$mergeObjects:["$doc", merger]}
+        }})
+    }   
+    return
 }
 
 
@@ -610,13 +674,12 @@ async function getCatagoryOptions(collection,
 
     const {filter = {}, sort = {}} = query
 
-    if (Object.keys(filter).length > 0) {
+    if (Object.keys(filter).length) {
         const processedFilter = await processFilters(filter)
         pipeline.push({ $match: processedFilter });
     }
-    if (Object.keys(sort).length > 0) {
-        const processedSort = await processSort(sort)
-        pipeline.push({ $sort: processedSort });
+    if (Object.keys(sort).length) {
+        await processSort(pipeline, sort)
     }
     const project = {
         label: `$${labelField}`,
@@ -725,11 +788,11 @@ async function getCards(collectionKey, {
     const {filter = {}, sort = {}} = query
     const pipeline = [];
 
-    if (Object.keys(filter).length > 0) {
+    if (Object.keys(filter).length) {
         const processedFilter = await processFilters(filter)
         pipeline.push({ $match: processedFilter });
     }
-    if (Object.keys(sort).length > 0) {
+    if (Object.keys(sort).length) {
         await processSort(pipeline,sort)
     }
     for (const field of lookupFields) {
@@ -749,7 +812,7 @@ async function getGraph(id, filter={}){
     const pipeline = []
     const storyID = convertIDs("storyID", id);
     const match = {storyID}
-    if (Object.keys(filter).length > 0) {
+    if (Object.keys(filter).length) {
         const processedFilter = await processFilters(filter)
         Object.assign(match, processedFilter)
     }
@@ -855,7 +918,7 @@ async function addOne(collectionKey, data, {preProcessing = {}, postProcessing =
     else if(existing){
         throw createError("This name already exists in this collecton for this user", 409)
     }
-    const preProcessedData = preprocessData(data, preProcessing)
+    const preProcessedData = await preprocessData(data, preProcessing)
     const created = new Date().toJSON()
     preProcessedData.created = created;
     preProcessedData.modified = created;
@@ -1022,7 +1085,9 @@ function sanitizeText(text){
 
 
 async function createID(name, author){
-    const username = await getUserById(author).username
+    const user = await getUserById(author)
+
+    const username = user.username
     return sanitizeId(`${name}_${username}`)
 }
 
@@ -1222,7 +1287,7 @@ const connectChapters = async (full) => {
         ...prevIds.map(source => ({id:`${source}-${id}`, source, target: id }))
     ];
 
-    if (newEdges.length > 0) {
+    if (newEdges.length) {
         await edgeCollection.insertMany(newEdges, { ordered: false }).catch(() => {}); // Avoids dup error
     }
 }

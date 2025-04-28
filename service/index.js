@@ -23,9 +23,9 @@ app.use('/api', racesRouter);
 app.use('/api', wildlifeRouter);
 app.use('/api', worldsRouter);
 
-
-
-
+app.use((_req, res) => {
+  res.sendFile('index.html', { root: 'public' });
+});
 
 
 

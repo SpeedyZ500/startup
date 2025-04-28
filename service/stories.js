@@ -22,7 +22,7 @@ const {
     addOne,
     updateOne,
     chaptersPostProcessing,
-    chaptersPreProcessing
+    chaptersPreProcessing,
 
 
 } = require('./database.js');
@@ -94,26 +94,35 @@ storiesRouter.get(`${urlPrefix}chapter/:chapterID`, verifyAuth, async (req, res)
 })
 
 
-storiesRouter.post(`${urlPrefix}:storyID?`, verifyAuth, async (req, res) => {
-    const { storyID } = req.params;
+storiesRouter.post(urlPrefix, verifyAuth, async (req, res) => {
     const {title} = req.body
     const author = req.usid
     const createData = req.body
     try{
         createData.author = author
-        if(!storyID){
-            const id = await createID(title, author)
-            createData.id = id
-            createData.url = `${urlPrefix}${id}`
-            const story = await addOne(urlPrefix,createData,{
-                preProcessing:storyPreProcessing,
-            })
-            if(story){
-                res.send({title:story.title, url:story.url, id:story.id})
-            }
+        const id = await createID(title, author)
+        createData.id = id
+        createData.url = `${urlPrefix}${id}`
+        const story = await addOne(urlPrefix,createData,{
+            preProcessing:storyPreProcessing,
+        })
+        if(story){
+            res.send({title:story.title, url:story.url, id:story.id})
         }
-        else{
-            createData.storyID = storyID
+        
+    }
+    catch(e){
+        res.status(e.status || 500).send({msg:e.message})
+    }
+})
+
+storiesRouter.post(`${urlPrefix}:storyID`, verifyAuth, async (req, res) => {
+    const { storyID } = req.params;
+    const {title} = req.body
+    const author = req.usid
+    const createData = req.body
+    try{
+        createData.storyID = storyID
             const id = await createID(`${storyID}_${title}`, author)
             createData.id = id
             createData.url = `${urlPrefix}${storyID}/${id}`
@@ -122,7 +131,6 @@ storiesRouter.post(`${urlPrefix}:storyID?`, verifyAuth, async (req, res) => {
                 postProcessing:chaptersPostProcessing
             })
             res.send({title:chapter.title, url:chapter.url, id:chapter.id})
-        }
     }
     catch(e){
         res.status(e.status || 500).send({msg:e.message})

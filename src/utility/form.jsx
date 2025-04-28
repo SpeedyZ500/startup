@@ -20,7 +20,7 @@ const selectSources = {
     organizations:"/worldbuilding/organizations",
     wildlife:"/worldbuilding/wildlife",
     flora:"/worldbuilding/flora",
-    biomes:"/worldbuilding/biomes",
+    biomes:"/worldbuilding/biomes"
 }
 const mapOptions = [
     "towns",
@@ -63,7 +63,7 @@ const handleErrors = async (res) => {
 
 const handleModify = async (id, formData, form, socket) => {
     if(id){
-        for(fieldkey in form){
+        for(const fieldkey in form){
             if(form[fieldkey].type === "modify-others"){
                 const {method, source} = form[fieldkey];
                 const ids = formData[fieldkey]
@@ -116,7 +116,7 @@ export function FormGenerator({handleClose}){
             }
         })
         .catch((error) =>{
-            consol.error(error.message)
+            console.error(error.message)
             handleClose?.();
 
 
@@ -132,7 +132,7 @@ export function FormGenerator({handleClose}){
             }
         })
         .catch((error) =>{
-            consol.error(error.message)
+            console.error(error.message)
             handleClose?.()
         })
         if(id){
@@ -142,11 +142,11 @@ export function FormGenerator({handleClose}){
             })
             .then(handleErrors)
             .then((data) => {
-                consol.error(null);
+                console.error(null);
                 setData(data)
             })
             .catch((error) =>{
-                consol.error(error.message)
+                console.error(error.message)
                 handleClose?.()
             })
         }
@@ -369,22 +369,35 @@ function GenerateCreatable({formData,fieldkey, field, socket, setData}){
     useEffect(() => {
         // Combine options from both sources
         updateOptions([...gotOptions, ...createdOptions]);
+        console.log(JSON.stringify(options))
     }, [gotOptions, createdOptions]);
     const handleCreateOption = (newOptionValue) => {
+        console.log(JSON.stringify(newOptionValue))
+
         const newOption = {
             value: newOptionValue,
             label: newOptionValue
         };
+        console.log(JSON.stringify(newOption))
+
+
         // Add new option to created options list
         updateCreatedOptions(prevOptions => [...prevOptions, newOption]);
+        console.log(JSON.stringify(createdOptions))
         // You may want to also update formData here if required
         const selected = [...(formData[fieldkey] || []), newOption.value];
+        console.log(JSON.stringify(selected))
+
         setData({...formData, [fieldkey]:selected})
+        console.log(JSON.stringify(formData))
+
 
     };
     const handleChange = (selectedOptions) => {
         const selectedValues = selectedOptions ? selectedOptions.map(option => option.value) : [];
         setData({...formData, [fieldkey]:selectedValues})
+        console.log(JSON.stringify(selectedValues))
+        console.log(JSON.stringify(formData))
 
     };
     return(
@@ -759,6 +772,7 @@ function GenerateForm({formData, form, socket, setData, currUrl}){
                 return <GenerateSelect 
                         formData={formData} 
                         key={fieldkey} 
+                        fieldkey={fieldkey} 
                         field={field} 
                         socket={socket} 
                         setData={setData} 
@@ -767,6 +781,7 @@ function GenerateForm({formData, form, socket, setData, currUrl}){
                 return <GenerateMultiSelect 
                     formData={formData} 
                     key={fieldkey} 
+                    fieldkey={fieldkey} 
                     field={field} 
                     socket={socket} 
                     setData={setData} 
@@ -787,6 +802,7 @@ function GenerateForm({formData, form, socket, setData, currUrl}){
                 return <SuperSelect 
                     formData={formData} 
                     key={fieldkey} 
+                    fieldkey={fieldkey} 
                     field={field} 
                     socket={socket} 
                     setData={setData} 
@@ -795,6 +811,7 @@ function GenerateForm({formData, form, socket, setData, currUrl}){
                 return <GenerateCreatable 
                     formData={formData} 
                     key={fieldkey} 
+                    fieldkey={fieldkey} 
                     field={field} 
                     socket={socket} 
                     setData={setData} 
@@ -803,6 +820,7 @@ function GenerateForm({formData, form, socket, setData, currUrl}){
                 return <GenerateTextCreatable 
                     formData={formData} 
                     key={fieldkey} 
+                    fieldkey={fieldkey} 
                     field={field} 
                     setData={setData} 
                 />
@@ -810,6 +828,7 @@ function GenerateForm({formData, form, socket, setData, currUrl}){
                 return <GenerateModifyOthers 
                     formData={formData} 
                     key={fieldkey} 
+                    fieldkey={fieldkey} 
                     field={field} 
                     socket={socket} 
                     setData={setData} 
@@ -819,6 +838,7 @@ function GenerateForm({formData, form, socket, setData, currUrl}){
                 return <SectionAdder 
                     formData={formData}
                     key={fieldkey}
+                    fieldkey={fieldkey} 
                     setData={setData}
                     field={field}
                 />
@@ -826,6 +846,7 @@ function GenerateForm({formData, form, socket, setData, currUrl}){
                 return <CustomAdder 
                     formData={formData} 
                     key={fieldkey} 
+                    fieldkey={fieldkey} 
                     field={field} 
                     socket={socket} 
                     setData={setData} 

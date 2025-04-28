@@ -4,7 +4,6 @@
   "buttonLabel":"New Advice",
   "form":{
     "title":"New Advice",
-    "createBioPage":false,
     "fields":{
         "description":{
             "label":"Description",
@@ -18,19 +17,19 @@
   "sort":[
     {
         "label":"New to Old",
-        "value":{"created":"decc"}
+        "value":{"created":-1}
     },
     {
         "label":"Old to New",
-        "value":{"created":"acc"}
+        "value":{"created":1}
     },
     {
         "label":"A-Z Author",
-        "value":{"author":"acc"}
+        "value":{"author":1}
     },
     {
         "label":"Z-A Author",
-        "value":{"author":"decc"}
+        "value":{"author":-1}
     }
 ]
 

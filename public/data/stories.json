@@ -4,80 +4,58 @@
     "buttonLabel":"New Story",
     "form":{
         "title":"New Stories",
-        "fields":[
-            {
-                "label":"Name",
+        "fields":{
+            "title":{
+                "label":"Title",
                 "required":true,
-                "type":"text",
-                "onCard":true,
-                "inList":true,
-                "filterable":false,
-                "location":"head"
+                "type":"text"
             },
-            {
+            "body":{
                 "label":"Description",
+                "required":true,
                 "type":"text-area",
-                "placeholder":"A short description/summary of your character",
-                "onCard":false,
-                "inList":true,
-                "filterable":false
+                "placeholder":"A short description/summary of your story ideas"
             },
-            {
+            "genres":{
                 "label":"Genre",
                 "type":"creatable",
-                "source":"/stories/genres"
+                "source":"genres"
             },
-            {
+            "contentWarnings":{
                 "label":"Content Warnings",
                 "type":"creatable",
-                "source":"/stories/contentwarnings"
-            },
-            {
-                "label":"Author",
-                "inList":true,
-                "hidden":false,
-                "filter":false
-            },
-            {
-                "label":"created",
-                "onCard":false,
-                "inList":true,
-                "hidden":true,
-                "filter":false
-            },
-            {
-                "label":"modified",
-                "onCard":false,
-                "inList":true,
-                "hidden":true,
-                "filter":false
+                "source":"contentwarnings"
             }
-        ]
+        }
     },
     "sort":[
         {
             "label":"New to Old",
-            "value":{"category":"created", "az":false}
+            "value":{"created":-1}
         },
         {
             "label":"Old to New",
-            "value":{"category":"created", "az":true}
+            "value":{"created":1}
         },
         {
-            "label":"A-Z Name",
-            "value":{"category":"Name", "az":true}
+            "label":"Recently Expanded",
+            "value":{"expanded":-1}
         },
         {
-            "label":"Z-A Name",
-            "value":{"category":"Name", "az":false}
+            "label":"A-Z Title",
+            "value":{"title":1}
+        },
+        {
+            "label":"Z-A Title",
+            "value":{"title":-1}
         },
         {
             "label":"A-Z Author",
-            "value":{"category":"Author", "az":true}
+            "value":{"author":1}
         },
         {
             "label":"Z-A Author",
-            "value":{"category":"Author", "az":false}
+            "value":{"author":-1}
         }
     ]
 
