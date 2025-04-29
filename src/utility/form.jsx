@@ -9,7 +9,7 @@ import Table from 'react-bootstrap/Table';
 import { ButtonGroup } from 'react-bootstrap';
 
 
-const selectSources = {
+export const selectSources = {
     races:"/worldbuilding/races",
     characters:"/characters",
     worlds:"/worldbuilding/worlds",
@@ -22,12 +22,12 @@ const selectSources = {
     flora:"/worldbuilding/flora",
     biomes:"/worldbuilding/biomes"
 }
-const mapOptions = [
+export const mapOptions = [
     "towns",
     "continents"
 ]
 
-const creatableSources = {
+export const creatableSources = {
     racestypes:"/worldbuilding/races",
     charactertypes:"/characters",
     countrytypes:"/worldbuilding/countries",

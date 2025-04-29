@@ -28,6 +28,21 @@
             }
         }
     },
+    "filter":{
+        "author":{
+            
+            "label":"Author",
+            "source":"users"
+        },
+        "genres":{
+            "label":"Genre",
+            "source":"genres"
+        },
+        "contentWarnings":{
+            "label":"Content Warnings",
+            "source":"contentwarnings"
+        }
+    },
     "sort":[
         {
             "label":"New to Old",

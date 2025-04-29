@@ -235,23 +235,26 @@ async function processFilters(rawFilters){
         const field = key.replace(/excludes|all/gi, "").trim();
         const temp = ensureArray(await convertIDs(key, value))
         const operator = isExclusion ? "$nin" : isAll ? "$all" : "$in";
-
-
-        if(processed[field]){
-            processed[field].push({[operator]: temp})
-        }
-        else{
-            processed[field] = [{[operator]: temp}]
+        if(temp.length && field){
+            if(processed[field]){
+                processed[field][operator] = temp
+            }
+            else{
+                processed[field] = {[operator]: temp}
+            }
         }
     }
     const keys = Object.keys(processed);
+    if(!keys.length){
+        return
+    }
     if (keys.length === 1) {
-        return { [keys[0]]: processed[keys[0]] };
+        return processed
     }
     return {
-        $and: keys.map(field => ({
-            [field]: processed[field]
-        }))
+        $and: keys.map(field => {
+          return {[field]:processed[field]}
+        })
     };
 }
 
@@ -455,6 +458,7 @@ async function convertIDs(collectionKey, input){
     let found = []
     if(typeCollections.includes(collection)){
         found = await addTypesBatch(collection, ids);
+        return unArray(input, found)
     }
     else if(collection === userCollection){
         found = await collection
@@ -471,7 +475,8 @@ async function convertIDs(collectionKey, input){
     if (found.length !== ids.length) {
         throw createError(`Missing one or more ${collectionKey}`, 404);
     }
-    return unArray(input, found)
+    const result = found.map(doc => doc._id)
+    return unArray(input, result)
 }
 function createError(message, statusCode = 500) {
     const err = new Error(message);
@@ -499,7 +504,7 @@ async function addTypesBatch(collection, ids) {
         existingItems.push(...insertedItems);
     }
 
-    return existingItems;
+    return sanitizedIds;
 }
 const allowedSortFields = [
     "title",
@@ -639,10 +644,10 @@ async function getOptions(collectionKey, { query }){
         return await getCatagoryOptions(storiesCollection, {query, labelField:"title"})
     }
     else if(collection === userCollection){
-        return getCatagoryOptions(collection, {query, labelField:"displayname", valueField:"username"})
+        return await getCatagoryOptions(collection, {query, labelField:"displayname", valueField:"username"})
     }
     else{
-        return getCatagoryOptions(collection, {query})
+        return await getCatagoryOptions(collection, {query})
     }
 }
 
@@ -676,7 +681,9 @@ async function getCatagoryOptions(collection,
 
     if (Object.keys(filter).length) {
         const processedFilter = await processFilters(filter)
-        pipeline.push({ $match: processedFilter });
+        if(processedFilter){
+            pipeline.push({ $match: processedFilter });
+        }
     }
     if (Object.keys(sort).length) {
         await processSort(pipeline, sort)
@@ -790,7 +797,9 @@ async function getCards(collectionKey, {
 
     if (Object.keys(filter).length) {
         const processedFilter = await processFilters(filter)
-        pipeline.push({ $match: processedFilter });
+        if(processedFilter){
+            pipeline.push({ $match: processedFilter });
+        }
     }
     if (Object.keys(sort).length) {
         await processSort(pipeline,sort)
@@ -805,17 +814,26 @@ async function getCards(collectionKey, {
     }
     Object.assign(project, projectionFields);
     pipeline.push({ $project: project });
-    return await collection.aggregate(pipeline).toArray();
+    const cards = await collection.aggregate(pipeline).toArray();
+    return cards;
 }
 
 async function getGraph(id, filter={}){
     const pipeline = []
     const storyID = convertIDs("storyID", id);
-    const match = {storyID}
+    let match = {storyID}
     if (Object.keys(filter).length) {
-        const processedFilter = await processFilters(filter)
-        Object.assign(match, processedFilter)
+        const processedFilter = await processFilters(filter);
+        if (processedFilter) {
+            if (processedFilter.$and) {
+                processedFilter.$and.push({ storyID });
+                match = processedFilter;
+            } else {
+                match = { $and: [ { storyID }, processedFilter ] };
+            }
+        }
     }
+
     pipeline.push({ $match: match });
     pipeline.push({
         $project:{

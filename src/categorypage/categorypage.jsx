@@ -11,29 +11,48 @@ import Select from 'react-select'
 import Creatable from 'react-select/creatable';
 import Table from 'react-bootstrap/Table';
 import { AuthState } from '../login/authState.js';
-import { FormGenerator } from '../utility/form';
+import { FormGenerator, selectSources,  mapOptions, creatableSources} from '../utility/form';
 
 import { WebSocketFacade, webSocket } from '../utility/websocketfacade.js';
 
-
+const filterSources = {...selectSources, ...creatableSources, users:"/users"}
 
 function FilterGenerator({filters, onFilterChange, socket}){
     const handleChange = (selectedOptions, attribute) => {
         onFilterChange(attribute, selectedOptions.map(option => option.value));
     };
     return Object.keys(filters).map((key) => {
+        const filter = filters[key];
+        const [options, updateOptions] = useState([])
+        useEffect(() => {
+            const collection = filter.source
+            const url = filterSources[collection]
+            if(mapOptions.includes(collection)){
+                socket.subscribe({url, type:"mapOptions", collection, commandId:key, setData:updateOptions})
+            }
+            else{
+                socket.subscribe({url, type:"getOptions", collection, commandId:key, setData:updateOptions})
+            }
+
+        },[key, filter, filters])
+
+        useEffect(() => {
+            console.log(JSON.stringify(options))
+        }, [options])
+
+        
+
         return(
             <div className="input-group" key={key}>
-
                 <label className="input-group-text" htmlFor={key}>
-                    {key}
+                    {filter.label}
                 </label>
                 <Select 
                     isMulti 
-                    options={filter.value} 
+                    options={options} 
                     className="form-control" 
-                    onChange={(selectedOptions) => handleChange(selectedOptions, filter.attribute)}
-                    name={filter.attribute}
+                    onChange={(selectedOptions) => handleChange(selectedOptions, key)}
+                    name={key}
                 />
             </div>
         )
@@ -58,7 +77,6 @@ export function CategoryPage(props) {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState({});
-    const [filters, setFilters] = useState({})
     const path = window.location.pathname;
     
 
@@ -66,8 +84,14 @@ export function CategoryPage(props) {
     const handleFilterChange = (attribute, values) => {
 
         const selected = values.map(value => value);
+        if(!selected.length){
+            setFilter({...filter, [attribute]:undefined});
+
+        }
+        else{
+            setFilter({...filter, [attribute]:selected});
+        }
         
-        setFilter({...filter, [attribute]:selected});
     };
    
     
@@ -97,7 +121,7 @@ export function CategoryPage(props) {
         const collection = path.startsWith("/worldbuilding/")
         ? path.replace("/worldbuilding/", "")
         : path.replace(/^\//, "");   
-        webSocket.subscribe({url:path, type:"getCards", collection, commandId:"getCards", query:{ sort:sortOptions.value},setData:setList})
+        webSocket.subscribe({url:path, type:"getCards", collection, commandId:"getCards", query:{filter, sort:sortOptions.value},setData:setList})
         console.log(JSON.stringify(list))
     }, [path, filter, sortOptions])
     useEffect(() => {
@@ -106,15 +130,7 @@ export function CategoryPage(props) {
     },[list])
     const [profanity, setProfanity] = useState(true);
 
-    useEffect(() => {
-        if(page && typeof page === "object"){
-            if(page.filter){
-                setFilters(page.filter)
-            }
-            
-
-        }
-    }, [page])
+    
     
     useEffect(() => {
         async function fetchProfanitySetting() {
@@ -175,27 +191,27 @@ export function CategoryPage(props) {
                     </Offcanvas>
                     
                     <div className="theme-h adaptive expanded">
+                        {
+                            page.filter &&<div className="filterAndSort theme-h adaptive">
+                                <h4>Filter:</h4> 
+                                <FilterGenerator filters={page.filter} onFilterChange={handleFilterChange} socket={socket}/>
+                            </div> 
+                        }
+
+                        <div className="input-group mb-3">
+                            <label className="input-group-text" htmlFor="sort" name="varSort" >Sort </label>
+                            <Select 
+                                options={page &&page.sort}
+                                value={sortOptions}
+                                className="form-control" 
+                                id="sort" 
+                                name="varSort" 
+                                onChange={setSortOptions}
+                            />
+                                
+                        </div>
                         
-                        <form className="filterAndSort theme-h adaptive" action="" method="get">
-                            <h4>Filter:</h4>
-                            <FilterGenerator filters={filters} onFilterChange={handleFilterChange} socket={socket}/>
         
-                            
-                            <div className="input-group mb-3">
-                                <label className="input-group-text" htmlFor="sort" name="varSort" >Sort </label>
-                                <Select 
-                                    options={page &&page.sort}
-                                    value={sortOptions}
-                                    className="form-control" 
-                                    id="sort" 
-                                    name="varSort" 
-                                    onChange={setSortOptions}
-                                />
-                                    
-                            </div>
-                           
-                            
-                        </form>
         
                        
                     </div>
