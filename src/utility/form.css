@@ -1,0 +1,54 @@
+h1, label {
+    background:white;
+    color: black;
+}
+
+input, textarea, select {
+    background:white;
+    color: black;
+   
+}
+input::placeholder ,
+textarea::placeholder {
+    color: lightgray !important;
+    opacity: 1; /* full opacity */
+}
+
+
+@media (prefers-color-scheme: dark){
+    h1, label{
+        background:black;
+        color: white;
+    }
+    
+    input, textarea, select {
+        background: black;
+        color: white;
+        border: 1px solid #444;
+    }
+    input:focus,
+    textarea:focus {
+        background: black;
+    }
+    input::placeholder,
+    textarea::placeholder {
+        color: whitesmoke !important;
+        opacity: 1; /* full opacity */
+    }
+    .form-control{
+        background:black;
+        color: white;
+    }
+    input, textarea, select {
+        background: black;
+        color: white;
+        border: 1px solid #444;
+        caret-color: white;
+    }
+    input:focus,
+    textarea:focus {
+        background-color: #000 !important;
+        color: #fff !important;
+    }
+      
+}

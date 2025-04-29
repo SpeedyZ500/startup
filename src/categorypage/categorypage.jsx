@@ -12,7 +12,7 @@ import Creatable from 'react-select/creatable';
 import Table from 'react-bootstrap/Table';
 import { AuthState } from '../login/authState.js';
 import { FormGenerator, selectSources,  mapOptions, creatableSources} from '../utility/form';
-
+import './../app.css'
 import { WebSocketFacade, webSocket } from '../utility/websocketfacade.js';
 
 const filterSources = {...selectSources, ...creatableSources, users:"/users"}

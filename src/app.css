@@ -284,6 +284,10 @@ nav{
         display: none;
       }
 
-     
+     label{
+        color: white !important;
+        background: black !important;
+    
+     }
 }
 

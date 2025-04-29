@@ -7,6 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from 'react-bootstrap/Button';
 import Table from 'react-bootstrap/Table';
 import { ButtonGroup } from 'react-bootstrap';
+import './form.css';
 
 
 export const selectSources = {
@@ -290,13 +291,17 @@ function GenerateMultiSelect({formData, fieldkey, field, socket, setData}){
         return null;
     }
     return (
-    <Select 
-        isMulti
-        options={options}
-        value={options.filter(opt => (formData[fieldkey] || []).includes(opt.value))}
-        onChange={(selected) => handleChange(selected)}
-        className="form-control"
-    />
+    <div key={fieldkey} className="mb-2 ">
+        <label htmlFor={fieldkey}>{field.label}</label>
+        <Select 
+                name={fieldkey}
+                isMulti
+                options={options}
+                value={options.filter(opt => (formData[fieldkey] || []).includes(opt.value))}
+                onChange={(selected) => handleChange(selected)}
+                className="form-control"
+        />
+    </div>
 )}
 
 function GenerateSelect({formData, fieldkey, field, socket, setData}){
@@ -349,13 +354,16 @@ function GenerateSelect({formData, fieldkey, field, socket, setData}){
     };
 
     return (
-    <Select 
-        name={fieldkey}
-        options={options}
-        value={(options|| []).find(opt => formData[fieldkey] && opt.value === formData[fieldkey]) || null}
-        onChange={(selected) => handleChange(selected)}
-        className="form-control"
-    />
+        <div>
+            <label htmlFor={fieldkey}>{field.label}</label>
+            <Select 
+                name={fieldkey}
+                options={options}
+                value={(options|| []).find(opt => formData[fieldkey] && opt.value === formData[fieldkey]) || null}
+                onChange={(selected) => handleChange(selected)}
+                className="form-control"
+            />
+        </div>
 )}
 
 function GenerateCreatable({formData,fieldkey, field, socket, setData}){
@@ -402,14 +410,18 @@ function GenerateCreatable({formData,fieldkey, field, socket, setData}){
 
     };
     return(
-        <Creatable 
-                isMulti
-                options={options}
-                value={options.filter(opt => formData[fieldkey]?.includes(opt.value)) || []}
-                onChange={handleChange}
-                onCreateOption={handleCreateOption} // Handle new options being created
-                className="form-control"
-        />
+        <div key={fieldkey} className="mb-2 ">
+            <label htmlFor={fieldkey}>{field.label}</label>
+            <Creatable 
+                    isMulti
+                    name={fieldkey}
+                    options={options}
+                    value={options.filter(opt => formData[fieldkey]?.includes(opt.value)) || []}
+                    onChange={handleChange}
+                    onCreateOption={handleCreateOption} // Handle new options being created
+                    className="form-control"
+            />
+        </div>
     )
 }
 
@@ -464,57 +476,61 @@ function SuperSelect({ formData, fieldkey, socket, field, setData}){
     };
 
     return (
-        <div className="input-group" key={fieldkey}>
-            <Table bordered>
-                <thead>
-                    <tr>
-                        <th>{field.categoryLabel}</th>
-                        <th>Selections</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {categories.map((category, index) => (
-                        <tr key={index}>
-                            <td>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    placeholder={field.categoryLabel}
-                                    value={category.label}
-                                    onChange={(e) => updateCategoryName(index, e.target.value)}
-                                />
-                            </td>
-                            <td>
-                                <Select
-                                    isMulti
-                                    options={options.map(option => ({
-                                        value: option.id,
-                                        label: option.name,
-                                    }))} // Map options into {value, label} format
-                                    value={category.value.map(val => ({
-                                        value: val,
-                                        label: options.find(option => option.id === val)?.name,
-                                    }))}
-                                    onChange={(selected) => updateSelections(index, selected)}
-                                    className="form-control"
-                                />
-                            </td>
-                            <td>
-                                <Button onClick={() => removeCategory(index)} className="btn btn-danger">
-                                    Remove
-                                </Button>
-                            </td>
+        <div key={fieldkey} className="mb-2 ">
+            <label htmlFor={fieldkey}>{field.label}</label>
+            <div className="input-group" name={fieldkey}>
+                <Table bordered>
+                    <thead>
+                        <tr>
+                            <th>{field.categoryLabel}</th>
+                            <th>Selections</th>
+                            <th>Action</th>
                         </tr>
-                    ))}
-                </tbody>
-            </Table>
+                    </thead>
+                    <tbody>
+                        {categories.map((category, index) => (
+                            <tr key={index}>
+                                <td>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        placeholder={field.categoryLabel}
+                                        value={category.label}
+                                        onChange={(e) => updateCategoryName(index, e.target.value)}
+                                    />
+                                </td>
+                                <td>
+                                    <Select
+                                        isMulti
+                                        options={options.map(option => ({
+                                            value: option.id,
+                                            label: option.name,
+                                        }))} // Map options into {value, label} format
+                                        value={category.value.map(val => ({
+                                            value: val,
+                                            label: options.find(option => option.id === val)?.name,
+                                        }))}
+                                        onChange={(selected) => updateSelections(index, selected)}
+                                        className="form-control"
+                                    />
+                                </td>
+                                <td>
+                                    <Button onClick={() => removeCategory(index)} className="btn btn-danger">
+                                        Remove
+                                    </Button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </Table>
 
-            <Button onClick={addCategory} className="btn btn-primary mb-2">
-                Add {field.categoryLabel}
-            </Button>
+                <Button onClick={addCategory} className="btn btn-primary mb-2">
+                    Add {field.categoryLabel}
+                </Button>
+            </div>
         </div>
     );
+    
 };
 
 
@@ -556,23 +572,26 @@ function GenerateTextCreatable({formData, fieldkey, field, setData}){
 };
 
 return (
-    <Creatable
-            name={fieldkey}
-            isMulti
-            options={selectedValues} // Use selectedValues as options, so it contains both initial and dynamically added options
-            value={selectedValues}
-            onChange={(newValue) => {
-                setSelectedValues(newValue);
-                const updatedValues = newValue.map(opt => opt.value);
-                setData({...formData, [fieldkey]:updatedValues})
+    <div key={fieldkey} className="mb-2 ">
+        <label htmlFor={fieldkey}>{field.label}</label>
+        <Creatable
+                name={fieldkey}
+                isMulti
+                options={selectedValues} // Use selectedValues as options, so it contains both initial and dynamically added options
+                value={selectedValues}
+                onChange={(newValue) => {
+                    setSelectedValues(newValue);
+                    const updatedValues = newValue.map(opt => opt.value);
+                    setData({...formData, [fieldkey]:updatedValues})
 
-            }}
-            onInputChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            inputValue={inputValue}
-            placeholder="Type and press Enter to add new item..."
-            className="form-control"
-        />
+                }}
+                onInputChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+                inputValue={inputValue}
+                placeholder="Type and press Enter to add new item..."
+                className="form-control"
+            />
+    </div>
 );
 }
 
@@ -617,14 +636,17 @@ function GenerateModifyOthers({formData, fieldkey, field, socket, currUrl, setDa
     };
     
     return (
-    <Select 
-        name={fieldkey}
-        isMulti
-        options={options}
-        value={options.filter(opt => (formData[fieldkey] || []).includes(opt.value))}
-        onChange={(selected) => handleChange(selected)}
-        className="form-control"
-    />
+    <div key={fieldkey} className="mb-2 ">
+        <label htmlFor={fieldkey}>{field.label}</label>
+        <Select 
+            name={fieldkey}
+            isMulti
+            options={options}
+            value={options.filter(opt => (formData[fieldkey] || []).includes(opt.value))}
+            onChange={(selected) => handleChange(selected)}
+            className="form-control"
+        />
+    </div>
 )}
 
 const Section = ({ section, updateSection, removeSection }) => {
@@ -710,7 +732,10 @@ function SectionAdder({formData, fieldkey, setData, field}){
         setData({ ...formData, [fieldkey]: newSections });  // immediately update parent
     };
     return (
+        <div key={fieldkey} className="mb-2 ">
+            <label htmlFor={fieldkey}>{field.label}</label>
             <div name ={fieldkey} className="formData-editor">
+                
             <Button onClick={addSection} className="btn btn-primary">Add Section</Button>
                 {sections.map((section, i) => (
                     <Section
@@ -721,6 +746,7 @@ function SectionAdder({formData, fieldkey, setData, field}){
                     />
                 ))}
             </div>
+        </div>
             
     );
 
@@ -732,17 +758,23 @@ function GenerateForm({formData, form, socket, setData, currUrl}){
         switch(field.type){
             case 'text':
                 return(
-                    <input 
+                    <div key={fieldkey} className="mb-2 ">
+                        <label htmlFor={fieldkey}>{field.label}</label>
+                        <input 
                             name={fieldkey}
                             type="text"
                             className="form-control"
                             value={formData[fieldkey] || ''}
                             onChange={(e) => setData({...formData, [fieldkey]:e.target.value})}
                         />
+                    </div>
+                    
                 )
             case 'text-area':
                 return(
-                    <textarea 
+                    <div key={fieldkey} className="mb-2 ">
+                        <label htmlFor={fieldkey}>{field.label}</label>
+                        <textarea 
                             name={fieldkey}
                             type="text"
                             className="form-control"
@@ -750,6 +782,8 @@ function GenerateForm({formData, form, socket, setData, currUrl}){
                             onChange={(e) => setData({...formData, [fieldkey]:e.target.value})}
                             placeholder={field.placeholder || ''}
                         />
+                    </div>
+                    
                 )
             case 'select':
                 return <GenerateSelect 
@@ -856,11 +890,9 @@ function GenerateForm({formData, form, socket, setData, currUrl}){
         <div>
             {form && Object.keys(form).map((fieldkey) => {
                 const field = form[fieldkey];
-                    return (
-                        <div key={fieldkey} className="mb-2">
-                            <label htmlFor={fieldkey}>{field.label}</label>
-                            {renderField(fieldkey, field)}
-                        </div>
+                    return (renderField(fieldkey, field)
+
+                       
                     );
                 })
             }
@@ -896,18 +928,21 @@ function CustomAdder({ formData, setData, field, fieldkey, socket }) {
         setData({ ...formData, [fieldkey]: newList });
     };
     return (
-        <div className="formData-editor" key={fieldkey}>
-            <Button onClick={addCustomField} className="btn btn-primary">Add Custom Field</Button>
-            {customFields.map((item, i) => (
-                <CustomField
-                    key={item.id}
-                    custom={item}
-                    updateCustom={(updated) => updateCustomField(i, updated)}
-                    removeCustom={() => removeCustomField(i)}
-                    socket={socket}
-                    index={i}
-                />
-            ))}
+        <div key={fieldkey} className="mb-2 ">
+            <label htmlFor={fieldkey}>{field.label}</label>
+            <div className="formData-editor" name={fieldkey}>
+                <Button onClick={addCustomField} className="btn btn-primary">Add Custom Field</Button>
+                {customFields.map((item, i) => (
+                    <CustomField
+                        key={item.id}
+                        custom={item}
+                        updateCustom={(updated) => updateCustomField(i, updated)}
+                        removeCustom={() => removeCustomField(i)}
+                        socket={socket}
+                        index={i}
+                    />
+                ))}
+            </div>
         </div>
     );
 
@@ -1036,7 +1071,7 @@ function CustomField({ custom, updateCustom, removeCustom, socket, index}) {
         {edit === "text" && (
         <input
             type="text"
-            className="form-control mb-2"
+            className="mb-2"
             value={custom.values?.[0] || ""}
             onChange={(e) =>
             updateCustom({ ...custom, values: [e.target.value] })
