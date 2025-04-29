@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo} from 'react';
+import React, { useEffect, useState, useMemo, useRef} from 'react';
 import {useWebSocketFacade} from './utility.jsx'
 import Select from 'react-select'
 import Creatable from 'react-select/creatable';
@@ -204,8 +204,9 @@ export function FormGenerator({handleClose}){
     return(
         <div>
             <h1>{form &&form.title || ""}</h1>
+            <GenerateForm formData={formData} form={memoizedFields} socket={socket} setData={setData} currUrl={url}/>
+
              <ButtonGroup>
-                <GenerateForm formData={formData} form={memoizedFields} socket={socket} setData={setData} currUrl={url}/>
                 <Button onClick={handleSubmit} variant='primary'>Submit</Button>
                 <Button onClick={handleClose} variant='secondary'>Close</Button>
             </ButtonGroup>
@@ -216,11 +217,12 @@ export function FormGenerator({handleClose}){
 function GenerateMultiSelect({formData, fieldkey, field, socket, setData}){
     const [options, updateOptions] = useState([])
     const [qualifierOptions, updateQualifierOptions] = useState([])
+    const reliesOn = field.filter?.key 
+
     useEffect(() =>{
         const collection = field.source
         const url = selectSources[collection]
         if(mapOptions.includes(collection)){
-            const reliesOn = field.filter.key 
             if(formData[reliesOn]){
                 let data = Array.isArray(formData[reliesOn]) ? formData[reliesOn][0] : formData[reliesOn]
                 if(typeof data === "object"){
@@ -237,12 +239,12 @@ function GenerateMultiSelect({formData, fieldkey, field, socket, setData}){
         }
         else{
             let filter = field.filter
-            if(filter && filter.key){
-                if(!formData[filter.key]) {
+            if(filter && reliesOn){
+                if(!formData[reliesOn]) {
                     setData({...formData, [fieldkey]:undefined})
                     return updateOptions([])
                 }
-                let data = Array.isArray(formData[filter.key]) ? formData[filter.key][0] : formData[filter.key]
+                let data = Array.isArray(formData[reliesOn]) ? formData[reliesOn][0] : formData[reliesOn]
                 if(typeof data === "object"){
                     data = data.value
                 }
@@ -252,7 +254,7 @@ function GenerateMultiSelect({formData, fieldkey, field, socket, setData}){
             socket.subscribe({url, type:"getOptions", collection, commandId:fieldkey, query:{filter},setData:updateOptions})
         }
 
-    }, [fieldkey, field, formData])
+    }, [fieldkey, field, formData[reliesOn]])
 
     useEffect(() => {
         if (!field.qualifier || !formData[field.qualifierKey]) return;
@@ -299,11 +301,13 @@ function GenerateMultiSelect({formData, fieldkey, field, socket, setData}){
 
 function GenerateSelect({formData, fieldkey, field, socket, setData}){
     const [options, updateOptions] = useState([])
+    const reliesOn = field.filter?.key;
+
+    
     useEffect(() =>{
         const collection = field.source
         const url = selectSources[collection]
         if(mapOptions.includes(collection)){
-            const reliesOn = field.filter.key 
             if(formData[reliesOn]){
                 let data = Array.isArray(formData[reliesOn]) ? formData[reliesOn][0] : formData[reliesOn]
                 if(typeof data === "object"){
@@ -320,14 +324,14 @@ function GenerateSelect({formData, fieldkey, field, socket, setData}){
         }
         else{
             let filter = field.filter
-            if(filter && filter.key){
-                if(!formData[filter.key]) {
+            if(filter && reliesOn){
+                if(!formData[reliesOn]) {
                     setData({...formData, [fieldkey]:undefined})
 
                     return updateOptions([])
                     
                 }
-                let data = Array.isArray(formData[filter.key]) ? formData[filter.key][0] : formData[filter.key]
+                let data = Array.isArray(formData[reliesOn]) ? formData[reliesOn][0] : formData[reliesOn]
                 if(typeof data === "object"){
                     data = data.value
                 }
@@ -337,7 +341,7 @@ function GenerateSelect({formData, fieldkey, field, socket, setData}){
             socket.subscribe({url, type:"getOptions", collection, commandId:fieldkey, query:{filter},setData:updateOptions})
         }
 
-    }, [fieldkey, field, formData])
+    }, [fieldkey, field, formData[reliesOn]])
     const handleChange = (selectedOption) => {
         const selected = selectedOption?.value;
         setData({...formData, [fieldkey]:selected})
@@ -345,16 +349,13 @@ function GenerateSelect({formData, fieldkey, field, socket, setData}){
     };
 
     return (
-    <div key={fieldkey}>
-        <label htmlFor={fieldkey}>{field.label || ""}</label>
-        <Select 
-            name={fieldkey}
-            options={options}
-            value={(options|| []).find(opt => formData[fieldkey] && opt.value === formData[fieldkey]) || null}
-            onChange={(selected) => handleChange(selected)}
-            className="form-control"
-        />
-    </div>
+    <Select 
+        name={fieldkey}
+        options={options}
+        value={(options|| []).find(opt => formData[fieldkey] && opt.value === formData[fieldkey]) || null}
+        onChange={(selected) => handleChange(selected)}
+        className="form-control"
+    />
 )}
 
 function GenerateCreatable({formData,fieldkey, field, socket, setData}){
@@ -365,7 +366,7 @@ function GenerateCreatable({formData,fieldkey, field, socket, setData}){
         const collection = field.source
         const url = creatableSources[collection]
         socket.subscribe({url, type:"getOptions", collection, commandId:fieldkey, setData:updateGotOptions})
-    }, [fieldkey, field, formData])
+    }, [fieldkey, field])
     useEffect(() => {
         // Combine options from both sources
         updateOptions([...gotOptions, ...createdOptions]);
@@ -401,17 +402,14 @@ function GenerateCreatable({formData,fieldkey, field, socket, setData}){
 
     };
     return(
-        <div key={fieldkey}>
-            <label htmlFor={fieldkey}>{field && field.label || ""}</label>
-            <Creatable 
+        <Creatable 
                 isMulti
                 options={options}
                 value={options.filter(opt => formData[fieldkey]?.includes(opt.value)) || []}
                 onChange={handleChange}
                 onCreateOption={handleCreateOption} // Handle new options being created
                 className="form-control"
-            />
-        </div>
+        />
     )
 }
 
@@ -467,8 +465,6 @@ function SuperSelect({ formData, fieldkey, socket, field, setData}){
 
     return (
         <div className="input-group" key={fieldkey}>
-            <h5>{field.label}</h5>
-
             <Table bordered>
                 <thead>
                     <tr>
@@ -560,9 +556,7 @@ function GenerateTextCreatable({formData, fieldkey, field, setData}){
 };
 
 return (
-    <div className="mb-3" key={fieldkey}>
-        <label htmlFor={fieldkey}>{field.label}</label>
-        <Creatable
+    <Creatable
             name={fieldkey}
             isMulti
             options={selectedValues} // Use selectedValues as options, so it contains both initial and dynamically added options
@@ -579,7 +573,6 @@ return (
             placeholder="Type and press Enter to add new item..."
             className="form-control"
         />
-    </div>
 );
 }
 
@@ -617,24 +610,21 @@ function GenerateModifyOthers({formData, fieldkey, field, socket, currUrl, setDa
 
             })
         }
-    },[field, formData, currUrl, socket])
+    },[field, formData[id], currUrl, socket])
     const handleChange = (selectedOption) => {
         const selected = (selectedOption|| []).map(opt => opt.value) || [];
         setData({...formData, [fieldkey]:selected})
     };
     
     return (
-    <div key={fieldkey}>
-        <label htmlFor={fieldkey}>{field.label}</label>
-        <Select 
-            name={fieldkey}
-            isMulti
-            options={options}
-            value={options.filter(opt => (formData[fieldkey] || []).includes(opt.value))}
-            onChange={(selected) => handleChange(selected)}
-            className="form-control"
-        />
-    </div>
+    <Select 
+        name={fieldkey}
+        isMulti
+        options={options}
+        value={options.filter(opt => (formData[fieldkey] || []).includes(opt.value))}
+        onChange={(selected) => handleChange(selected)}
+        className="form-control"
+    />
 )}
 
 const Section = ({ section, updateSection, removeSection }) => {
@@ -720,9 +710,7 @@ function SectionAdder({formData, fieldkey, setData, field}){
         setData({ ...formData, [fieldkey]: newSections });  // immediately update parent
     };
     return (
-        <div className="formData-editor" key={fieldkey}>
-            <label className="input-group-text" htmlFor={fieldkey}>{field.label}</label>
-            <div name ={fieldkey}>
+            <div name ={fieldkey} className="formData-editor">
             <Button onClick={addSection} className="btn btn-primary">Add Section</Button>
                 {sections.map((section, i) => (
                     <Section
@@ -734,7 +722,6 @@ function SectionAdder({formData, fieldkey, setData, field}){
                 ))}
             </div>
             
-        </div>
     );
 
 }
@@ -745,32 +732,30 @@ function GenerateForm({formData, form, socket, setData, currUrl}){
         switch(field.type){
             case 'text':
                 return(
-                    <div key={fieldkey}>
-                        <label htmlFor={fieldkey}>{field.label}</label>
-                        <input 
+                    <input 
                             name={fieldkey}
                             type="text"
+                            className="form-control"
                             value={formData[fieldkey] || ''}
                             onChange={(e) => setData({...formData, [fieldkey]:e.target.value})}
                         />
-                    </div>
                 )
             case 'text-area':
                 return(
-                    <div key={fieldkey}>
-                        <label htmlFor={fieldkey}>{field.label}</label>
-                        <textarea 
+                    <textarea 
                             name={fieldkey}
                             type="text"
+                            className="form-control"
                             value={formData[fieldkey] || ''}
                             onChange={(e) => setData({...formData, [fieldkey]:e.target.value})}
                             placeholder={field.placeholder || ''}
                         />
-                    </div>
                 )
             case 'select':
                 return <GenerateSelect 
                         formData={formData} 
+                        className="form-control"
+
                         key={fieldkey} 
                         fieldkey={fieldkey} 
                         field={field} 
@@ -780,6 +765,8 @@ function GenerateForm({formData, form, socket, setData, currUrl}){
             case 'multi-select':
                 return <GenerateMultiSelect 
                     formData={formData} 
+                    className="form-control"
+
                     key={fieldkey} 
                     fieldkey={fieldkey} 
                     field={field} 
@@ -788,20 +775,19 @@ function GenerateForm({formData, form, socket, setData, currUrl}){
                 />
             case 'checkbox':
                 return (
-                    <label key={fieldkey}>
-                        <input
+                    <input
                             type="checkbox"
                             name={fieldkey}
                             checked={formData[fieldkey] || false}
                             onChange={(e) => setData({ ...form, [fieldkey]: e.target.checked })}
-                        />
-                        {field.label}
-                    </label>
+                    />
                 );
             case "super-select":
                 return <SuperSelect 
                     formData={formData} 
                     key={fieldkey} 
+                    className="form-control"
+
                     fieldkey={fieldkey} 
                     field={field} 
                     socket={socket} 
@@ -812,6 +798,8 @@ function GenerateForm({formData, form, socket, setData, currUrl}){
                     formData={formData} 
                     key={fieldkey} 
                     fieldkey={fieldkey} 
+                    className="form-control"
+
                     field={field} 
                     socket={socket} 
                     setData={setData} 
@@ -819,6 +807,8 @@ function GenerateForm({formData, form, socket, setData, currUrl}){
             case "text-creatable":
                 return <GenerateTextCreatable 
                     formData={formData} 
+                    className="form-control"
+
                     key={fieldkey} 
                     fieldkey={fieldkey} 
                     field={field} 
@@ -829,6 +819,8 @@ function GenerateForm({formData, form, socket, setData, currUrl}){
                     formData={formData} 
                     key={fieldkey} 
                     fieldkey={fieldkey} 
+                    className="form-control"
+
                     field={field} 
                     socket={socket} 
                     setData={setData} 
@@ -838,6 +830,8 @@ function GenerateForm({formData, form, socket, setData, currUrl}){
                 return <SectionAdder 
                     formData={formData}
                     key={fieldkey}
+                    className="form-control"
+
                     fieldkey={fieldkey} 
                     setData={setData}
                     field={field}
@@ -846,6 +840,8 @@ function GenerateForm({formData, form, socket, setData, currUrl}){
                 return <CustomAdder 
                     formData={formData} 
                     key={fieldkey} 
+                    className="form-control"
+
                     fieldkey={fieldkey} 
                     field={field} 
                     socket={socket} 
@@ -861,7 +857,7 @@ function GenerateForm({formData, form, socket, setData, currUrl}){
             {form && Object.keys(form).map((fieldkey) => {
                 const field = form[fieldkey];
                     return (
-                        <div key={fieldkey}>
+                        <div key={fieldkey} className="mb-2">
                             <label htmlFor={fieldkey}>{field.label}</label>
                             {renderField(fieldkey, field)}
                         </div>
@@ -901,7 +897,6 @@ function CustomAdder({ formData, setData, field, fieldkey, socket }) {
     };
     return (
         <div className="formData-editor" key={fieldkey}>
-            <label className="input-group-text">{field.label}</label>
             <Button onClick={addCustomField} className="btn btn-primary">Add Custom Field</Button>
             {customFields.map((item, i) => (
                 <CustomField
