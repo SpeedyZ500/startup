@@ -1,28 +1,21 @@
 const express = require('express');
-const { verifyAuth } = require('./service.js');
+const { verifyAuth, authCookieName } = require('./service.js');
 const urlPrefix = "/worldbuilding/races/";
 
 const racesRouter = express.Router();
 
 const { 
     createID, 
-    baseFields,
     fullBio,
     racePreProcessing,
-    raceCardLookups,
     raceFullLookups,
-    raceProjectionFields,
-    raceBioProjectionFields,
-    bioWithTypes,
     raceEditProjectionFields,
-    getOptions,
     modifyMany,
     addOne,
     updateOne,
-    getCards,
-    getDisplayable,
     getEditable,
-    raceUnwindFields
+    raceUnwindFields,
+    getUserByToken
 
 
     
@@ -30,7 +23,24 @@ const {
 
 
 
-
+racesRouter.get(`${urlPrefix}author/:id`,async (req, res)=>{
+    const token = req.cookies[authCookieName];
+    const user = await getUserByToken(token)
+    if(!user){
+        return res.send({isAuthor:false})
+    }
+    const id = req.params.id
+    const author = user._id
+    try{
+        await getEditable(urlPrefix, author, id, {
+            fields:["id"]
+        })
+        return res.send({isAuthor:true})
+    }
+    catch{
+        return res.send({isAuthor:false})
+    }
+})
 
 
 

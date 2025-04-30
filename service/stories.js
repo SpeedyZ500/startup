@@ -1,21 +1,14 @@
 
 const express = require('express');
 
-const { verifyAuth } = require('./service.js');  
+const { verifyAuth, authCookieName } = require('./service.js');  
 
 const {
     createID, 
-    getGraph, 
-    getCards, 
-    getDisplayable, 
     getEditable, 
-    getOptions, 
     baseLookupFields, 
-    baseProjectionFields, 
     storyFields, 
     baseEditProjectionFields,
-    chapterLookupFields,
-    chapterProjectFields,
     chapterEditLookupFields,
     chapterEditProjectFields,
     storyPreProcessing,
@@ -25,6 +18,7 @@ const {
     chaptersPreProcessing,
     baseUnwindFields,
     chapterUnwindFields,
+    getUserByToken
 } = require('./database.js');
 
 const urlPrefix = "/stories/"
@@ -32,22 +26,67 @@ const urlPrefix = "/stories/"
 
 const storiesRouter = express.Router();
 
-
-
-//stories chapters
-
-//stories chapters
-storiesRouter.get(`${urlPrefix}:storyID/chapters`, async (req, res) => {
-    const { storyID } = req.params;
-    const { filter } = req.query
-    const graph = await getGraph(storyID, filter)
-    if(graph){
-        res.send(graph)
+storiesRouter.get(`${urlPrefix}author/chapter/:id`,async (req, res)=>{
+    const token = req.cookies[authCookieName];
+    const user = await getUserByToken(token)
+    if(!user){
+        return res.send({isAuthor:false})
     }
-    else{
-        res.status(404).send({msg:"Graph not found"})
+    const id = req.params.id
+    const author = user._id
+    try{
+        await getEditable(urlPrefix, author, id, {
+            fields:["id"]
+        })
+        return res.send({isAuthor:true})
     }
-});
+    catch{
+        return res.send({isAuthor:false})
+    }
+})
+
+storiesRouter.get(`${urlPrefix}author/:id`,async (req, res)=>{
+    const token = req.cookies[authCookieName];
+    const user = await getUserByToken(token)
+    if(!user){
+        return res.send({isAuthor:false})
+    }
+    const id = req.params.id
+    const author = user._id
+    try{
+        await getEditable(urlPrefix, author, id, {
+            fields:["id"]
+        })
+        return res.send({isAuthor:true})
+    }
+    catch{
+        return res.send({isAuthor:false})
+    }
+})
+
+
+storiesRouter.get(`${urlPrefix}chapter/:chapterID`, verifyAuth, async (req, res) => {
+    const {chapterID} = req.params;
+    
+    try{
+        const chapter = await getEditable("chapters", req.usid, chapterID, {
+            fields:storyFields,
+            lookupFields:chapterEditLookupFields,
+            projectionFields:chapterEditProjectFields,
+            unwindFields:chapterUnwindFields
+
+        })
+        if(chapter){
+            res.send(chapter);
+        }
+        else{
+            res.status(404).send({msg:"Chapter not found"})
+        }
+    }
+    catch(e){
+        res.status(e.status || 500).send({msg:e.message})
+    }
+})
 storiesRouter.get(`${urlPrefix}:storyID`, verifyAuth, async (req, res) => {
     const { storyID } = req.params;
     try{
@@ -73,28 +112,7 @@ storiesRouter.get(`${urlPrefix}:storyID`, verifyAuth, async (req, res) => {
 
 
 
-storiesRouter.get(`${urlPrefix}chapter/:chapterID`, verifyAuth, async (req, res) => {
-    const {chapterID} = req.params;
-    
-    try{
-        const chapter = await getEditable("chapters", req.usid, chapterID, {
-            fields:storyFields,
-            lookupFields:chapterEditLookupFields,
-            projectionFields:chapterEditProjectFields,
-            unwindFields:chapterUnwindFields
 
-        })
-        if(chapter){
-            res.send(chapter);
-        }
-        else{
-            res.status(404).send({msg:"Chapter not found"})
-        }
-    }
-    catch(e){
-        res.status(e.status || 500).send({msg:e.message})
-    }
-})
 
 
 storiesRouter.post(urlPrefix, verifyAuth, async (req, res) => {

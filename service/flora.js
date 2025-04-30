@@ -1,76 +1,41 @@
 const express = require('express');
-const { verifyAuth } = require('./service.js');
+const { verifyAuth, authCookieName } = require('./service.js');
 const urlPrefix = "/worldbuilding/flora/"
 
 const floraRouter = express.Router();
 const { 
     createID, 
-    baseFields,
     fullBio,
     floraPreProcessing,
-    livingThingCardLookups,
     livingThingFullLookups,
-    livingThingProjectionFields,
-    livingThingBioProjectionFields,
     livingThingEditProjectionFields,
-    getOptions,
     modifyMany,
     addOne,
     updateOne,
-    getCards,
-    getDisplayable,
     getEditable,
-    livingThingUnwindFields
-
-
+    getUserByToken
     
  } = require('./database.js')
 
-floraRouter.get(`${urlPrefix}types/options`, async (req, res) => {
-    const options = await getOptions("floratypes")
-    res.send(options)
-})
-
-floraRouter.get(`${urlPrefix}options`, async (req, res) => {
-    const options = await getOptions("flora", {query:req.query})
-    res.send(options)
-})
-
-
-
-
-floraRouter.get(`${urlPrefix}`, async (req, res) => {
-    const query = req.query || {};
-    const floraToSend = await getCards(urlPrefix, {
-        query,
-        lookupFields:livingThingCardLookups,
-        fields:baseFields,
-        projectionFields:livingThingProjectionFields,
-        unwindFields:livingThingUnwindFields
-    })
-    res.send(floraToSend)
-})
-
-floraRouter.get(`${urlPrefix}:id/bio`, async (req, res) => {
-    const { id } = req.params;
+ floraRouter.get(`${urlPrefix}author/:id`,async (req, res)=>{
+    const token = req.cookies[authCookieName];
+    const user = await getUserByToken(token)
+    if(!user){
+        return res.send({isAuthor:false})
+    }
+    const id = req.params.id
+    const author = user._id
     try{
-        const flora = await getDisplayable(urlPrefix, id, {
-            lookupFields:livingThingFullLookups,
-            fields:fullBio,
-            projectionFields:livingThingBioProjectionFields
-        });
-        if(flora){
-            res.send(flora);
-        }
-        else{
-            res.status(404).json({ error: "Flora not found" });
-        }
+        await getEditable(urlPrefix, author, id, {
+            fields:["id"]
+        })
+        return res.send({isAuthor:true})
     }
     catch{
-        res.status(500).send({msg:"server error"})
+        return res.send({isAuthor:false})
     }
-    
-});
+})
+
 floraRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     const author = req.usid
     const {id} = req.params

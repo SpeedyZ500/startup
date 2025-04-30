@@ -1,86 +1,40 @@
 const express = require('express');
-const { verifyAuth, } = require('./service.js');
+const { verifyAuth, authCookieName} = require('./service.js');
 const { createID, 
-    getDisplayable, 
-    getCards, 
     addOne, 
     updateOne, 
-    getOptions, 
-    baseFields,
     worldPreProcessing,
     worldFullFields,
-    baseProjectionFields,
     baseLookupFields,
     baseEditProjectionFields,
     baseUnwindFields,
-    optionsMap
+    getUserByToken
  } = require("./database.js")
 const urlPrefix = "/worldbuilding/worlds/";
 
 const worldsRouter = express.Router();
 
-
-
-
-worldsRouter.get(`${urlPrefix}continents/options`, async (req, res) => {
-    try {
-        const worlds = await getCards(urlPrefix, {
-            query:req.query, 
-            projectionFields:{
-                options:optionsMap("continents")
-            },
-            fields:["id"]
-        });
-        const flattened = worlds.flatMap(world =>
-            (world.options || []).map(opt => ({
-                ...opt,
-                qualifier: world.id  // make sure it's still your displayable id
-            }))
-        );
-        res.send(flattened);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send({ error: 'Failed to fetch continent options' });
+worldsRouter.get(`${urlPrefix}author/:id`,async (req, res)=>{
+    const token = req.cookies[authCookieName];
+    const user = await getUserByToken(token)
+    if(!user){
+        return res.send({isAuthor:false})
     }
-});
-
-
-worldsRouter.get(`${urlPrefix}options`, async (req, res) => {
-    const options = await getOptions(urlPrefix, {query:req.query})
-    res.send(options)
-})
-
-worldsRouter.get(`${urlPrefix}`, async (req, res) => {
-    const query = req.query || {};
-    const worldsToSend = await getCards(urlPrefix, {
-        query,
-        lookupFields:baseLookupFields,
-        fields:baseFields,
-        projectionFields:baseProjectionFields
-    })
-    res.send(worldsToSend)
-})
-
-worldsRouter.get(`${urlPrefix}:id/bio`, async (req, res) => {
-    const { id } = req.params;
+    const id = req.params.id
+    const author = user._id
     try{
-        const world = await getDisplayable(urlPrefix, id, {
-            lookupFields:baseLookupFields,
-            fields:worldFullFields,
-            projectionFields:baseProjectionFields
-        });
-        if(world){
-            res.send(world);
-        }
-        else{
-            res.status(404).json({ error: "World not found" });
-        }
+        await getEditable(urlPrefix, author, id, {
+            fields:["id"]
+        })
+        return res.send({isAuthor:true})
     }
     catch{
-        res.status(500).send({msg:"server error"})
+        return res.send({isAuthor:false})
     }
-    
-});
+})
+
+
+
 worldsRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     const author = req.usid
     const {id} = req.params

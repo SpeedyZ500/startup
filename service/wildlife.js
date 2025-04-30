@@ -1,5 +1,5 @@
 const express = require('express');
-const { verifyAuth } = require('./service.js');  
+const { verifyAuth, authCookieName } = require('./service.js');  
 
 
 const urlPrefix = "/worldbuilding/wildlife/"
@@ -8,72 +8,43 @@ const wildlifeRouter = express.Router();
 
 const { 
     createID, 
-    baseFields,
-    baseFullFields,
     wildlifePreProcessing,
-    livingThingCardLookups,
     livingThingFullLookups,
-    livingThingProjectionFields,
-    livingThingBioProjectionFields,
     livingThingEditProjectionFields,
     livingThingUnwindFields,
     fullBio,
-    getOptions,
     modifyMany,
     addOne,
     updateOne,
-    getCards,
-    getDisplayable,
-    getEditable
+    getEditable,
+    getUserByToken
 
 
     
  } = require('./database.js')
 
-wildlifeRouter.get(`${urlPrefix}types/options`, async (req, res) => {
-    const options = await getOptions("wildlifetypes")
-    res.send(options)
-})
-
-wildlifeRouter.get(`${urlPrefix}options`, async (req, res) => {
-    const options = await getOptions("wildlife", {query:req.query})
-    res.send(options)
-})
 
 
-
-
-wildlifeRouter.get(`${urlPrefix}`, async (req, res) => {
-    const query = req.query || {};
-    const wildlifeToSend = await getCards(urlPrefix, {
-        query,
-        lookupFields:livingThingCardLookups,
-        fields:baseFields,
-        projectionFields:livingThingProjectionFields
-    })
-    res.send(wildlifeToSend)
-})
-
-wildlifeRouter.get(`${urlPrefix}:id/bio`, async (req, res) => {
-    const { id } = req.params;
+ wildlifeRouter.get(`${urlPrefix}author/:id`,async (req, res)=>{
+    const token = req.cookies[authCookieName];
+    const user = await getUserByToken(token)
+    if(!user){
+        return res.send({isAuthor:false})
+    }
+    const id = req.params.id
+    const author = user._id
     try{
-        const wildlife = await getDisplayable(urlPrefix, id, {
-            lookupFields:livingThingFullLookups,
-            fields:baseFullFields,
-            projectionFields:livingThingBioProjectionFields
-        });
-        if(wildlife){
-            res.send(wildlife);
-        }
-        else{
-            res.status(404).json({ error: "Wildlife not found" });
-        }
+        await getEditable(urlPrefix, author, id, {
+            fields:["id"]
+        })
+        return res.send({isAuthor:true})
     }
     catch{
-        res.status(500).send({msg:"server error"})
+        return res.send({isAuthor:false})
     }
-    
-});
+})
+
+
 wildlifeRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     const author = req.usid
     const {id} = req.params

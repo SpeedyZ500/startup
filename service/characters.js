@@ -10,7 +10,8 @@ const{ createID, getCards, getDisplayable, getEditable, getOptions,
     characterFullFields,
     characterFullLookupFields,
     characterProjectionFields,
-    characterUnwindFields
+    characterUnwindFields,
+    getUserByToken
     
 } = require('./database.js')
 const urlPrefix = "/characters/"
@@ -69,6 +70,25 @@ characterRouter.get(`${urlPrefix}:id/bio`, async (req, res) => {
     }
     
 });
+
+characterRouter.get(`${urlPrefix}author/:id`,async (req, res)=>{
+    const token = req.cookies[authCookieName];
+    const user = await getUserByToken(token)
+    if(!user){
+        return res.send({isAuthor:false})
+    }
+    const id = req.params.id
+    const author = user._id
+    try{
+        await getEditable(urlPrefix, author, id, {
+            fields:["id"]
+        })
+        return res.send({isAuthor:true})
+    }
+    catch{
+        return res.send({isAuthor:false})
+    }
+})
 characterRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     const author = req.usid
     const {id} = req.params
@@ -105,9 +125,6 @@ characterRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
     creationData.id = id;
     creationData.url = `${urlPrefix}${id}`
     creationData.author = author;
-
-
-
     try{
         const character = await addOne(urlPrefix, creationData, {preProcessing:characterPreProcessing});
         if(character){

@@ -130,56 +130,7 @@
             }
         }
     },
-    "card":{
-        "head":[
-            {
-                "key":"name",
-                "url":"url"
-            }
-        ],
-        "body":[
-            {
-                "label":"Author:",
-                "key":"author",
-                "display":"/author/display/"
-            },
-            {
-                "label":"Home Land",
-                "set":[
-                    {
-                        "label":"World",
-                        "key":"homeWorld",
-                        "display":"/worldbuilding/worlds/display/"
-                    },
-                    {
-                        "label":"Country",
-                        "key":"homeCountry",
-                        "display":"/worldbuilding/country/display/"
-
-                    },
-                    {
-                        "label":"Town",
-                        "key":"homeTown"
-                    }
-                ]
-            },
-            {
-                "label":"Race",
-                "key":"race"
-            }
-        ],
-        "footer":[
-            {
-                "label":"Abilities",
-                "key":"abilities"
-            },
-            {
-                "label":"Past and Current Residences",
-                "key":"countries"
-            }
-        ]
-
-    },
+    
     "filter":{
         "author":{
             "label":"Author",

@@ -1,36 +1,44 @@
 const express = require('express');
-const { verifyAuth } = require('./service.js');
+const { verifyAuth, authCookieName } = require('./service.js');
 const urlPrefix = "/worldbuilding/organizations/";
 
 const organizationsRouter = express.Router();
 
 const { 
     createID, 
-    baseInstitutionCards,
     institutionFullFields,
     organizationsPreProcessing,
     postProcessLeader,
-    institutionLookups,
     organizationFullLookups,
-    institutionProjectionFields,
-    organizationBioProjectionFields,
     organizationEditFields,
-    getOptions,
     modifyMany,
     addOne,
     updateOne,
-    getCards,
-    getDisplayable,
     getEditable,
-    raceUnwindFields
-
-
-    
+    raceUnwindFields,
+    getUserByToken
  } = require('./database.js')
 
 
 
-
+organizationsRouter.get(`${urlPrefix}author/:id`,async (req, res)=>{
+    const token = req.cookies[authCookieName];
+    const user = await getUserByToken(token)
+    if(!user){
+        return res.send({isAuthor:false})
+    }
+    const id = req.params.id
+    const author = user._id
+    try{
+        await getEditable(urlPrefix, author, id, {
+            fields:["id"]
+        })
+        return res.send({isAuthor:true})
+    }
+    catch{
+        return res.send({isAuthor:false})
+    }
+})
 
 organizationsRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     const author = req.usid

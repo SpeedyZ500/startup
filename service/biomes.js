@@ -1,22 +1,15 @@
 const express = require('express');
-const { verifyAuth } = require('./service.js');
+const { verifyAuth, authCookieName} = require('./service.js');
 const {
     createID, 
-    getCards, 
-    getDisplayable, 
     getEditable, 
-    getOptions,
     biomeLookupFields,
-    biomeProjectionFields, 
     biomeEditProjectionFields,
     biomePreProcessing, 
-    baseFields,
-    baseLookupFields,
-    baseProjectionFields,
     baseFullFields,
     addOne,
     updateOne,
-    baseUnwindFields
+    getUserByToken
 } = require('./database.js')
 const urlPrefix = "/worldbuilding/biomes/";
 
@@ -27,43 +20,25 @@ const biomesRouter = express.Router();
 
 
 
-biomesRouter.get(`${urlPrefix}options`, async (req, res) => {
-    const options = await getOptions(urlPrefix, {query:req.query})
-    res.send(options)
-})
 
-biomesRouter.get(urlPrefix, async (req, res) =>{
-    const query = req.query || {};
-    const biomesToSend = await getCards(urlPrefix,{
-        query,
-        lookupFields:baseLookupFields,
-        fields:baseFields,
-        projectionFields:baseProjectionFields,
-        unwindFields:baseUnwindFields
-    })
-    res.send(biomesToSend)
-})
-
-biomesRouter.get(`${urlPrefix}:id/bio`, async (req, res) => {
-    const { id } = req.params;
+biomesRouter.get(`${urlPrefix}author/:id`,async (req, res)=>{
+    const token = req.cookies[authCookieName];
+    const user = await getUserByToken(token)
+    if(!user){
+        return res.send({isAuthor:false})
+    }
+    const id = req.params.id
+    const author = user._id
     try{
-        const character = await getDisplayable(urlPrefix, id, {
-            lookupFields:biomeLookupFields,
-            fields:baseFullFields,
-            projectionFields:biomeProjectionFields
-        });
-        if(character){
-            res.send(character);
-        }
-        else{
-            res.status(404).json({ error: "Character not found" });
-        }
+        await getEditable(urlPrefix, author, id, {
+            fields:["id"]
+        })
+        return res.send({isAuthor:true})
     }
     catch{
-        res.status(500).send({msg:"server error"})
+        return res.send({isAuthor:false})
     }
-    
-});
+})
 
 // 🚀 Router: Fetch biomes or individual biome
 biomesRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {

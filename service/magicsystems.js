@@ -1,5 +1,5 @@
 const express = require('express');
-const { verifyAuth } = require('./service.js');
+const { verifyAuth, authCookieName } = require('./service.js');
 const urlPrefix = "/worldbuilding/magicsystems/";
 
 
@@ -7,73 +7,41 @@ const magicRouter = express.Router();
 
 const { 
     createID, 
-    baseFields,
     fullBio,
     magicSystemPreProcessing,
-    institutionLookups,
     magicSystemFullLookups,
-    institutionProjectionFields,
-    institutionBioProjectionFields,
     institutionEditProjectionFields,
-    getOptions,
     modifyMany,
     addOne,
     updateOne,
-    getCards,
-    getDisplayable,
     getEditable,
-    raceUnwindFields
+    raceUnwindFields,
+    getUserByToken
 
 
 
     
  } = require('./database.js')
 
-magicRouter.get(`${urlPrefix}types/options`, async (req, res) => {
-    const options = await getOptions("magictypes")
-    res.send(options)
-})
-
-magicRouter.get(`${urlPrefix}options`, async (req, res) => {
-    const options = await getOptions("magicsystems", {query:req.query})
-    res.send(options)
-})
-
-
-
-
-magicRouter.get(`${urlPrefix}`, async (req, res) => {
-    const query = req.query || {};
-    const magicSystemToSend = await getCards(urlPrefix, {
-        query,
-        lookupFields:institutionLookups,
-        fields:baseFields,
-        projectionFields:institutionProjectionFields,
-        unwindFields:raceUnwindFields
-    })
-    res.send(magicSystemToSend)
-})
-
-magicRouter.get(`${urlPrefix}:id/bio`, async (req, res) => {
-    const { id } = req.params;
+ magicRouter.get(`${urlPrefix}author/:id`,async (req, res)=>{
+    const token = req.cookies[authCookieName];
+    const user = await getUserByToken(token)
+    if(!user){
+        return res.send({isAuthor:false})
+    }
+    const id = req.params.id
+    const author = user._id
     try{
-        const magicSystem = await getDisplayable(urlPrefix, id, {
-            lookupFields:magicSystemFullLookups,
-            fields:fullBio,
-            projectionFields:institutionBioProjectionFields
-        });
-        if(magicSystem){
-            res.send(magicSystem);
-        }
-        else{
-            res.status(404).json({ error: "Magic System not found" });
-        }
+        await getEditable(urlPrefix, author, id, {
+            fields:["id"]
+        })
+        return res.send({isAuthor:true})
     }
     catch{
-        res.status(500).send({msg:"server error"})
+        return res.send({isAuthor:false})
     }
-    
-});
+})
+
 magicRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     const author = req.usid
     const {id} = req.params
@@ -81,7 +49,8 @@ magicRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
         const magicSystem = await getEditable(urlPrefix, author, id, {
                 lookupFields:magicSystemFullLookups,
                 fields:fullBio,
-                projectionFields:institutionEditProjectionFields
+                projectionFields:institutionEditProjectionFields,
+                unwindFields:raceUnwindFields
             }
         );
         if(magicSystem){

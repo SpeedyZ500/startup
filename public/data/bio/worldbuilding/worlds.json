@@ -54,7 +54,7 @@
             },
             "group":{
                 "by":"continent",
-                "lablePrefix":"Countries in "
+                "lablePrefix":"Countries in"
             },
             "label":"All Countries"
         },

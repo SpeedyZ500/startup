@@ -1,19 +1,15 @@
 const express = require('express');
-const { verifyAuth } = require('./service.js');
+const { verifyAuth, authCookieName } = require('./service.js');
 const urlPrefix = "/worldbuilding/countries/";
 
 const countriesRouter = express.Router();
 
 const { 
     createID, 
-    baseInstitutionCards,
     institutionFullFields,
     countriesPreProcessing,
     postProcessLeader,
-    institutionLookups,
     countryFullLookups,
-    institutionProjectionFields,
-    countryBioProjectionFields,
     countryEditFields,
     getOptions,
     modifyMany,
@@ -21,11 +17,8 @@ const {
     updateOne,
     optionsMap,
     getCards,
-    getDisplayable,
     getEditable,
-    raceUnwindFields
-
-
+    getUserByToken
     
  } = require('./database.js')
 
@@ -64,38 +57,28 @@ countriesRouter.get(`${urlPrefix}options`, async (req, res) => {
 
 
 
-countriesRouter.get(`${urlPrefix}`, async (req, res) => {
-    const query = req.query || {};
-    const countryToSend = await getCards(urlPrefix, {
-        query,
-        lookupFields:institutionLookups,
-        fields:baseInstitutionCards,
-        projectionFields:institutionProjectionFields,
-        unwindFields:raceUnwindFields
-    })
-    res.send(countryToSend)
-})
 
-countriesRouter.get(`${urlPrefix}:id/bio`, async (req, res) => {
-    const { id } = req.params;
+
+countriesRouter.get(`${urlPrefix}author/:id`,async (req, res)=>{
+    const token = req.cookies[authCookieName];
+    const user = await getUserByToken(token)
+    if(!user){
+        return res.send({isAuthor:false})
+    }
+    const id = req.params.id
+    const author = user._id
     try{
-        const country = await getDisplayable(urlPrefix, id, {
-            lookupFields:countryFullLookups,
-            fields:institutionFullFields,
-            projectionFields:countryBioProjectionFields
-        });
-        if(country){
-            res.send(country);
-        }
-        else{
-            res.status(404).json({ error: "country not found" });
-        }
+        await getEditable(urlPrefix, author, id, {
+            fields:["id"]
+        })
+        return res.send({isAuthor:true})
     }
     catch{
-        res.status(500).send({msg:"server error"})
+        return res.send({isAuthor:false})
     }
-    
-});
+})
+
+
 countriesRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     const author = req.usid
     const {id} = req.params
