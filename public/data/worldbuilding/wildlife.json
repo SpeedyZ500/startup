@@ -4,84 +4,121 @@
     "buttonLabel":"New Wildlife",
     "form":{
         "title":"New Wildlife",
-        "fields":[
-            {
+        "fields":{
+            "name":{
                 "label": "Name",
                 "required": true,
                 "type": "text"
             },
-            {
+            "types":{
                 "label":"Type",
                 "type":"creatable",
-                "source":"/worldbuilding/wildlife/types",
+                "source":"wildlifetypes",
                 "key":"type"
             },
-            {
+            "description":{
                 "label":"Description",
                 "type":"text-area",
                 "placeholder":"Describe your Wildlife",
                 "key":"description"
             },
-            {
-                "label1":"Origin World",
-                "type":"select-plus",
-                "type1":"select",
-                "source1":"/worldbuilding/worlds",
-                "key1":"originWorld",
-                "label2":"Origin Biome",
-                "type2":"iteration-select",
-                "source2":"originBiome",
-                "key2":"originBiome"
+            "originWorld":{
+                "label":"Origin World",
+                "type":"select",
+                "source":"worlds"
             },
-            {
+            "originBiome":{
+                "label":"Origin Biome",
+                "type":"select",
+                "filter":{
+                    "key":"originWorld",
+                    "as":"worlds"
+                },
+                "soruce":"biomes"
+            },
+            "otherWorlds":{
                 "label":"Other Worlds",
                 "type":"multi-select",
-                "source":"/worldbuilding/worlds",
-                "key":"otherWorlds"
+                "source":"worlds"
             },
-            {
-                "label":"Abilities",
-                "type":"multi-select",
-                "source":"/worldbuilding/magicsystems"
-
-            },
-            {
+            "otherBiomes":{
                 "label":"Other Biomes",
                 "type":"multi-select",
-                "key":"otherBiomes"
+                "source":"biomes"
             },
-            {
+            "abilities":{
+                "label":"Abilities",
+                "type":"multi-select",
+                "source":"magicsystems"
+            },
+            "custom":{
+                "label":"Custom Fields",
+                "type":"custom-adder"
+            },
+            "sections":{
                 "label":"Sections",
                 "type":"section-adder"
             }
-        ]
+        }
     },
 
     "sort":[
         {
             "label":"New to Old",
-            "value":{"category":"created", "az":false}
+            "value":{"created":-1}
         },
         {
             "label":"Old to New",
-            "value":{"category":"created", "az":true}
+            "value":{"created":1}
         },
         {
             "label":"A-Z Name",
-            "value":{"category":"Name", "az":true}
+            "value":{"name":1}
         },
         {
             "label":"Z-A Name",
-            "value":{"category":"Name", "az":false}
+            "value":{"name":-1}
         },
         {
             "label":"A-Z Author",
-            "value":{"category":"Author", "az":true}
+            "value":{"author":1}
         },
         {
             "label":"Z-A Author",
-            "value":{"category":"Author", "az":false}
+            "value":{"author":-1}
         }
-    ]
+    ],
+    "filter":{
+        "author":{
+            "label":"Author",
+            "source":"users"
+        },
+        "worlds":{
+            "label":"World",
+            "source":"worlds"
+        },
+        "biomes":{
+            "label":"Biomes",
+            "source":"biomes",
+            "filter":"worlds"
+        },
+        "types":{
+            "label":"Type",
+            "source":"wildlifetypes"
+        }
+    },
+    "cards":{
+        "header":{
+            "name":{
+                "url":"url"
+            }
+        },
+        "body":{
+            "author":"Author",
+            "originWorld":"Origin World",
+            "originBiome":"Origin Biome",
+            "description":""
+        }
+    }
 
 }

@@ -40,7 +40,7 @@ export const creatableSources = {
     contentwarnings:"/stories",
 }
 
-function extractIDfromURL(){
+export function extractIDfromURL(){
     let path = window.location.pathname;
     if(!path.startsWith("/")){
         path = "/" + path;
@@ -179,7 +179,6 @@ export function FormGenerator({handleClose}){
             })
             .then(handleErrors)
             .then(data => {
-                console.log(JSON.stringify(data))
                 socket.notify({collection:url, type:"POST", id:data.id})
                 handleModify(data.id,formData,form,socket)
                 handleClose?.()
@@ -378,35 +377,27 @@ function GenerateCreatable({formData,fieldkey, field, socket, setData}){
     useEffect(() => {
         // Combine options from both sources
         updateOptions([...gotOptions, ...createdOptions]);
-        console.log(JSON.stringify(options))
     }, [gotOptions, createdOptions]);
     const handleCreateOption = (newOptionValue) => {
-        console.log(JSON.stringify(newOptionValue))
 
         const newOption = {
             value: newOptionValue,
             label: newOptionValue
         };
-        console.log(JSON.stringify(newOption))
 
 
         // Add new option to created options list
         updateCreatedOptions(prevOptions => [...prevOptions, newOption]);
-        console.log(JSON.stringify(createdOptions))
         // You may want to also update formData here if required
         const selected = [...(formData[fieldkey] || []), newOption.value];
-        console.log(JSON.stringify(selected))
 
         setData({...formData, [fieldkey]:selected})
-        console.log(JSON.stringify(formData))
 
 
     };
     const handleChange = (selectedOptions) => {
         const selectedValues = selectedOptions ? selectedOptions.map(option => option.value) : [];
         setData({...formData, [fieldkey]:selectedValues})
-        console.log(JSON.stringify(selectedValues))
-        console.log(JSON.stringify(formData))
 
     };
     return(
@@ -599,10 +590,11 @@ return (
 
 function GenerateModifyOthers({formData, fieldkey, field, socket, currUrl, setData}){
     const [options, setOptions] = useState([]);
+    const id = formData.id
+
     useEffect(() => {
         const collection = Object.keys(selectSources).find(collect => selectSources[collect] === currUrl);
         const url = selectSources[field.source]
-        const id = formData.id
         if(id && field.method === "remove"){
             const query = {filter:{[collection]:id}}
             socket.subscribe({
@@ -634,6 +626,9 @@ function GenerateModifyOthers({formData, fieldkey, field, socket, currUrl, setDa
         const selected = (selectedOption|| []).map(opt => opt.value) || [];
         setData({...formData, [fieldkey]:selected})
     };
+    if(field.method === "remove" && !id){
+        return
+    }
     
     return (
     <div key={fieldkey} className="mb-2 ">
@@ -753,7 +748,6 @@ function SectionAdder({formData, fieldkey, setData, field}){
 }
 
 function GenerateForm({formData, form, socket, setData, currUrl}){
-
     const renderField = (fieldkey, field) => {
         switch(field.type){
             case 'text':
@@ -809,12 +803,17 @@ function GenerateForm({formData, form, socket, setData, currUrl}){
                 />
             case 'checkbox':
                 return (
-                    <input
-                            type="checkbox"
-                            name={fieldkey}
-                            checked={formData[fieldkey] || false}
-                            onChange={(e) => setData({ ...form, [fieldkey]: e.target.checked })}
-                    />
+                    <div key={fieldkey}  className="mb-2 form-check">
+                        <label  htmlFor={fieldkey}>{field.label}</label>
+                        <input
+                                type="checkbox"
+                                className="form-check-input"
+                              
+                                name={fieldkey}
+                                checked={formData[fieldkey] || false}
+                                onChange={(e) => setData({ ...formData, [fieldkey]: e.target.checked })}
+                        />
+                    </div>
                 );
             case "super-select":
                 return <SuperSelect 

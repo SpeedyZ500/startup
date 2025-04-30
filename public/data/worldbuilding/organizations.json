@@ -5,66 +5,113 @@
 
     "form":{
         "title":"New Organization",
-        "fields":[
-            {
+        "fields":{
+            "name":{
                 "label":"name",
                 "required":true,
                 "type": "text"
             },
-            {
+            "originWorld":{
                 "label":"World",
                 "type":"select",
-                "source":"/worldbuilding/worlds"
+                "source":"worlds"
             },
-            {
-                "label":"Other_Worlds",
+            "otherWorlds":{
+                "label":"Other Worlds",
                 "type":"multi-select",
-                "source":"/worldbuilding/worlds"
+                "source":"worlds"
             },
-            {
+            "types":{
                 "label":"Type",
                 "type":"creatable",
-                "source":"/worldbuilding/organizations/types"
+                "source":"organizationtypes"
             },
-            {
+            "leaders":{
                 "label":"Leaders",
                 "type":"multi-select",
-                "source":"/characters"
+                "source":"characters"
             },
-            {
-                "label":"description",
-                "type":"text"
+            "authorIsLeader":{
+                "label":"Is the author a leader",
+                "type":"checkbox"
             },
-            {
+            "description":{
+                "label":"Description",
+                "type":"text-area"
+            },
+            "addMembers":{
+                "label":"Members",
+                "type":"modify-others",
+                "method":"add",
+                "source":"characters"
+            },
+            "removeMembers":{
+                "label":"Remove Members",
+                "type":"modify-others",
+                "method":"remove",
+                "source":"characters"
+            },
+            "custom":{
+                "label":"Custom Fields",
+                "type":"custom-adder"
+            },
+            "sections":{
                 "label":"Sections",
                 "type":"section-adder"
             }
-        ]
+        }
     },
     "sort":[
         {
             "label":"New to Old",
-            "value":{"category":"created", "az":false}
+            "value":{"created":-1}
         },
         {
             "label":"Old to New",
-            "value":{"category":"created", "az":true}
+            "value":{"created":1}
         },
         {
             "label":"A-Z Name",
-            "value":{"category":"Name", "az":true}
+            "value":{"name":1}
         },
         {
             "label":"Z-A Name",
-            "value":{"category":"Name", "az":false}
+            "value":{"name":-1}
         },
         {
             "label":"A-Z Author",
-            "value":{"category":"Author", "az":true}
+            "value":{"author":1}
         },
         {
             "label":"Z-A Author",
-            "value":{"category":"Author", "az":false}
+            "value":{"author":-1}
         }
-    ]
+    ],
+    "filter":{
+        "author":{
+            "label":"Author",
+            "source":"users"
+        },
+        "worlds":{
+            "label":"World",
+            "source":"worlds"
+        },
+        "types":{
+            "label":"Type",
+            "source":"organizationtypes"
+        }
+    },
+    "cards":{
+        "header":{
+            "name":{
+                "url":"url"
+            }
+        },
+        "body":{
+            "author":"Author",
+            "originWorld":"Origin World",
+            "isAuthorLeader":{"label":"Leader", "value":"author"},
+            "description":""
+        }
+    }
 }

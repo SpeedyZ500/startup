@@ -4,80 +4,155 @@
     "buttonLabel":"New Country",
     "form":{
         "title":"New Country",
-        "fields":[
-            {
-                "label":"Name",
+        "fields":{
+            "name":{
+                "label":"name",
                 "required":true,
-                "type":"text",
-                "onCard":true,
-                "inList":true,
-                "filterable":false,
-                "location":"head"
+                "type": "text"
             },
-            {
-                "label":"Description",
-                "type":"text-area",
-                "placeholder":"A short description/summary of your Biome",
-                "onCard":false,
-                "inList":true,
-                "filterable":false
+            "originWorld":{
+                "label":"Origin World",
+                "type":"select",
+                "source":"worlds"
             },
-            {
+            "otherWorlds":{
+                "label":"Other Worlds",
+                "type":"multi-select",
+                "source":"worlds"
+            },
+            "continents":{
+                "label":"Continents",
+                "type":"multi-select",
+                "soruce":"continents",
+                "filter":{
+                    "key":"originWorld",
+                    "as":"id"
+                }
+            },
+            "biomes":{
+                "label":"Biomes",
+                "type":"multi-select",
+                "source":"biomes"
+            },
+            "towns":{
+                "label":"Towns",
+                "type":"text-creatable"
+            },
+            "types":{
+                "label":"Type",
+                "type":"creatable",
+                "source":"countrytypes"
+            },
+            "leaders":{
                 "label":"Leaders",
                 "type":"multi-select",
-                "source":"/characters"
+                "source":"characters"
             },
-            {
-                "label":"World",
-                "type":"multi-select",
-                "source":"/api/worldbuilding/worlds"
+            "authorIsLeader":{
+                "label":"Is the author a leader",
+                "type":"checkbox"
             },
-            {
-                "label":"Wildlife",
-                "type":"multi-select",
-                "source":"/api/worldbuilding/wildlife"
+            "description":{
+                "label":"Description",
+                "type":"text-area",
+                "placeholder":"A short description/summary of your Country"
             },
-            {
-                "label":"Flora",
-                "type":"multi-select",
-                "source":"/api/worldbuilding/flora"
+            "addCitizens":{
+                "label":"Citizens",
+                "type":"modify-others",
+                "method":"add",
+                "source":"characters"
             },
-            {
-                "Label":"Biomes",
-                "type":"multi-select",
-                "source":"/api/worldbuilding/biomes"
+            "removeCitizens":{
+                "label":"Remove Citizens",
+                "type":"modify-others",
+                "method":"remove",
+                "source":"characters"
             },
-            {
+            "addRaces":{
+                "label":"Races",
+                "type":"modify-others",
+                "method":"add",
+                "source":"races"
+            },
+            "removeRaces":{
+                "label":"Remove Races",
+                "type":"modify-others",
+                "method":"remove",
+                "source":"races"
+            },
+            "custom":{
+                "label":"Custom Fields",
+                "type":"custom-adder"
+            },
+            "sections":{
                 "label":"Sections",
                 "type":"section-adder"
             }
-        ]
+
+        }
     },
     "sort":[
         {
             "label":"New to Old",
-            "value":{"category":"created", "az":false}
+            "value":{"created":-1}
         },
         {
             "label":"Old to New",
-            "value":{"category":"created", "az":true}
+            "value":{"created":1}
         },
         {
             "label":"A-Z Name",
-            "value":{"category":"Name", "az":true}
+            "value":{"name":1}
         },
         {
             "label":"Z-A Name",
-            "value":{"category":"Name", "az":false}
+            "value":{"name":-1}
         },
         {
             "label":"A-Z Author",
-            "value":{"category":"Author", "az":true}
+            "value":{"author":1}
         },
         {
             "label":"Z-A Author",
-            "value":{"category":"Author", "az":false}
+            "value":{"author":-1}
         }
-    ]
-
+    ],
+    "filter":{
+        "author":{
+            "label":"Author",
+            "source":"users"
+        },
+        "worlds":{
+            "label":"World",
+            "source":"worlds"
+        },
+        "continents":{
+            "label":"Continents",
+            "source":"continents",
+            "filter":"worlds"
+        },
+        "biomes":{
+            "label":"Biomes",
+            "source":"biomes"
+        },
+        "types":{
+            "label":"Type",
+            "source":"countrytypes"
+        }
+        
+    },
+    "cards":{
+        "header":{
+            "name":{
+                "url":"url"
+            }
+        },
+        "body":{
+            "author":"Author",
+            "originWorld":"Origin World",
+            "isAuthorLeader":{"label":"Leader", "value":"author"},
+            "description":""
+        }
+    }
 }

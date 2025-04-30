@@ -4,65 +4,93 @@
     "buttonLabel":"New Magic System",
     "form":{
         "title":"New Magic System",
-        "fields":[
-            {
-                "label": "name",
+        "fields":{
+            "name":{
+                "label": "Name",
                 "required": true,
                 "type": "text"
             },
-            {
+            "types":{
                 "label":"Type",
                 "type":"creatable",
-                "source":"/worldbuilding/magicsystems/types"
+                "source":"magictypes"
             },
-            {
+            "description":{
                 "label":"Description",
                 "type":"text-area",
                 "placeholder":"Describe your Magic System"
             },
-            {
-                "label":"Origin_World",
+            "originWorld":{
+                "label":"Origin World",
                 "type":"select",
-                "source":"/worldbuilding/worlds",
-                "onCard":true,
-                "inList":true
+                "source":"worlds"
             },
-            {
-                "label":"Worlds",
+            "otherWorlds":{
+                "label":"Other Worlds",
                 "type":"multi-select",
-                "source":"/worldbuilding/worlds"
+                "source":"worlds"
             },
-            {
+            "custom":{
+                "label":"Custom Fileds",
+                "type":"custom-adder"
+            },
+            "sections":{
                 "label":"Sections",
                 "type":"section-adder"
             }
-        ]
+        }
     },
 
     "sort":[
         {
             "label":"New to Old",
-            "value":{"category":"created", "az":false}
+            "value":{"created":-1}
         },
         {
             "label":"Old to New",
-            "value":{"category":"created", "az":true}
+            "value":{"created":1}
         },
         {
             "label":"A-Z Name",
-            "value":{"category":"Name", "az":true}
+            "value":{"name":1}
         },
         {
             "label":"Z-A Name",
-            "value":{"category":"Name", "az":false}
+            "value":{"name":-1}
         },
         {
             "label":"A-Z Author",
-            "value":{"category":"Author", "az":true}
+            "value":{"author":1}
         },
         {
             "label":"Z-A Author",
-            "value":{"category":"Author", "az":false}
+            "value":{"author":-1}
         }
-    ]
+    ],
+    "filter":{
+        "author":{
+            "label":"Author",
+            "source":"users"
+        },
+        "worlds":{
+            "label":"World",
+            "source":"worlds"
+        },
+        "types":{
+            "label":"Type",
+            "source":"magictypes"
+        }
+    },
+    "cards":{
+        "header":{
+            "name":{
+                "url":"url"
+            }
+        },
+        "body":{
+            "author":"Author",
+            "originWorld":"Origin World",
+            "description":""
+        }
+    }
 }

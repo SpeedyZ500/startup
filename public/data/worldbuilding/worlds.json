@@ -4,67 +4,114 @@
     "buttonLabel":"New World",
     "form":{
         "title":"New World",
-        "fields":[
-            {
-                "label": "name",
+        "fields":{
+            "name":{
+                "label": "Name",
                 "required": true,
                 "type": "text"
             },
-            {
+            "description":{
                 "label":"Description",
                 "type":"text-area",
-                "placeholder":"Describe your world",
-                "onCard":false,
-                "inList":true,
-                "filterable":false
+                "placeholder":"Describe your world"
             },
-            {
+            "addMagicsystems":{
                 "label":"Magic Systems",
-                "type":"multi-select",
-                "source":"/worldbuilding/magicsystems"
-
+                "type":"modify-others",
+                "method":"add",
+                "source":"magicsystems"
             },
-            {
+            "removeMagicsystems":{
+                "label":"Remove Magic Systems",
+                "type":"modify-others",
+                "method":"remove",
+                "source":"magicsystems"
+            },
+            "addRaces":{
                 "label":"Races",
-                "type":"multi-select",
-                "source":"/worldbuilding/races"
+                "type":"modify-others",
+                "method":"add",
+                "source":"races"
             },
-            {
+            "removeRaces":{
+                "label":"Remove Races",
+                "type":"modify-others",
+                "method":"remove",
+                "source":"races"
+            },
+            "addFlora":{
                 "label": "Flora",
-                "type": "multi-select",
-                "source":"/worldbuilding/flora"
+                "type":"modify-others",
+                "method":"add",
+                "source":"flora"
             },
-            {
+            "removeFlora":{
+                "label": "Remove Flora",
+                "type":"modify-others",
+                "method":"remove",
+                "source":"flora"
+            },
+            "addWildlife":{
                 "label": "Wildlife",
-                "type": "multi-select",
-                "source":"/worldbuilding/wildlife"
+                "type":"modify-others",
+                "method":"add",
+                "source":"wildlife"
             },
-            {
-                "label":"Biomes",
-                "type":"multi-select"
+            "removeWildlife":{
+                "label": "Remove Wildlife",
+                "type":"modify-others",
+                "method":"remove",
+                "source":"wildlife"
             },
-            {
+            "addBiomes":{
+                "label": "Biomes",
+                "type":"modify-others",
+                "method":"add",
+                "source":"biomes"
+            },
+            "removeBiomes":{
+                "label": "Remove Biomes",
+                "type":"modify-others",
+                "method":"remove",
+                "source":"biomes"
+            },
+            "continents":{
                 "label": "Continents",
-                "type":"super-select",
-                "source":"/worldbuilding/countries",
-                "categoryLabel":"Continent"
+                "type":"text-creatable"
             },
-            {
-                "label":"Religion",
-                "type":"multi-select",
-                "source":"/worldbuilding/organizations",
-                "category":"type=religion"
+            "addCountries":{
+                "label": "Countries",
+                "type":"modify-others",
+                "method":"add",
+                "source":"countries"
             },
-            {
+            "removeCountries":{
+                "label": "Countries",
+                "type":"modify-others",
+                "method":"remove",
+                "source":"countries"
+            },
+            "addOrganizations":{
                 "label":"Organizations",
-                "type":"multi-select",
-                "source":"/worldbuilding/organizations"
+                "type":"modify-others",
+                "method":"add",
+                "source":"organizations"
             },
-            {
+            "removeOrganizations":{
+                "label":"Remove Organizations",
+                "type":"modify-others",
+                "method":"remove",
+                "source":"organizations"
+            },
+            "custom":{
+                "label":"Custom Fields",
+                "type":"custom-adder"
+            },
+            "sections":{
                 "label":"Sections",
                 "type":"section-adder"
             }
-        ]
+        }
 
 
     },
@@ -78,22 +125,47 @@
         { "label": "Races", "query": "/worldbuilding/races?worlds=" },
         { "label": "Characters Found Here/have visited/lived here", "query":"/characters?worlds="}
     ],
+    "filter":{
+        "author":{
+            "label":"Author",
+            "source":"users"
+        }
+    },
     "sort":[
         {
             "label":"New to Old",
-            "value":{"category":"created", "az":false}
+            "value":{"created":-1}
         },
         {
             "label":"Old to New",
-            "value":{"category":"created", "az":true}
+            "value":{"created":1}
+        },
+        {
+            "label":"A-Z Name",
+            "value":{"name":1}
+        },
+        {
+            "label":"Z-A Name",
+            "value":{"name":-1}
         },
         {
             "label":"A-Z Author",
-            "value":{"category":"Author", "az":true}
+            "value":{"author":1}
         },
         {
             "label":"Z-A Author",
-            "value":{"category":"Author", "az":false}
+            "value":{"author":-1}
         }
-    ]
+    ],
+    "cards":{
+        "header":{
+            "name":{
+                "url":"url"
+            }
+        },
+        "body":{
+            "author":"Author",
+            "description":""
+        }
+    }
 }

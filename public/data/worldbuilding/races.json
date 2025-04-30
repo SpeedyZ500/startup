@@ -4,76 +4,108 @@
     "buttonLabel":"New Race",
     "form":{
         "title":"New Race",
-        "fields":[
-            {
-                "label": "name",
+        "fields":{
+            "name":{
+                "label": "Name",
                 "required": true,
                 "type": "text"
             },
-            {
+            "types":{
                 "label":"Type",
                 "type":"creatable",
-                "source":"/worldbuilding/races/types"
+                "source":"racetypes"
             },
-            {
+            "description":{
                 "label":"Description",
                 "type":"text-area",
-                "placeholder":"Describe your Wildlife"
+                "placeholder":"Describe your Race"
             },
-            {
-                "label1":"Origin World",
+            "originWorld":{
+                "label":"Origin World",
                 "type":"select",
-                "source":"/worldbuilding/worlds",
-                "key":"originWorld"
+                "source":"worlds"
             },
-            {
+            "otherWorlds":{
                 "label":"Other Worlds",
                 "type":"multi-select",
-                "source":"/worldbuilding/worlds",
-                "key":"otherWorlds"
+                "source":"worlds"
             },
-            {
+            "countries":{
                 "label":"Countries",
                 "type":"multi-select",
-                "source":"/worldbuilding/countries"
+                "source":"countries"
             },
-            {
+            "abilities":{
                 "label":"Abilities",
                 "type":"multi-select",
-                "source":"/worldbuilding/magicsystems"
+                "source":"magicsystems"
 
             },
-            {
+            "custom":{
+                 "label":"Custom Fields",
+                "type":"custom-adder"
+            },
+            "sections":{
                 "label":"Sections",
                 "type":"section-adder"
             }
-        ]
+        }
     },
 
     "sort":[
         {
             "label":"New to Old",
-            "value":{"category":"created", "az":false}
+            "value":{"created":-1}
         },
         {
             "label":"Old to New",
-            "value":{"category":"created", "az":true}
+            "value":{"created":1}
         },
         {
             "label":"A-Z Name",
-            "value":{"category":"Name", "az":true}
+            "value":{"name":1}
         },
         {
             "label":"Z-A Name",
-            "value":{"category":"Name", "az":false}
+            "value":{"name":-1}
         },
         {
             "label":"A-Z Author",
-            "value":{"category":"Author", "az":true}
+            "value":{"author":1}
         },
         {
             "label":"Z-A Author",
-            "value":{"category":"Author", "az":false}
+            "value":{"author":-1}
         }
-    ]
+    ],
+    "filter":{
+        "author":{
+            "label":"Author",
+            "source":"users"
+        },
+        "worlds":{
+            "label":"World",
+            "source":"worlds"
+        },
+        "countries":{
+            "label":"Countries",
+            "source":"countries"
+        },
+        "types":{
+            "label":"Type",
+            "source":"racetypes"
+        }
+    },
+    "cards":{
+        "header":{
+            "name":{
+                "url":"url"
+            }
+        },
+        "body":{
+            "author":"Author",
+            "originWorld":"Origin World",
+            "description":""
+        }
+    }
 }

@@ -14,7 +14,6 @@ import { filterProfanity
 
 
 function renderItem(item, cardId){
-    console.log(JSON.stringify(item))
     if(Array.isArray(item.value)){
         return(
             <OverlayTrigger 
@@ -89,6 +88,9 @@ function renderSection(card, cardId, formatting) {
         if(config.url){
             item.url = card[config.url]
         }
+        if(config.value){
+            item.value = card[config.value]
+        }
 
         return renderItem(item, cardId);
     });
@@ -102,7 +104,6 @@ function renderCard(cards, formatting){
     
     return (
         cards.map((card, index) => {
-            console.log(JSON.stringify({card, index}))
             return(<Card key={index} style={{width:"18rem"}}>
                 {formatting.header && 
                     <Card.Header className="theme adaptive" key="head">
@@ -154,9 +155,6 @@ export function CardsRenderer({cards, profanity=true, formatting={body:{name:{ur
 
     const renderCards = useMemo(() => renderCard(cleanCards, formatting), [cleanCards, formatting]);
     
-    useEffect(() => {
-        console.log("CardsRenderer re-rendered");
-    }, [cards, renderCards]);
     return(
         <div className="card-columns my-container scrollable" data-bs-spy="scroll">
             {renderCards}

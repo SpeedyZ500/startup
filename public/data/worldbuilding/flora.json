@@ -4,80 +4,120 @@
     "buttonLabel":"New Flora",
     "form":{
         "title":"Flora",
-        "fields":[
-            {
-                "label":"name",
-                "required":true,
-                "type":"text"
+        "fields":{
+            "name":{
+                "label": "Name",
+                "required": true,
+                "type": "text"
             },
-            {
+            "types":{
                 "label":"Type",
                 "type":"creatable",
-                "source":"/worldbuilding/flora/types"
+                "source":"floratypes",
+                "key":"type"
             },
-            {
-                "label":"description",
+            "description":{
+                "label":"Description",
                 "type":"text-area",
-                "placeholder":"Describe your Flora"
+                "placeholder":"Describe your flora",
+                "key":"description"
             },
-            {
-                "label":"Properties",
-                "type":"multi-select",
-                "source":"/worldbuilding/magicsystems"
-            },
-            {
-                "label":"Origin_World",
+            "originWorld":{
+                "label":"Origin World",
                 "type":"select",
-                "source":"/worldbuilding/worlds",
-                "onCard":true,
-                "inList":true
+                "source":"worlds"
             },
-            {
-                "label":"Worlds",
+            "originBiome":{
+                "label":"Origin Biome",
+                "type":"select",
+                "filter":{
+                    "key":"originWorld",
+                    "as":"worlds"
+                },
+                "soruce":"biomes"
+            },
+            "otherWorlds":{
+                "label":"Other Worlds",
                 "type":"multi-select",
-                "source":"/worldbuilding/worlds"
+                "source":"worlds"
             },
-            {
-                "label":"Biomes",
+            "otherBiomes":{
+                "label":"Other Biomes",
                 "type":"multi-select",
-                "source":"/worldbuilding/biomes"
+                "source":"biomes"
             },
-            {
-                "label":"Countries",
+            "abilities":{
+                "label":"Abilities",
                 "type":"multi-select",
-                "source":"/worldbuilding/countries"
+                "source":"magicsystems"
             },
-
-            {
+            "custom":{
+                "label":"Custom Fields",
+                "type":"custom-adder"
+            },
+            "sections":{
                 "label":"Sections",
                 "type":"section-adder"
             }
-        ]
+        }
     },
+
     "sort":[
         {
             "label":"New to Old",
-            "value":{"category":"created", "az":false}
+            "value":{"created":-1}
         },
         {
             "label":"Old to New",
-            "value":{"category":"created", "az":true}
+            "value":{"created":1}
         },
         {
             "label":"A-Z Name",
-            "value":{"category":"Name", "az":true}
+            "value":{"name":1}
         },
         {
             "label":"Z-A Name",
-            "value":{"category":"Name", "az":false}
+            "value":{"name":-1}
         },
         {
             "label":"A-Z Author",
-            "value":{"category":"Author", "az":true}
+            "value":{"author":1}
         },
         {
             "label":"Z-A Author",
-            "value":{"category":"Author", "az":false}
+            "value":{"author":-1}
         }
-    ]
+    ],
+    "filter":{
+        "author":{
+            "label":"Author",
+            "source":"users"
+        },
+        "worlds":{
+            "label":"World",
+            "source":"worlds"
+        },
+        "biomes":{
+            "label":"Biomes",
+            "source":"biomes",
+            "filter":"worlds"
+        },
+        "types":{
+            "label":"Type",
+            "source":"wildlifetypes"
+        }
+    },
+    "cards":{
+        "header":{
+            "name":{
+                "url":"url"
+            }
+        },
+        "body":{
+            "author":"Author",
+            "originWorld":"Origin World",
+            "originBiome":"Origin Biome",
+            "description":""
+        }
+    }
 }

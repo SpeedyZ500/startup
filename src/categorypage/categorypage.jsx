@@ -17,53 +17,57 @@ import { WebSocketFacade, webSocket } from '../utility/websocketfacade.js';
 
 const filterSources = {...selectSources, ...creatableSources, users:"/users"}
 
-function FilterGenerator({filters, onFilterChange, socket, profanity = true}){
+function FilterOptions({filter, attribute, onFilterChange, socket, profanity}){
     const handleChange = (selectedOptions, attribute) => {
         onFilterChange(attribute, selectedOptions.map(option => option.value));
     };
+    const [options, updateOptions] = useState([])
+    const [filteredOptions, setFilteredOptions] = useState([])
+    useEffect(() => {
+        const collection = filter.source
+        const url = filterSources[collection]
+        if(mapOptions.includes(collection)){
+            socket.subscribe({url, type:"mapOptions", collection, commandId:attribute, setData:updateOptions})
+        }
+        else{
+            socket.subscribe({url, type:"getOptions", collection, commandId:attribute, setData:updateOptions})
+        }
+
+    },[attribute, filter])
+    useEffect(() => {
+        async function runFilter() {
+            const cleanOptions = await filterProfanity(options, profanity, true);
+            setFilteredOptions(cleanOptions);
+        }
+        runFilter();
+    }, [options, profanity])
+    return(
+        <div className="input-group" key={attribute}>
+            <label className="input-group-text" htmlFor={attribute}>
+                {filter.label}
+            </label>
+            <Select 
+                isMulti 
+                options={filteredOptions} 
+                className="form-control" 
+                onChange={(selectedOptions) => handleChange(selectedOptions, attribute)}
+                name={attribute}
+            />
+        </div>
+    )
+}
+function FilterGenerator({ filters, onFilterChange, socket, profanity = true }) {
     return Object.keys(filters).map((key) => {
-        const filter = filters[key];
-        const [options, updateOptions] = useState([])
-        const [filteredOptions, setFilteredOptions] = useState([])
-
-        useEffect(() => {
-            const collection = filter.source
-            const url = filterSources[collection]
-            if(mapOptions.includes(collection)){
-                socket.subscribe({url, type:"mapOptions", collection, commandId:key, setData:updateOptions})
-            }
-            else{
-                socket.subscribe({url, type:"getOptions", collection, commandId:key, setData:updateOptions})
-            }
-
-        },[key, filter, filters])
-
-
-        useEffect(() => {
-            async function runFilter() {
-                const cleanOptions = await filterProfanity(options, profanity, true);
-                console.log("Filtered Options:", cleanOptions);
-                setFilteredOptions(cleanOptions);
-            }
-            runFilter();
-        }, [options, profanity])
-
-        
-
-        return(
-            <div className="input-group" key={key}>
-                <label className="input-group-text" htmlFor={key}>
-                    {filter.label}
-                </label>
-                <Select 
-                    isMulti 
-                    options={filteredOptions} 
-                    className="form-control" 
-                    onChange={(selectedOptions) => handleChange(selectedOptions, key)}
-                    name={key}
-                />
-            </div>
-        )
+        return (
+            <FilterOptions
+                key={key}
+                filter={filters[key]}
+                attribute={key}
+                onFilterChange={onFilterChange}
+                socket={socket}
+                profanity={profanity}
+            />
+        );
     });
 }
 
@@ -112,11 +116,9 @@ export function CategoryPage(props) {
         }
         paths = paths.replace(/\/$/, '').trim()
         const jsonPath = `/data${paths}.json`;
-        console.log(jsonPath)
         fetch(jsonPath)
         .then((res) => res.json())
         .then((data) =>{
-            console.log(JSON.stringify(data));
             setPage(data);
             setSortOptions(data.sort?.[0] || null);
             setError(null);
@@ -132,12 +134,8 @@ export function CategoryPage(props) {
         ? path.replace("/worldbuilding/", "")
         : path.replace(/^\//, "");   
         webSocket.subscribe({url:path, type:"getCards", collection, commandId:"getCards", query:{filter, sort:sortOptions.value},setData:setList})
-        console.log(JSON.stringify(list))
     }, [path, filter, sortOptions])
-    useEffect(() => {
-        console.log(JSON.stringify(list))
-
-    },[list])
+    
     
     if(loading){
         <main>

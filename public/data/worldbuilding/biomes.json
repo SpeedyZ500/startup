@@ -4,88 +4,116 @@
     "buttonLabel":"New Biome",
     "form":{
         "title":"New Biome",
-        "fields":[
-            {
-                "label":"Name",
-                "required":true,
-                "type":"text",
-                "onCard":true,
-                "inList":true,
-                "filterable":false,
-                "location":"head",
-                "key":"name"
-
+        "fields":{
+            "name":{
+                "label": "Name",
+                "required": true,
+                "type": "text"
             },
-            {
+            "description":{
                 "label":"Description",
                 "type":"text-area",
-                "placeholder":"A short description/summary of your Biome",
-                "onCard":false,
-                "inList":true,
-                "filterable":false,
-                "key":"description"
-
+                "placeholder":"Describe your Biome"
             },
-            {
-                "label":"Worlds",
-                "type":"multi-select",
-                "key":"worlds",
-
-                "source":"/api/worldbuilding/worlds"
+            "addRaces":{
+                "label":"Races",
+                "type":"modify-others",
+                "method":"add",
+                "source":"races"
             },
-            {
-                "label":"Wildlife",
-                "key":"wildlife",
-
-                "type":"multi-select",
-                "source":"/api/worldbuilding/wildlife"
+            "removeRaces":{
+                "label":"Remove Races",
+                "type":"modify-others",
+                "method":"remove",
+                "source":"races"
             },
-            {
-                "label":"Flora",
-                "key":"flora",
-
-                "type":"multi-select",
-                "source":"/api/worldbuilding/flora"
+            "addFlora":{
+                "label": "Flora",
+                "type":"modify-others",
+                "method":"add",
+                "source":"flora"
             },
-            {
+            "removeFlora":{
+                "label": "Remove Flora",
+                "type":"modify-others",
+                "method":"remove",
+                "source":"flora"
+            },
+            "addWildlife":{
+                "label": "Wildlife",
+                "type":"modify-others",
+                "method":"add",
+                "source":"wildlife"
+            },
+            "removeWildlife":{
+                "label": "Remove Wildlife",
+                "type":"modify-others",
+                "method":"remove",
+                "source":"wildlife"
+            },
+            "addCountries":{
+                "label": "Countries",
+                "type":"modify-others",
+                "method":"add",
+                "source":"countries"
+            },
+            "removeCountries":{
+                "label": "Countries",
+                "type":"modify-others",
+                "method":"remove",
+                "source":"countries"
+            },
+            "custom":{
                 "label":"Custom Fields",
-                "type":"custom-adder",
-                "key":"custom"
+                "type":"custom-adder"
             },
-            {
+            "sections":{
                 "label":"Sections",
-                "key":"sections",
-
                 "type":"section-adder"
             }
-            
-        ]
+        }
     },
     "sort":[
         {
             "label":"New to Old",
-            "value":{"category":"created", "az":false}
+            "value":{"created":-1}
         },
         {
             "label":"Old to New",
-            "value":{"category":"created", "az":true}
+            "value":{"created":1}
         },
         {
             "label":"A-Z Name",
-            "value":{"category":"Name", "az":true}
+            "value":{"name":1}
         },
         {
             "label":"Z-A Name",
-            "value":{"category":"Name", "az":false}
+            "value":{"name":-1}
         },
         {
             "label":"A-Z Author",
-            "value":{"category":"Author", "az":true}
+            "value":{"author":1}
         },
         {
             "label":"Z-A Author",
-            "value":{"category":"Author", "az":false}
+            "value":{"author":-1}
         }
-    ]
-
+    ],
+    "filter":{
+        "author":{
+            "label":"Author",
+            "source":"users"
+        }
+    },
+    "cards":{
+        "header":{
+            "name":{
+                "url":"url"
+            }
+        },
+        "body":{
+            "author":"Author",
+            "description":""
+        }
+    }
 }

@@ -30,7 +30,6 @@
     },
     "filter":{
         "author":{
-            
             "label":"Author",
             "source":"users"
         },

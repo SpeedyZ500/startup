@@ -194,6 +194,10 @@
             "source":"countries",
             "filter":"worlds"
         },
+        "types":{
+            "label":"Role",
+            "source":"charactertypes"
+        },
         "races":{
             "label":"Race",
             "source":"races"
@@ -227,6 +231,26 @@
             "label":"Z-A Author",
             "value":{"author":-1}
         }
-    ]
+    ],
+    "cards":{
+        "header":{
+            "name":{
+                "url":"url"
+            }
+        },
+        "body":{
+            "author":"Author",
+            "gender":"Gender",
+            "pronouns":"Pronouns",
+            "born":"Born",
+            "died":"Died",
+            "homeWorld":"Home World",
+            "homeCountry":"Home Country",
+            "homeTown":"Home Town",
+            "race":"Race",
+            "religion":"Religion",
+            "description":""
+        }
+    }
 
 }

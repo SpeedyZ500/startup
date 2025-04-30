@@ -20,7 +20,7 @@ const db = client.db('yggdrasil');
     }
   });
 
-  function sanitizeId(id){
+function sanitizeId(id){
     return id
         .trim()
         .toLowerCase()
