@@ -114,7 +114,7 @@ worldsRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
         return res.status(409).send({msg:"Required fields not filled out"});
     }
 
-    const id = createID(req.body.name, author);
+    const id = await createID(req.body.name, author);
     const worldData = req.body;
     worldData.id = id;
     worldData.url = `${urlPrefix}${id}`

@@ -1,0 +1,48 @@
+{
+    "card":{
+        "name":"",
+        "author":"author",
+        "worlds":"Worlds",
+        "custom":{"format":"custom"},
+        "created":{"label":"Created", "format":"time"},
+        "modified":{"label":"Modified", "format":"time"}
+    },
+    "description":"Description",
+    "sections":{"format":"sections"},
+    "cardSections":{
+        "countries":{
+            "label":"Countries",
+            "type":"getCards",
+            "url":"/worldbuilding/countries",
+            "filter":{
+                "biomes":"id"
+            },
+            "sort":{
+                "name":1
+            }
+        },
+        "wildlife":{
+            "label":"Wildlife",
+            "type":"getCards",
+            "url":"/worldbuilding/wildlife",
+            "filter":{
+                "biomes":"id"
+            },
+            "sort":{
+                "name":1
+            }
+
+        },
+        "flora":{
+            "label":"Flora",
+            "type":"getCards",
+            "url":"/worldbuilding/flora",
+            "filter":{
+                "biomes":"id"
+            },
+            "sort":{
+                "name":1
+            }
+        }
+    }
+}

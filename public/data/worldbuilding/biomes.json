@@ -10,58 +10,59 @@
                 "required": true,
                 "type": "text"
             },
+            "worlds":{
+                "label": "Worlds",
+                "type": "multi-select",
+                "source":"worlds"
+            },
             "description":{
                 "label":"Description",
                 "type":"text-area",
                 "placeholder":"Describe your Biome"
             },
-            "addRaces":{
-                "label":"Races",
-                "type":"modify-others",
-                "method":"add",
-                "source":"races"
-            },
-            "removeRaces":{
-                "label":"Remove Races",
-                "type":"modify-others",
-                "method":"remove",
-                "source":"races"
-            },
+            
             "addFlora":{
                 "label": "Flora",
                 "type":"modify-others",
                 "method":"add",
-                "source":"flora"
+                "source":"flora",
+                "list":"otherBiomes"
             },
             "removeFlora":{
                 "label": "Remove Flora",
                 "type":"modify-others",
                 "method":"remove",
-                "source":"flora"
+                "source":"flora",
+                "list":"otherBiomes"
             },
             "addWildlife":{
                 "label": "Wildlife",
                 "type":"modify-others",
                 "method":"add",
-                "source":"wildlife"
+                "source":"wildlife",
+                "list":"otherBiomes"
             },
             "removeWildlife":{
                 "label": "Remove Wildlife",
                 "type":"modify-others",
                 "method":"remove",
-                "source":"wildlife"
+                "source":"wildlife",
+                "list":"otherBiomes"
             },
             "addCountries":{
                 "label": "Countries",
                 "type":"modify-others",
                 "method":"add",
-                "source":"countries"
+                "source":"countries",
+                "list":"biomes"
+
             },
             "removeCountries":{
-                "label": "Countries",
+                "label": "Remove Countries",
                 "type":"modify-others",
                 "method":"remove",
-                "source":"countries"
+                "source":"countries",
+                "list":"biomes"
             },
             "custom":{
                 "label":"Custom Fields",

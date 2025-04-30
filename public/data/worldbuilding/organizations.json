@@ -43,13 +43,15 @@
                 "label":"Members",
                 "type":"modify-others",
                 "method":"add",
-                "source":"characters"
+                "source":"characters",
+                "list":"organization"
             },
             "removeMembers":{
                 "label":"Remove Members",
                 "type":"modify-others",
                 "method":"remove",
-                "source":"characters"
+                "source":"characters",
+                "list":"organization"
             },
             "custom":{
                 "label":"Custom Fields",

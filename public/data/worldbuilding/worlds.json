@@ -19,61 +19,74 @@
                 "label":"Magic Systems",
                 "type":"modify-others",
                 "method":"add",
-                "source":"magicsystems"
+                "source":"magicsystems",
+                "list":"otherWorlds"
             },
             "removeMagicsystems":{
                 "label":"Remove Magic Systems",
                 "type":"modify-others",
                 "method":"remove",
-                "source":"magicsystems"
+                "source":"magicsystems",
+                "list":"otherWorlds"
             },
             "addRaces":{
                 "label":"Races",
                 "type":"modify-others",
                 "method":"add",
-                "source":"races"
+                "source":"races",
+                "list":"otherWorlds"
             },
             "removeRaces":{
                 "label":"Remove Races",
                 "type":"modify-others",
                 "method":"remove",
-                "source":"races"
+                "source":"races",
+                "list":"otherWorlds"
+
             },
             "addFlora":{
                 "label": "Flora",
                 "type":"modify-others",
                 "method":"add",
-                "source":"flora"
+                "source":"flora",
+                "list":"otherWorlds"
             },
             "removeFlora":{
                 "label": "Remove Flora",
                 "type":"modify-others",
                 "method":"remove",
-                "source":"flora"
+                "source":"flora",
+                "list":"otherWorlds"
+
             },
             "addWildlife":{
                 "label": "Wildlife",
                 "type":"modify-others",
                 "method":"add",
-                "source":"wildlife"
+                "source":"wildlife",
+                "list":"otherWorlds"
             },
             "removeWildlife":{
                 "label": "Remove Wildlife",
                 "type":"modify-others",
                 "method":"remove",
-                "source":"wildlife"
+                "source":"wildlife",
+                "list":"otherWorlds"
             },
             "addBiomes":{
                 "label": "Biomes",
                 "type":"modify-others",
                 "method":"add",
-                "source":"biomes"
+                "source":"biomes",
+                "list":"worlds"
             },
             "removeBiomes":{
                 "label": "Remove Biomes",
                 "type":"modify-others",
                 "method":"remove",
-                "source":"biomes"
+                "source":"biomes",
+                "list":"worlds"
+
             },
             "continents":{
                 "label": "Continents",
@@ -83,25 +96,43 @@
                 "label": "Countries",
                 "type":"modify-others",
                 "method":"add",
-                "source":"countries"
+                "source":"countries",
+                "list":"otherWorlds"
             },
             "removeCountries":{
-                "label": "Countries",
+                "label": "Remove Countries",
                 "type":"modify-others",
                 "method":"remove",
-                "source":"countries"
+                "source":"countries",
+                "list":"otherWorlds"
             },
             "addOrganizations":{
                 "label":"Organizations",
                 "type":"modify-others",
                 "method":"add",
-                "source":"organizations"
+                "source":"organizations",
+                "list":"otherWorlds"
             },
             "removeOrganizations":{
                 "label":"Remove Organizations",
                 "type":"modify-others",
                 "method":"remove",
-                "source":"organizations"
+                "source":"organizations",
+                "list":"otherWorlds"
+            },
+            "addCharacters":{
+                "label":"Add Characters",
+                "type":"modify-others",
+                "method":"add",
+                "source":"characters",
+                "list":"otherWorlds"
+            },
+            "removeCharacters":{
+                "label":"Remove Characters",
+                "type":"modify-others",
+                "method":"remove",
+                "source":"characters",
+                "list":"otherWorlds"
             },
             "custom":{
                 "label":"Custom Fields",

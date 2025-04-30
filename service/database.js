@@ -995,6 +995,9 @@ async function updateOne(collectionKey, data, author, {preProcessing = {}, postP
     }
     const preProcessedData = preprocessData(data, preProcessing)
     data.modified = new Date().toJSON();
+    if(collection === organizationsCollection){
+        data.listUsersAsMembers = original.listUsersAsMembers
+    }
     const result = await collection.findOneAndUpdate({_id: original._id, author:author}, {$set:preProcessedData}, {returnDocument: 'after'})
     await Promise.all(
         Object.entries(postProcessing).map(([key, fn]) => fn(result[key], result, collectionKey))
@@ -1044,7 +1047,7 @@ async function  modifyMany(collectionKey, ids, list, data, method){
         throw createError(`${list} is not a list on this type`, 400);
     }
     let finalList = list
-    const match = list.match(/^other(.+)/);
+    const match = list.match(/^other(.+)/|/^altForms$/);
     if (!match) {
         let otherField = `other${list[0].toUpperCase()}${list.slice(1)}`;
         if (sample[otherField]) {
@@ -1624,7 +1627,7 @@ const characterFullLookupFields = [
     "enemies",
     "allies",
     "otherWorlds",
-    "othercountries"
+    "otherCountries"
 ]
 
 
@@ -1664,7 +1667,6 @@ const fullBio = [
     ...baseFields,
     ...bioWithTypes
 ]
-
 
 
 const livingThingFullLookups = [
@@ -1904,7 +1906,7 @@ const displayableMap = {
     },
     flora:{
         lookupFields:livingThingCardLookups,
-        fields:baseFields,
+        fields:fullBio,
         projectionFields:livingThingProjectionFields,
         unwindFields:livingThingUnwindFields
     },
@@ -1916,7 +1918,7 @@ const displayableMap = {
     },
     organizations:{
         lookupFields:organizationFullLookups,
-        fields:institutionFullFields,
+        fields:[...institutionFullFields, "listUsersAsMembers"],
         projectionFields:organizationBioProjectionFields,
         unwindFields:raceUnwindFields
     },
@@ -1939,9 +1941,9 @@ const displayableMap = {
         unwindFields:characterUnwindFields
     },
     biomes:{
-        lookupFields:baseLookupFields,
-        fields:baseFields,
-        projectionFields:baseProjectionFields,
+        lookupFields:biomeLookupFields,
+        fields:baseFullFields,
+        projectionFields:biomeProjectionFields,
         unwindFields:baseUnwindFields,
     }
 }
@@ -2069,7 +2071,11 @@ module.exports = {
     baseUnwindFields,
     raceUnwindFields,
     livingThingUnwindFields,
-    characterUnwindFields
+    characterUnwindFields,
+    baseFullFields,
+    bioWithTypes,
+    institutionBioProjectionFields,
+    institutionEditProjectionFields
 
 
 }

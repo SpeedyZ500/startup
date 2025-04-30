@@ -61,25 +61,31 @@
                 "label":"Citizens",
                 "type":"modify-others",
                 "method":"add",
-                "source":"characters"
+                "source":"characters",
+                "list":"otherCountries"
+
             },
             "removeCitizens":{
                 "label":"Remove Citizens",
                 "type":"modify-others",
                 "method":"remove",
-                "source":"characters"
+                "source":"characters",
+                "list":"otherCountries"
+
             },
             "addRaces":{
                 "label":"Races",
                 "type":"modify-others",
                 "method":"add",
-                "source":"races"
+                "source":"races",
+                "list":"countries"
             },
             "removeRaces":{
                 "label":"Remove Races",
                 "type":"modify-others",
                 "method":"remove",
-                "source":"races"
+                "source":"races",
+                "list":"countries"
             },
             "custom":{
                 "label":"Custom Fields",

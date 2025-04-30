@@ -9,13 +9,11 @@
             "label":"Description",
             "type":"text-area",
             "placeholder":"Your Advice"
-
         }
     }
-
   },
   "sort":[
-    {
+        {
         "label":"New to Old",
         "value":{"created":-1}
     },
@@ -31,11 +29,10 @@
         "label":"Z-A Author",
         "value":{"author":-1}
     }
-],
-"cards":{
-    "body":{
-        "description":""
+    ],
+    "cards":{
+        "body":{
+            "description":""
+        }
     }
-}
-
 }

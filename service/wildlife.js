@@ -9,7 +9,7 @@ const wildlifeRouter = express.Router();
 const { 
     createID, 
     baseFields,
-    fullBio,
+    baseFullFields,
     wildlifePreProcessing,
     livingThingCardLookups,
     livingThingFullLookups,
@@ -17,6 +17,7 @@ const {
     livingThingBioProjectionFields,
     livingThingEditProjectionFields,
     livingThingUnwindFields,
+    fullBio,
     getOptions,
     modifyMany,
     addOne,
@@ -58,7 +59,7 @@ wildlifeRouter.get(`${urlPrefix}:id/bio`, async (req, res) => {
     try{
         const wildlife = await getDisplayable(urlPrefix, id, {
             lookupFields:livingThingFullLookups,
-            fields:fullBio,
+            fields:baseFullFields,
             projectionFields:livingThingBioProjectionFields
         });
         if(wildlife){
@@ -105,7 +106,7 @@ wildlifeRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
         return res.status(409).send({msg:"Required fields not filled out"});
     }
 
-    const id = createID(req.body.name, author);
+    const id = await createID(req.body.name, author);
     const creationData = req.body;
     creationData.id = id;
     creationData.url = `${urlPrefix}${id}`

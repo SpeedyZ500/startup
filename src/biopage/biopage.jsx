@@ -64,10 +64,10 @@ function generateRows(data){
                                     <Fragment key={subIndex}>
                                         {typeof item === "object" && item.value !== null & item.value !== "" ? (
                                         item.path ? (
-                                            <NavLink to={item.path}>{item.value}</NavLink>
+                                            <NavLink to={item.url}>{item.value}</NavLink>
                                         ) : (
                                             
-                                            <span>{item.value}</span>
+                                            <span>{item.url}</span>
                                         ) ) : (
                                             <span>{item}</span>
                                         )}

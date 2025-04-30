@@ -41,6 +41,13 @@
                 "source":"magicsystems"
 
             },
+            "removeAltForms":{
+                "label":"Remove Alternate Forms",
+                "type":"modify-others",
+                "method":"remove",
+                "source":"characters",
+                "list":"altForms"
+            },
             "custom":{
                  "label":"Custom Fields",
                 "type":"custom-adder"

@@ -1,0 +1,60 @@
+{
+    "card":{
+        "name":"",
+        "author":"author",
+        "types":"Type",
+        "originWorld":"Origin World",
+        "otherWorlds":"Worlds Found In",
+        "custom":{"format":"custom"},
+        "created":{"label":"Created", "format":"time"},
+        "modified":{"label":"Modified", "format":"time"}
+    },
+    "description":"Description",
+    "sections":{"format":"sections"},
+    "cardSections":{
+        "characters":{
+            "label":"Practitioners",
+            "type":"getCards",
+            "url":"/characters",
+            "filter":{
+                "abilities":"id"
+            },
+            "sort":{
+                "name":1
+            }
+        },
+        "races":{
+            "label":"Races With Natrual Talent",
+            "type":"getCards",
+            "url":"/worldbuilding/races",
+            "filter":{
+                "abilities":"id"
+            },
+            "sort":{
+                "name":1
+            }
+        },
+        "wildlife":{
+            "label":"Natural Practitioners",
+            "type":"getCards",
+            "url":"/worldbuilding/wildlife",
+            "filter":{
+                "abilities":"id"
+            },
+            "sort":{
+                "name":1
+            }
+        },
+        "flora":{
+            "label":"Plant Practitioners and/or ingredients",
+            "type":"getCards",
+            "url":"/worldbuilding/flora",
+            "filter":{
+                "abilities":"id"
+            },
+            "sort":{
+                "name":1
+            }
+        }
+    }
+}

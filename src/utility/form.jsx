@@ -66,11 +66,11 @@ const handleModify = async (id, formData, form, socket) => {
     if(id){
         for(const fieldkey in form){
             if(form[fieldkey].type === "modify-others"){
-                const {method, source} = form[fieldkey];
+                const {method, source, list} = form[fieldkey];
                 const ids = formData[fieldkey]
                 const url = selectSources[source]
                 if(method && source && url && id && ids && (!Array.isArray(ids) || ids.length > 0)){
-                    fetch(`/api${url}/${source}/${method}`, {
+                    fetch(`/api${url}/${list}/${method}`, {
                         method:"PATCH",
                         headers: {"content-type": "application/json"},
                         body: JSON.stringify({ids, id})
@@ -193,7 +193,7 @@ export function FormGenerator({handleClose}){
             <div>
                 <h1>Modify {formData.name}</h1>
                  <ButtonGroup>
-                    <GenerateForm formData={formData} form={memoizedFields} socket={socket} setData={setData} currUrl={url}/>
+                    <GenerateForm formData={formData} form={memoizedFields} socket={socket} setData={setData} />
                     <Button onClick={handleSubmit} variant='primary'>Submit</Button>
                     <Button onClick={handleClose} variant='secondary'>Close</Button>
                 </ButtonGroup>
@@ -204,7 +204,7 @@ export function FormGenerator({handleClose}){
     return(
         <div>
             <h1>{form &&form.title || ""}</h1>
-            <GenerateForm formData={formData} form={memoizedFields} socket={socket} setData={setData} currUrl={url}/>
+            <GenerateForm formData={formData} form={memoizedFields} socket={socket} setData={setData} />
 
              <ButtonGroup>
                 <Button onClick={handleSubmit} variant='primary'>Submit</Button>
@@ -218,6 +218,7 @@ function GenerateMultiSelect({formData, fieldkey, field, socket, setData}){
     const [options, updateOptions] = useState([])
     const [qualifierOptions, updateQualifierOptions] = useState([])
     const reliesOn = field.filter?.key 
+    
 
     useEffect(() =>{
         const collection = field.source
@@ -267,7 +268,7 @@ function GenerateMultiSelect({formData, fieldkey, field, socket, setData}){
         if (typeof qualifierValue === "object") qualifierValue = qualifierValue.value;
     
         const filter = {
-            ...field.qualifier.filter,
+            ...field.qualifier?.filter,
         };
     
         socket.subscribe({
@@ -280,6 +281,14 @@ function GenerateMultiSelect({formData, fieldkey, field, socket, setData}){
         });
     }, [field.qualifier, field.qualifierKey, formData[field.qualifierKey]]);
 
+    const selectedOptions = useMemo(() => {
+        const selected = Array.isArray(formData[fieldkey]) ? formData[fieldkey] : [];
+      
+        const selectedPrimitives = selected.map(v =>
+          typeof v === "object" ? v.value : v
+        );
+        return options.filter(opt => selectedPrimitives.includes(opt.value));
+      }, [formData[fieldkey], options]);
 
     const handleChange = (selectedOption) => {
         const selected = selectedOption?.map(opt => opt.value) || [];
@@ -296,7 +305,7 @@ function GenerateMultiSelect({formData, fieldkey, field, socket, setData}){
                 name={fieldkey}
                 isMulti
                 options={options}
-                value={options.filter(opt => (formData[fieldkey] || []).includes(opt.value))}
+                value={selectedOptions}
                 onChange={(selected) => handleChange(selected)}
                 className="form-control"
         />
@@ -588,12 +597,12 @@ return (
 
 
 
-function GenerateModifyOthers({formData, fieldkey, field, socket, currUrl, setData}){
+function GenerateModifyOthers({formData, fieldkey, field, socket,  setData}){
     const [options, setOptions] = useState([]);
     const id = formData.id
 
     useEffect(() => {
-        const collection = Object.keys(selectSources).find(collect => selectSources[collect] === currUrl);
+        const collection = field.list
         const url = selectSources[field.source]
         if(id && field.method === "remove"){
             const query = {filter:{[collection]:id}}
@@ -621,7 +630,7 @@ function GenerateModifyOthers({formData, fieldkey, field, socket, currUrl, setDa
 
             })
         }
-    },[field, formData[id], currUrl, socket])
+    },[field, formData[id],  socket])
     const handleChange = (selectedOption) => {
         const selected = (selectedOption|| []).map(opt => opt.value) || [];
         setData({...formData, [fieldkey]:selected})
@@ -747,7 +756,7 @@ function SectionAdder({formData, fieldkey, setData, field}){
 
 }
 
-function GenerateForm({formData, form, socket, setData, currUrl}){
+function GenerateForm({formData, form, socket, setData}){
     const renderField = (fieldkey, field) => {
         switch(field.type){
             case 'text':
@@ -857,7 +866,6 @@ function GenerateForm({formData, form, socket, setData, currUrl}){
                     field={field} 
                     socket={socket} 
                     setData={setData} 
-                    currUrl={currUrl}
                 />
             case "section-adder":
                 return <SectionAdder 

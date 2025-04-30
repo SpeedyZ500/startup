@@ -72,7 +72,7 @@ biomesRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     try{
         const biome = await getEditable(urlPrefix, author, id, {
                 lookupFields:biomeLookupFields,
-                fields:baseFields,
+                fields:baseFullFields,
                 projectionFields:biomeEditProjectionFields
             }
         );
@@ -98,7 +98,7 @@ biomesRouter.post(`${urlPrefix}`, verifyAuth, async (req, res) => {
     if(!name || !description || !sections){
         return res.status(409).send({msg:"Required fields not filled out"});
     }
-    const id = createID(name, author);
+    const id = await createID(name, author);
     const biomeData = req.body;
     biomeData.id = id;
     biomeData.url = `${urlPrefix}${id}`
