@@ -23,8 +23,8 @@ const {
     updateOne,
     chaptersPostProcessing,
     chaptersPreProcessing,
-
-
+    baseUnwindFields,
+    chapterUnwindFields,
 } = require('./database.js');
 
 const urlPrefix = "/stories/"
@@ -54,7 +54,8 @@ storiesRouter.get(`${urlPrefix}:storyID`, verifyAuth, async (req, res) => {
         const story = await getEditable(urlPrefix,req.params.usid,storyID,{ 
             lookupFields:baseLookupFields, 
             projectionFields:baseEditProjectionFields,
-            fields:storyFields
+            fields:storyFields,
+            unwindFields:baseUnwindFields
         })
         if(story){
             res.send(story)
@@ -80,6 +81,8 @@ storiesRouter.get(`${urlPrefix}chapter/:chapterID`, verifyAuth, async (req, res)
             fields:storyFields,
             lookupFields:chapterEditLookupFields,
             projectionFields:chapterEditProjectFields,
+            unwindFields:chapterUnwindFields
+
         })
         if(chapter){
             res.send(chapter);

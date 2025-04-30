@@ -16,6 +16,7 @@ const {
     livingThingProjectionFields,
     livingThingBioProjectionFields,
     livingThingEditProjectionFields,
+    livingThingUnwindFields,
     getOptions,
     modifyMany,
     addOne,
@@ -79,7 +80,8 @@ wildlifeRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
         const wildlife = await getEditable(urlPrefix, author, id, {
                 lookupFields:livingThingFullLookups,
                 fields:fullBio,
-                projectionFields:livingThingEditProjectionFields
+                projectionFields:livingThingEditProjectionFields,
+                unwindFields:livingThingUnwindFields
             }
         );
         if(wildlife){

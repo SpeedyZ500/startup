@@ -19,7 +19,8 @@ const {
     updateOne,
     getCards,
     getDisplayable,
-    getEditable
+    getEditable,
+    livingThingUnwindFields
 
 
     
@@ -44,7 +45,8 @@ floraRouter.get(`${urlPrefix}`, async (req, res) => {
         query,
         lookupFields:livingThingCardLookups,
         fields:baseFields,
-        projectionFields:livingThingProjectionFields
+        projectionFields:livingThingProjectionFields,
+        unwindFields:livingThingUnwindFields
     })
     res.send(floraToSend)
 })

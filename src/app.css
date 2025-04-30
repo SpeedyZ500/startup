@@ -59,7 +59,11 @@
     .navbar-toggler-icon{
         filter:invert(100%);
     }
+    label{
+        color: white !important;
+        background: black !important;
     
+     }
 }
 .filterAndSort{
     flex: 1;
@@ -269,6 +273,7 @@ nav{
     font-weight: bold;
 }
 
+
 @media screen and (min-width: 0px) and (max-width: 1140px){
     .page-title  {
         display: none;
@@ -284,10 +289,6 @@ nav{
         display: none;
       }
 
-     label{
-        color: white !important;
-        background: black !important;
-    
-     }
+     
 }
 

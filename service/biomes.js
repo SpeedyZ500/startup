@@ -15,7 +15,8 @@ const {
     baseProjectionFields,
     baseFullFields,
     addOne,
-    updateOne
+    updateOne,
+    baseUnwindFields
 } = require('./database.js')
 const urlPrefix = "/worldbuilding/biomes/";
 
@@ -37,7 +38,8 @@ biomesRouter.get(urlPrefix, async (req, res) =>{
         query,
         lookupFields:baseLookupFields,
         fields:baseFields,
-        projectionFields:baseProjectionFields
+        projectionFields:baseProjectionFields,
+        unwindFields:baseUnwindFields
     })
     res.send(biomesToSend)
 })

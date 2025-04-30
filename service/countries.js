@@ -22,7 +22,8 @@ const {
     optionsMap,
     getCards,
     getDisplayable,
-    getEditable
+    getEditable,
+    raceUnwindFields
 
 
     
@@ -69,7 +70,8 @@ countriesRouter.get(`${urlPrefix}`, async (req, res) => {
         query,
         lookupFields:institutionLookups,
         fields:baseInstitutionCards,
-        projectionFields:institutionProjectionFields
+        projectionFields:institutionProjectionFields,
+        unwindFields:raceUnwindFields
     })
     res.send(countryToSend)
 })

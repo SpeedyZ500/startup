@@ -12,6 +12,7 @@ const { createID,
     baseProjectionFields,
     baseLookupFields,
     baseEditProjectionFields,
+    baseUnwindFields,
     optionsMap
  } = require("./database.js")
 const urlPrefix = "/worldbuilding/worlds/";
@@ -87,7 +88,8 @@ worldsRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
         const world = await getEditable(urlPrefix, author, id, {
                 lookupFields:baseLookupFields,
                 fields:worldFullFields,
-                projectionFields:baseEditProjectionFields
+                projectionFields:baseEditProjectionFields,
+                unwindFields:baseUnwindFields
             }
         );
         if(world){

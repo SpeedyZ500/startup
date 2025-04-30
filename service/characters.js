@@ -10,6 +10,8 @@ const{ createID, getCards, getDisplayable, getEditable, getOptions,
     characterFullFields,
     characterFullLookupFields,
     characterProjectionFields,
+    characterUnwindFields
+    
 } = require('./database.js')
 const urlPrefix = "/characters/"
 
@@ -41,7 +43,8 @@ characterRouter.get(`${urlPrefix}`, async (req, res) => {
         query,
         lookupFields:characterCardsLookup,
         fields:characterCards,
-        projectionFields:characterProjectionFields
+        projectionFields:characterProjectionFields,
+        unwindFields:characterUnwindFields
     })
     res.send(charactersToSend)
 })

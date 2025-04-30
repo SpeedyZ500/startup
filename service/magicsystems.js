@@ -21,7 +21,9 @@ const {
     updateOne,
     getCards,
     getDisplayable,
-    getEditable
+    getEditable,
+    raceUnwindFields
+
 
 
     
@@ -46,7 +48,8 @@ magicRouter.get(`${urlPrefix}`, async (req, res) => {
         query,
         lookupFields:institutionLookups,
         fields:baseFields,
-        projectionFields:institutionProjectionFields
+        projectionFields:institutionProjectionFields,
+        unwindFields:raceUnwindFields
     })
     res.send(magicSystemToSend)
 })

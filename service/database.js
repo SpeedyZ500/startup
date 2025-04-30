@@ -369,7 +369,6 @@ async function convertToDisplayable(source, raw) {
     }
     if(storyCollections.includes(collection)){
         results = await collection.aggregate(basicProject(ids, {value: `$title`, url:1})).toArray();
-
     }
     else{
         results = await collection.aggregate(basicProject(ids, {value: `$name`, url:1})).toArray();
@@ -603,12 +602,7 @@ async function processSort(pipeline, rawSort){
     }
     const merger = {}
     for(const key of toUnwind){
-        pipeline.push({
-            $unwind:{
-                path:`$${key}`,
-                preserveNullAndEmptyArrays: true
-            }
-        })
+        ensureUnwind(pipeline, key);
         grouper[key] = {$addToSet:`$${key}`}
         merger[key] = `$${key}`
     }
@@ -783,13 +777,21 @@ const ensureLookup = (pipeline, field) => {
         });
     }
 };
-
+const ensureUnwind = (pipeline, field) => {
+    pipeline.push({
+        $unwind:{
+            path:`$${field}`,
+            preserveNullAndEmptyArrays: true
+        }
+    });
+}
 
 async function getCards(collectionKey, {
     query = {},
     fields = ["description"],
     lookupFields = [],
-    projectionFields = {}
+    projectionFields = {},
+    unwindFields = []
 } = {}){
     const collection = getCollection(collectionKey)
     const {filter = {}, sort = {}} = query
@@ -807,7 +809,9 @@ async function getCards(collectionKey, {
     for (const field of lookupFields) {
         ensureLookup(pipeline, field);
     }
-
+    for (const field of unwindFields){
+        ensureUnwind(pipeline, field)
+    }
     const project = {_id:0}
     for(const field of fields){
         project[field] = 1;
@@ -855,7 +859,8 @@ async function getGraph(id, filter={}){
 async function getEditable(collectionKey, author, id, {    
     lookupFields = [],
     fields = [], 
-    projectionFields = {}
+    projectionFields = {},
+    unwindFields = []
 }= {}){
     const collection = getCollection(collectionKey)
     const pipeline = [
@@ -863,6 +868,9 @@ async function getEditable(collectionKey, author, id, {
     ]
     for (const field of lookupFields) {
         ensureLookup(pipeline, field);
+    }
+    for (const field of unwindFields){
+        ensureUnwind(pipeline, field)
     }
     const project = {_id:0}
     for(const field of fields){
@@ -888,7 +896,8 @@ async function getEditable(collectionKey, author, id, {
 async function getDisplayable(collectionKey, id, {    
     lookupFields = [],
     fields = [], 
-    projectionFields = {}
+    projectionFields = {},
+    unwindFields = []
 }= {}){
     const collection = getCollection(collectionKey)
     const pipeline = [
@@ -896,6 +905,9 @@ async function getDisplayable(collectionKey, id, {
     ]
     for (const field of lookupFields) {
         ensureLookup(pipeline, field);
+    }
+    for (const field of unwindFields){
+        ensureUnwind(pipeline, field)
     }
     const project = {_id:0}
     for(const field of fields){
@@ -1381,7 +1393,8 @@ const storyFields = [
     "title",
     "genres",
     "contentWarnings",
-    "body"
+    "body",
+    "url"
 ]
 const chapterLookupFields=[
     ...baseLookupFields,
@@ -1769,56 +1782,85 @@ const countryFullLookups = [
     "biomes",
 ]
 
+const baseUnwindFields = [
+    "authorDetails"
+]
+const raceUnwindFields = [
+    ...baseUnwindFields,
+    "originWorldDetails"
+]
+const livingThingUnwindFields = [
+    ...raceUnwindFields,
+    "originBiomeDetails"
+]
+const characterUnwindFields = [
+    ...baseUnwindFields,
+    "raceDetails",
+    "homeWorldDetails",
+    "homeCountryDetails",
+    "relegionDetails"
+]
 const cardsMap = {
     stories:{
         lookupFields:baseLookupFields, 
         projectionFields:baseProjectionFields,
+        unwindFields:baseUnwindFields,
         fields:storyFields
     },
     worlds:{
         lookupFields:baseLookupFields,
         fields:baseFields,
-        projectionFields:baseProjectionFields
+        projectionFields:baseProjectionFields,
+        unwindFields:baseUnwindFields,
     },
     wildlife:{
         lookupFields:livingThingCardLookups,
         fields:baseFields,
-        projectionFields:livingThingProjectionFields
+        projectionFields:livingThingProjectionFields,
+        unwindFields:livingThingUnwindFields
     },
     flora:{
         lookupFields:livingThingCardLookups,
         fields:baseFields,
-        projectionFields:livingThingProjectionFields
+        projectionFields:livingThingProjectionFields,
+        unwindFields:livingThingUnwindFields
     },
     races:{
         lookupFields:raceCardLookups,
         fields:baseFields,
-        projectionFields:raceProjectionFields
+        projectionFields:raceProjectionFields,
+        unwindFields:raceUnwindFields
     },
     organizations:{
         lookupFields:institutionLookups,
         fields:baseInstitutionCards,
-        projectionFields:institutionProjectionFields
+        projectionFields:institutionProjectionFields,
+        unwindFields:raceUnwindFields
     },
     magicsystems:{
         lookupFields:institutionLookups,
         fields:baseFields,
-        projectionFields:institutionProjectionFields
+        projectionFields:institutionProjectionFields,
+        unwindFields:raceUnwindFields
     },
     countries:{
         lookupFields:institutionLookups,
         fields:baseInstitutionCards,
-        projectionFields:institutionProjectionFields
+        projectionFields:institutionProjectionFields,
+        unwindFields:raceUnwindFields
     },
     characters:{
         lookupFields:characterCardsLookup,
         fields:characterCards,
-        projectionFields:characterProjectionFields
+        projectionFields:characterProjectionFields,
+        unwindFields:characterUnwindFields
+
     },
     biomes:{
         lookupFields:baseLookupFields,
         fields:baseFields,
-        projectionFields:baseProjectionFields
+        projectionFields:baseProjectionFields,
+        unwindFields:baseUnwindFields
     },
     users:{
         fields:["displayname"]
@@ -1830,62 +1872,77 @@ const cardsMap = {
         fields:["description"]
     }
 }
+const chapterUnwindFields = [
+    ...baseUnwindFields,
+    "storyIDDetails"
+]
 
 const displayableMap = {
     stories:{
         lookupFields:baseLookupFields, 
         projectionFields:baseProjectionFields,
-        fields:storyFields
+        fields:storyFields,
+        unwindFields:baseUnwindFields,
     },
     chapter:{
         fields:storyFields,
         lookupFields:chapterLookupFields,
         projectionFields:chapterProjectFields,
+        unwindFields:chapterUnwindFields
     },
     worlds:{
         lookupFields:baseLookupFields,
         fields:worldFullFields,
-        projectionFields:baseProjectionFields
+        projectionFields:baseProjectionFields,
+        unwindFields:baseUnwindFields,
     },
     wildlife:{
         lookupFields:livingThingFullLookups,
         fields:fullBio,
-        projectionFields:livingThingBioProjectionFields
+        projectionFields:livingThingBioProjectionFields,
+        unwindFields:livingThingUnwindFields
     },
     flora:{
         lookupFields:livingThingCardLookups,
         fields:baseFields,
-        projectionFields:livingThingProjectionFields
+        projectionFields:livingThingProjectionFields,
+        unwindFields:livingThingUnwindFields
     },
     races:{
         lookupFields:raceFullLookups,
         fields:fullBio,
-        projectionFields:raceBioProjectionFields
+        projectionFields:raceBioProjectionFields,
+        unwindFields:raceUnwindFields
     },
     organizations:{
         lookupFields:organizationFullLookups,
         fields:institutionFullFields,
-        projectionFields:organizationBioProjectionFields
+        projectionFields:organizationBioProjectionFields,
+        unwindFields:raceUnwindFields
     },
     magicsystems:{
         lookupFields:magicSystemFullLookups,
         fields:fullBio,
-        projectionFields:institutionBioProjectionFields
+        projectionFields:institutionBioProjectionFields,
+        unwindFields:raceUnwindFields
     },
     countries:{
         lookupFields:countryFullLookups,
         fields:institutionFullFields,
-        projectionFields:countryBioProjectionFields
+        projectionFields:countryBioProjectionFields,
+        unwindFields:raceUnwindFields
     },
     characters:{
         lookupFields:characterFullLookupFields,
         fields:characterFullFields,
-        projectionFields:characterBioProjectionFields
+        projectionFields:characterBioProjectionFields,
+        unwindFields:characterUnwindFields
     },
     biomes:{
         lookupFields:baseLookupFields,
         fields:baseFields,
-        projectionFields:baseProjectionFields
+        projectionFields:baseProjectionFields,
+        unwindFields:baseUnwindFields,
     }
 }
 
@@ -1893,16 +1950,21 @@ const mapOptionsMap = {
     continents:{
         collection:"worlds",
         projectionFields:{
-            options:optionsMap("continents")
+            label:"$continents",
+            value:"$continents",
+            qualifier:"$id"
         },
-        fields:["id"]
+        unwindFields:["continents"],
     },
     towns:{
         collection:"countries",
         projectionFields:{
-            options:optionsMap("towns")
+            label:"$towns",
+            value:"$towns",
+            qualifier:"$id"
+
         },
-        fields:["id"]
+        unwindFields:["towns"],
     }
 }
 
@@ -2002,8 +2064,12 @@ module.exports = {
     sanitizeId,
     mapOptionsMap,
     cardsMap,
-    displayableMap
-    
+    displayableMap,
+    chapterUnwindFields,
+    baseUnwindFields,
+    raceUnwindFields,
+    livingThingUnwindFields,
+    characterUnwindFields
 
 
 }

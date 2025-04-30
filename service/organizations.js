@@ -21,7 +21,8 @@ const {
     updateOne,
     getCards,
     getDisplayable,
-    getEditable
+    getEditable,
+    raceUnwindFields
 
 
     
@@ -38,7 +39,9 @@ organizationsRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
         const organization = await getEditable(urlPrefix, author, id, {
                 lookupFields:organizationFullLookups,
                 fields:institutionFullFields,
-                projectionFields:organizationEditFields
+                projectionFields:organizationEditFields,
+                unwindFields:raceUnwindFields
+
             }
         );
         if(organization){

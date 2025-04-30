@@ -20,6 +20,7 @@ const socketHandlers = {
                 projectionFields:params.projectionFields,
                 fields:params.fields,
                 lookupFields:params.lookupFields,
+                unwindFields:params.unwindFields
             })
             socket.send(JSON.stringify({
                 type: message.type,
@@ -58,6 +59,7 @@ const socketHandlers = {
                 projectionFields:params.projectionFields,
                 fields:params.fields,
                 lookupFields:params.lookupFields,
+                unwindFields:params.unwindFields
             })
             socket.send(JSON.stringify({
                 type: message.type,
@@ -145,20 +147,14 @@ const socketHandlers = {
             const data = await getCards(map.collection, {
                 query:message.query,
                 projectionFields:map.projectionFields,
-                fields:map.fields
+                unwindFields:map.unwindFields,
             })
-            const flattened = data.flatMap(dat =>
-                (dat.options || []).map(opt => ({
-                    ...opt,
-                    qualifier: dat.id  // make sure it's still your displayable id
-                }))
-            );
             socket.send(JSON.stringify({
                 type: message.type,
                 requestId: message.requestId,
                 commandId:message.commandId,
                 success: true,
-                flattened,
+                data
               }));
         
         }

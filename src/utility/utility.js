@@ -171,24 +171,26 @@ function filterAndSort(list, filter, sort){
     return sortList(filtered, sort)
 }
 
-export async function filterProfanity(json, profanityFilterEnabled){
+export async function filterProfanity(json, profanityFilterEnabled, isOptions=false){
     if(profanityFilterEnabled){
         if(typeof json === "string"){
             return await applyProfFilter(json);
         }
+        else if(Array.isArray(json)){
+            return await Promise.all(
+                json.map(item => filterProfanity(item, profanityFilterEnabled))
+            )
+        }
         else{
             const updatedJson = json
-
-            for(const key in json){
-                if(key.toLowerCase() === "author"){
-                    updatedJson[key] = await filterProfanity(await replaceAuthor(json[key]));
-                }
-                else if(["source", "username", "path", "display", "filter", "hidden", "chapters"].includes(key)){
+            const keys = Object.keys(json)
+            for(const key of keys){
+                if(["url", "id", "username", "qualifier"].includes(key) || (isOptions && key === "value")){
                     updatedJson[key] = json[key]
                 }
                 
                 else{
-                    updatedJson[key] = await filterProfanity(json[key])
+                    updatedJson[key] = await filterProfanity(json[key], profanityFilterEnabled)
                 }
             }
             return updatedJson

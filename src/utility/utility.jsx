@@ -1,24 +1,20 @@
 import { NavLink } from 'react-router-dom';
-import React, {Fragment, useMemo, useCallback, useEffect, useState, useRef} from 'react';
+import React, {Fragment, useMemo, useEffect, useState, useRef} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Card from 'react-bootstrap/Card';
 import "../app.css"
 import Button from 'react-bootstrap/Button';
-import Overlay from 'react-bootstrap/Overlay';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Popover from 'react-bootstrap/Popover';
-import Select from 'react-select'
 import { WebSocketFacade }  from './websocketfacade.js';
 
 
-import {
-    sortList, filterAndSort,
-    formatJSONDate, filterProfanity
+import { filterProfanity
 }  from './utility.js';
 
 
 function renderItem(item, cardId){
-    if(item.display === false || item.hidden === true) return null;
+    console.log(JSON.stringify(item))
     if(Array.isArray(item.value)){
         return(
             <OverlayTrigger 
@@ -27,13 +23,13 @@ function renderItem(item, cardId){
                 placement="bottom"
                 overlay={
                     <Popover id={`popover-${cardId}-${item.label}`}>
-                        <Popover.Header as="h4">{item.label}:</Popover.Header>
+                        <Popover.Header as="h4">{item.label}: </Popover.Header>
                         <Popover.Body>
                                 {item.value.map((detail, subIndex) => (
                                     <Fragment key={subIndex}>
-                                        {typeof detail == "object" && detail.label ? (
-                                            item.path ? (
-                                                <NavLink to={detail.path}>{detail.value}</NavLink>
+                                        {typeof detail == "object" ? (
+                                            item.url ? (
+                                                <NavLink to={detail.url}>{detail.value}</NavLink>
                                             ) :(
                                                 <span>{detail}</span>
                                             )
@@ -52,23 +48,53 @@ function renderItem(item, cardId){
         )
     }
     
-    else if(item.path){
-        if(item.location !== "head"){
-            return<p>{item.label}: <NavLink to={item.path}>{item.value}</NavLink></p>;
+    else if(item.url){
+        if(item.label){
+            return<p key={`${item.value}-${cardId}`} >
+                {item.label}: <NavLink to={item.url}>{item.value}</NavLink>
+            </p>;
         }
         else{
-            return <NavLink to={item.path}>{item.value}</NavLink>;
+            return <NavLink key={`${item.value}-${cardId}`} to={item.url}>{item.value}</NavLink>;
         }
     }
     else{
         
-        return <span>{item.label}: {item.value}</span>
-        
+        return <p key={`${item.value}-${cardId}`} >{item.label && `${item.label}: `}{item.value}</p>
     }
 }
 
 
-function renderCard(cards){
+function renderSection(card, cardId, formatting) {
+    return Object.entries(formatting).map(([key, config], i) => {
+        const data = card[key];
+        if (!data) return null;
+
+        // Handle basic string label config
+        if (typeof config !== "object") {
+            return renderItem({ label: config, value: data }, cardId);
+        }
+
+        // Handle full config object
+        const item = {
+            label: config.label,
+            value: data,
+        };
+        
+
+        if (typeof data === "object") {
+            item.url = data.url
+            item.value = data.name || data.title || data.value || data.toString();
+        }
+        if(config.url){
+            item.url = card[config.url]
+        }
+
+        return renderItem(item, cardId);
+    });
+}
+
+function renderCard(cards, formatting){
     
     if(!cards){
         return null;
@@ -77,23 +103,28 @@ function renderCard(cards){
     return (
         cards.map((card, index) => {
             console.log(JSON.stringify({card, index}))
-
             return(<Card key={index} style={{width:"18rem"}}>
-                
-                <Card.Body className="theme adaptive">
-                     <p>{card.description || ""}</p>
-                </Card.Body>
-                
-
+                {formatting.header && 
+                    <Card.Header className="theme adaptive" key="head">
+                        {renderSection(card, index, formatting.header)}
+                    </Card.Header>
+                }
+                {formatting.body && 
+                    <Card.Body className="theme adaptive" key="body">
+                        {renderSection(card, index, formatting.body)}
+                    </Card.Body>
+                }
+                {formatting.footer && 
+                    <Card.Footer className="theme adaptive" key="footer">
+                        {renderSection(card, index, formatting.footer)}
+                    </Card.Footer>
+                }
             </Card>)
 
-        })
-        
+        }) 
     );
-
-
 }
-export function CardsRenderer({cards, profanity}){
+export function CardsRenderer({cards, profanity=true, formatting={body:{name:{url:"url"}, title:{url:"url"}, displayName:""}}}){
     //const currSort = useEffect(() => console.log(JSON.stringify(sort)), [sort]);
     
     
@@ -121,7 +152,7 @@ export function CardsRenderer({cards, profanity}){
     }, [cards, profanity]);
       
 
-    const renderCards = useMemo(() => renderCard(cards), [cards]);
+    const renderCards = useMemo(() => renderCard(cleanCards, formatting), [cleanCards, formatting]);
     
     useEffect(() => {
         console.log("CardsRenderer re-rendered");

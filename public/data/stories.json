@@ -72,6 +72,21 @@
             "label":"Z-A Author",
             "value":{"author":-1}
         }
-    ]
+    ],
+    "cards":{
+        "header":{
+            "title":{
+                "url":"url"
+            }
+        },
+        "body":{
+            "author":"Author",
+            "body":""
+        },
+        "footer":{
+            "genres":"Genres",
+            "contentWarnings":"Content Warnings"
+        }
+    }
 
 }

@@ -20,7 +20,8 @@ const {
     updateOne,
     getCards,
     getDisplayable,
-    getEditable
+    getEditable,
+    raceUnwindFields
 
 
     
@@ -39,7 +40,8 @@ racesRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
         const race = await getEditable(urlPrefix, author, id, {
                 lookupFields:raceFullLookups,
                 fields:fullBio,
-                projectionFields:raceEditProjectionFields
+                projectionFields:raceEditProjectionFields,
+                unwindFields:raceUnwindFields
             }
         );
         if(race){

@@ -5,7 +5,7 @@ import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { OffcanvasBody, OffcanvasHeader } from 'react-bootstrap';
 import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
-import {genFilter, updateFilter, sortList, SortOptions, FilterOptions, FilterItem, sanitizeId, filterProfanity} from '../utility/utility.js'
+import {filterProfanity} from '../utility/utility.js'
 import {CardsRenderer, useWebSocketFacade} from '../utility/utility.jsx'
 import Select from 'react-select'
 import Creatable from 'react-select/creatable';
@@ -17,13 +17,15 @@ import { WebSocketFacade, webSocket } from '../utility/websocketfacade.js';
 
 const filterSources = {...selectSources, ...creatableSources, users:"/users"}
 
-function FilterGenerator({filters, onFilterChange, socket}){
+function FilterGenerator({filters, onFilterChange, socket, profanity = true}){
     const handleChange = (selectedOptions, attribute) => {
         onFilterChange(attribute, selectedOptions.map(option => option.value));
     };
     return Object.keys(filters).map((key) => {
         const filter = filters[key];
         const [options, updateOptions] = useState([])
+        const [filteredOptions, setFilteredOptions] = useState([])
+
         useEffect(() => {
             const collection = filter.source
             const url = filterSources[collection]
@@ -36,9 +38,15 @@ function FilterGenerator({filters, onFilterChange, socket}){
 
         },[key, filter, filters])
 
+
         useEffect(() => {
-            console.log(JSON.stringify(options))
-        }, [options])
+            async function runFilter() {
+                const cleanOptions = await filterProfanity(options, profanity, true);
+                console.log("Filtered Options:", cleanOptions);
+                setFilteredOptions(cleanOptions);
+            }
+            runFilter();
+        }, [options, profanity])
 
         
 
@@ -49,7 +57,7 @@ function FilterGenerator({filters, onFilterChange, socket}){
                 </label>
                 <Select 
                     isMulti 
-                    options={options} 
+                    options={filteredOptions} 
                     className="form-control" 
                     onChange={(selectedOptions) => handleChange(selectedOptions, key)}
                     name={key}
@@ -64,6 +72,8 @@ export function CategoryPage(props) {
     const [visible, setVisibility] = useState(false);
     const [selections, onSelectionChange] = useState([]);
     const socket = useWebSocketFacade()
+    const profanity = props.profanityFilter
+
     
     
     
@@ -128,37 +138,6 @@ export function CategoryPage(props) {
         console.log(JSON.stringify(list))
 
     },[list])
-    const [profanity, setProfanity] = useState(true);
-
-    
-    
-    useEffect(() => {
-        async function fetchProfanitySetting() {
-            try {
-                const res = await fetch('/api/user/prof', { method: 'GET' });
-                const data = await res.json(); // Ensure it's parsed correctly
-                setProfanity(data.profanityFilter);
-            } catch {
-                setProfanity(true);
-            }
-        }
-
-        fetchProfanitySetting();
-    }, []);
-    useEffect(() => {
-        async function applyProfanityFilter() {
-    
-            
-    
-           
-        }
-    
-        applyProfanityFilter();
-    }, [list, profanity]);
-
-    useEffect(() => {
-        
-    }, [socket, ])
     
     if(loading){
         <main>
@@ -194,7 +173,7 @@ export function CategoryPage(props) {
                         {
                             page.filter &&<div className="filterAndSort theme-h adaptive">
                                 <h4>Filter:</h4> 
-                                <FilterGenerator filters={page.filter} onFilterChange={handleFilterChange} socket={socket}/>
+                                <FilterGenerator filters={page.filter} onFilterChange={handleFilterChange} socket={socket} profanity={profanity}/>
                             </div> 
                         }
 
@@ -215,7 +194,7 @@ export function CategoryPage(props) {
         
                        
                     </div>
-                    <CardsRenderer cards={list}/>
+                    <CardsRenderer cards={list} profanity={profanity} formatting={page.cards}/>
                     
                     
             </main>
