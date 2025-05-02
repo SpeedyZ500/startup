@@ -1,22 +1,28 @@
 {
     "card":{
-        "name":"",
-        "author":"author",
-        "types":"Type",
-        "originWorld":"Origin World",
-        "otherWorlds":"Worlds Colonized",
-        "biomes":"Biomes",
-        "continents":"Continents",
-        "towns":"Towns",
-        "leaders":{
-            "label":"Leaders",
-            "append":{
-                "author":{"if":"authorIsLeader"}
-            }
+        "head":{
+            "name":"",
+            "author":"author"
         },
-        "custom":{"format":"custom"},
-        "created":{"label":"Created", "format":"time"},
-        "modified":{"label":"Modified", "format":"time"}
+        "body":{
+            "types":"Type",
+            "originWorld":"Origin World",
+            "otherWorlds":"Worlds Colonized",
+            "biomes":"Biomes",
+            "continents":"Continents",
+            "towns":"Towns",
+            "leaders":{
+                "label":"Leaders",
+                "append":{
+                    "author":"authorIsLeader"
+                }
+            },
+            "custom":{"format":"custom"}
+        },
+        "foot":{
+            "created":{"label":"Created", "format":"time"},
+            "modified":{"label":"Modified", "format":"time"}
+        }
     },
     "description":"Description",
     "sections":{"format":"sections"},

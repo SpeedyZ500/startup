@@ -47,7 +47,7 @@ export function extractIDfromURL(){
     }
     for(const [fieldkey, value] of Object.entries(selectSources)){
         if(path.startsWith(value)){
-            const id = path.replace(value, "").replace(/\/$/, ""); // Remove trailing slash if any
+            const id = path.replace(value, "").replace(/^\/|\/$/g, ""); // Remove trailing slash if any
             return {url:value, id }
         }
     }

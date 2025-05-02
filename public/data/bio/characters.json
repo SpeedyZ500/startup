@@ -1,35 +1,41 @@
 {
     "card":{
-        "name":"",
-        "author":"author",
-        "family":{
-            "label":"Family", 
-            "format":"table"
+        "head":{
+            "name":"",
+            "author":"author"
         },
-        "gender":"Gender",
-        "pronouns":"Pronouns",
-        "titles":{
-            "label":"Titles",
-            "format":"vertical"
+        "body":{
+            "family":{
+                "label":"Family", 
+                "format":"table"
+            },
+            "gender":"Gender",
+            "pronouns":"Pronouns",
+            "titles":{
+                "label":"Titles",
+                "format":"vertical"
+            },
+            "types":"Roles",
+            "born":"Born",
+            "died":"Died",
+            "race":"Race",
+            "altForms":"Alternate Forms",
+            "abilities":"Abilities",
+            "homeWorld":"Home World",
+            "homeCountry":"Home Country",
+            "homeTown":"Home Town",
+            "religion":"Religion",
+            "otherWorlds":"Worlds Visited",
+            "otherCountries":"Countries Visited",
+            "organizations":"Organizations",
+            "allies":"Allies",
+            "enemies":"Enemies",
+            "custom":{"format":"custom"}
         },
-        "types":"Roles",
-        "born":"Born",
-        "died":"Died",
-        "race":"Race",
-        "altForms":"Alternate Forms",
-        "abilities":"Abilities",
-        "homeWorld":"Home World",
-        "homeCountry":"Home Country",
-        "homeTown":"Home Town",
-        "religion":"Religion",
-        "otherWorlds":"Worlds Visited",
-        "otherCountries":"Countries Visited",
-        "organizations":"Organizations",
-        "allies":"Allies",
-        "enemies":"Enemies",
-        "custom":{"format":"custom"},
-        "created":{"label":"Created", "format":"time"},
-        "modified":{"label":"Modified", "format":"time"}
+        "foot":{
+            "created":{"label":"Created", "format":"time"},
+            "modified":{"label":"Modified", "format":"time"}
+        }
     },
     "description":"Description",
     "sections":{"format":"sections"}

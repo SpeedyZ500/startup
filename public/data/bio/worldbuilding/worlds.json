@@ -1,11 +1,17 @@
 {
     "card":{
-        "name":"",
-        "author":"author",
-        "continents":"Continents",
-        "custom":{"format":"custom"},
-        "created":{"label":"Created", "format":"time"},
-        "modified":{"label":"Modified", "format":"time"}
+        "head":{
+            "name":"",
+            "author":"author"    
+        },
+        "body":{
+            "continents":"Continents",
+            "custom":{"format":"custom"}
+        },
+        "foot":{
+            "created":{"label":"Created", "format":"time"},
+            "modified":{"label":"Modified", "format":"time"}
+        }
     },
     "description":"Description",
     "sections":{"format":"sections"},
@@ -44,6 +50,7 @@
             }
         },
         "countries":{
+            "label":"Countries",
             "type":"getCards",
             "url":"/worldbuilding/countries",
             "filter":{
@@ -53,10 +60,9 @@
                 "name":1
             },
             "group":{
-                "by":"continent",
-                "lablePrefix":"Countries in"
-            },
-            "label":"All Countries"
+                "by":"continents",
+                "labelJoin":"in" 
+            }     
         },
         "magicsystems":{
             "label":"Magic Systems",

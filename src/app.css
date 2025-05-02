@@ -239,6 +239,11 @@ main{
     margin:0;
     justify-content: top;
 }
+
+  
+.with-subnav {
+    padding-top: 4rem; 
+}
 .navbar-right{
     float: right;
 }
@@ -288,7 +293,9 @@ nav{
     footer {
         display: none;
       }
-
+    .with-subnav {
+        padding-top: 0rem; 
+    }
      
 }
 

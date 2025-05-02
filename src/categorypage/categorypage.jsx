@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, Fragment } from 'react';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { OffcanvasBody, OffcanvasHeader } from 'react-bootstrap';
-import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, NavLink, Route, Routes, useLocation } from 'react-router-dom';
 import {filterProfanity} from '../utility/utility.js'
 import {CardsRenderer, useWebSocketFacade} from '../utility/utility.jsx'
 import Select from 'react-select'
@@ -14,6 +14,7 @@ import { AuthState } from '../login/authState.js';
 import { FormGenerator, selectSources,  mapOptions, creatableSources} from '../utility/form';
 import './../app.css'
 import { WebSocketFacade, webSocket } from '../utility/websocketfacade.js';
+
 
 const filterSources = {...selectSources, ...creatableSources, users:"/users"}
 
@@ -73,8 +74,10 @@ function FilterGenerator({ filters, onFilterChange, socket, profanity = true }) 
 
 
 export function CategoryPage(props) {
+    const location = useLocation();
+    const isWorldbuilding = location.pathname.startsWith("/worldbuilding");
+
     const [visible, setVisibility] = useState(false);
-    const [selections, onSelectionChange] = useState([]);
     const socket = useWebSocketFacade()
     const profanity = props.profanityFilter
 
@@ -133,22 +136,22 @@ export function CategoryPage(props) {
         const collection = path.startsWith("/worldbuilding/")
         ? path.replace("/worldbuilding/", "")
         : path.replace(/^\//, "");   
-        webSocket.subscribe({url:path, type:"getCards", collection, commandId:"getCards", query:{filter, sort:sortOptions.value},setData:setList})
+        socket.subscribe({url:path, type:"getCards", collection, commandId:"getCards", query:{filter, sort:sortOptions.value},setData:setList})
     }, [path, filter, sortOptions])
     
     
     if(loading){
-        <main>
+        <main className={`${isWorldbuilding ? "with-subnav" : ""}`}>
              <p>Loading</p>
         </main>
     }
     else if (error){
-        <main><p style={{color:"red"}}>{error}</p></main>
+        <main className={`${isWorldbuilding ? "with-subnav" : ""}`}><p style={{color:"red"}}>{error}</p></main>
     }
     else{
         return (
         
-            <main>
+            <main className={`${isWorldbuilding ? "with-subnav" : ""}`}>
                 
                 <div className="theme-h adaptive textbody">
                         <h1>{page && page.title}</h1>

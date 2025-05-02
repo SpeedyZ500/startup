@@ -327,10 +327,9 @@ async function processCustomToDisplayable(custom) {
 
             for (const customRelation of field.value) {
                 const displayValues = await convertToDisplayable(source, customRelation.value);
-                value.push({ label: customRelation.label, value: displayValues });
+                value.push({ label: customRelation.label, value: displayValues});
             }
-
-            newCustom.push({ value, label: field.label });
+            newCustom.push({ value, label: field.label, format:"table"});
         } 
         else {
             const source = field.source;
@@ -843,7 +842,7 @@ async function getGraph(id, filter={}){
         $project:{
             _id:0,
             id:1,
-            data:{title:1, genres:1, url:1, contentWarnings:1}
+            data:{title:1, genres:1, url:1, contentWarnings:1, description:1}
         }
     })
     const nodes = await chapterCollection.aggregate(pipeline).toArray()
@@ -1383,6 +1382,7 @@ const storyPreProcessing = {
 }
 const chaptersPreProcessing = {
     ...storyPreProcessing,
+    description:(value, _full) => preProcessText(value),
     storyID: async (value, _full) => processSingleID(value, "stories"),
     samePrevious: async(value, _full) => processIDArray(value, "chapters"),
     anyPrevious: async(value, _full) => processIDArray(value, "chapters"),
@@ -1887,7 +1887,7 @@ const displayableMap = {
         unwindFields:baseUnwindFields,
     },
     chapter:{
-        fields:storyFields,
+        fields:[...storyFields, "description"],
         lookupFields:chapterLookupFields,
         projectionFields:chapterProjectFields,
         unwindFields:chapterUnwindFields

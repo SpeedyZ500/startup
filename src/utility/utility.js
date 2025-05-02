@@ -173,6 +173,9 @@ function filterAndSort(list, filter, sort){
 
 export async function filterProfanity(json, profanityFilterEnabled, isOptions=false){
     if(profanityFilterEnabled){
+        if(!json){
+            return
+        }
         if(typeof json === "string"){
             return await applyProfFilter(json);
         }

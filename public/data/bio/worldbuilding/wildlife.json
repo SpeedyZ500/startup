@@ -1,16 +1,22 @@
 {
     "card":{
-        "name":"",
-        "author":"author",
-        "types":"Type",
-        "originWorld":"Origin World",
-        "originBiome":"Origin Biome",
-        "otherWorlds":"Worlds Found In",
-        "otherBiomes":"Other Biomes found in",
-        "abilities":"Abilities",
-        "custom":{"format":"custom"},
-        "created":{"label":"Created", "format":"time"},
-        "modified":{"label":"Modified", "format":"time"}
+        "head":{
+            "name":"",
+            "author":"author"
+        },
+        "body":{
+            "types":"Type",
+            "originWorld":"Origin World",
+            "originBiome":"Origin Biome",
+            "otherWorlds":"Worlds Found In",
+            "otherBiomes":"Other Biomes found in",
+            "abilities":"Abilities",
+            "custom":{"format":"custom"}
+        },
+        "foot":{
+            "created":{"label":"Created", "format":"time"},
+            "modified":{"label":"Modified", "format":"time"}
+        }
     },
     "description":"Description",
     "sections":{"format":"sections"}

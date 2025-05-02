@@ -61,12 +61,13 @@ const socketHandlers = {
                 lookupFields:params.lookupFields,
                 unwindFields:params.unwindFields
             })
+
             socket.send(JSON.stringify({
                 type: message.type,
                 requestId: message.requestId,
                 commandId:message.commandId,
                 success: true,
-                data,
+                data: Array.isArray(data) ? data[0] : data,
               }));
         
         }
