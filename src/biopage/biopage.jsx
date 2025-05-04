@@ -274,7 +274,7 @@ function NavGen({data, cleanData, sectionPref=""}){
                     </NavLink>
                 </li>
                 {entry.subsections && Array.isArray(entry.subsections) && entry.subsections.length > 0&&(
-                    <ul>
+                    <ul className="internal-menu">
                         <NavGen data= {entry.subsections} cleanData={cleanData[index].subsections} sectionPref={`${sectionPref}${index}.`} />
                     </ul>
                 )}
@@ -348,7 +348,7 @@ function CardSectionNavGen({cardSections, data, cleanData}){
         if(parameters.group && !Array.isArray(parameters.group) && data && cleanData){
             const group =parameters.group
             if(typeof group !== "object"){
-                result.push(<ul key={`${index}-group`}>{generateCardGroup({
+                result.push(<ul key={`${index}-group`} className="internal-menu">{generateCardGroup({
                     label:parameters.label,
                     list:data[group],
                     cleanList:cleanData[group],
@@ -360,7 +360,7 @@ function CardSectionNavGen({cardSections, data, cleanData}){
                 const list = data[keys]
                 const cleanList = cleanData[keys]
                 result.push(
-                    <ul key={`${index}-${key}-group`}>
+                    <ul className="internal-menu" key={`${index}-${key}-group`}>
                         {generateCardGroup({
                             label:parameters.label,
                             list,
@@ -384,10 +384,6 @@ function parseCardSections({}){
 
 const MemoizedNavGen = React.memo(NavGen);
 const MemoizedSectionsParse = React.memo(SectionsParse);
-const MemoizedInfoCard = React.memo(InfoCard);
-
-
-   
 
 export function BioPage(props){
     const location = useLocation();
@@ -413,6 +409,7 @@ export function BioPage(props){
     }
     
     useEffect(() => {
+        console.log("checking if author")
         fetch(`/api${url}/author/${id}`)
         .then(res => {
             if(!res.ok){
@@ -421,9 +418,12 @@ export function BioPage(props){
             return res.json();
         })
         .then((data) => {
+            console.log(JSON.stringify(data))
             setIsAuthor(data.isAuthor)
         })
         .catch(e => {
+            console.log("what happened")
+
             setIsAuthor(false)
         })
     }, [url, id, props.user])
@@ -472,7 +472,7 @@ export function BioPage(props){
         return(<main className={`${isWorldbuilding ? "with-subnav" : ""}`}><FormGenerator handleClose={toggleEditing}/></main>)
     }
     return(
-        <main className="bio">
+        <main className={`bio ${isWorldbuilding ? "with-subnav" : ""}`}>
             {formatter.card && <InfoCard cardFormatter={formatter.card} data={cleanBio} />}
             {isAuthor && (
                 <Button variant ="primary" onClick={toggleEditing}>
@@ -490,9 +490,7 @@ export function BioPage(props){
                     <Accordion width="50%" className="internal-nav">
                         <Accordion.Item eventKey="0">
                             <Accordion.Header>Nav</Accordion.Header>
-
                             <Accordion.Body>
-
                                 <nav>
 
                                     <menu className="internal-menu">

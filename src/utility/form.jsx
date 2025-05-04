@@ -143,7 +143,7 @@ export function FormGenerator({handleClose}){
             })
             .then(handleErrors)
             .then((data) => {
-                console.error(null);
+                console.log(JSON.stringify(data))
                 setData(data)
             })
             .catch((error) =>{
@@ -152,9 +152,12 @@ export function FormGenerator({handleClose}){
             })
         }
     }, [url,id])
+    
 
     const handleSubmit = () => {
         if(id){
+            console.log(JSON.stringify(formData))
+            console.log(`updating ${id}`)
             fetch(`/api${url}/${id}`,{
                 method:"PUT",
                 headers: {"content-type": "application/json"},
@@ -163,6 +166,8 @@ export function FormGenerator({handleClose}){
             })
             .then(handleErrors)
             .then(data => {
+                console.log(`successfully updated ${id}`)
+
                 socket.notify({collection:url, type:"PUT", id:data.id})
                 handleModify(data.id,formData,form,socket)
                 handleClose?.()
@@ -192,8 +197,8 @@ export function FormGenerator({handleClose}){
         return(
             <div>
                 <h1>Modify {formData.name}</h1>
+                <GenerateForm formData={formData} form={form.fields} socket={socket} setData={setData} id={id} />
                  <ButtonGroup>
-                    <GenerateForm formData={formData} form={memoizedFields} socket={socket} setData={setData} />
                     <Button onClick={handleSubmit} variant='primary'>Submit</Button>
                     <Button onClick={handleClose} variant='secondary'>Close</Button>
                 </ButtonGroup>
@@ -204,8 +209,7 @@ export function FormGenerator({handleClose}){
     return(
         <div>
             <h1>{form &&form.title || ""}</h1>
-            <GenerateForm formData={formData} form={memoizedFields} socket={socket} setData={setData} />
-
+            <GenerateForm formData={formData} form={form.fields} socket={socket} setData={setData} />
              <ButtonGroup>
                 <Button onClick={handleSubmit} variant='primary'>Submit</Button>
                 <Button onClick={handleClose} variant='secondary'>Close</Button>
@@ -315,6 +319,7 @@ function GenerateMultiSelect({formData, fieldkey, field, socket, setData}){
 function GenerateSelect({formData, fieldkey, field, socket, setData}){
     const [options, updateOptions] = useState([])
     const reliesOn = field.filter?.key;
+    
 
     
     useEffect(() =>{
@@ -407,7 +412,6 @@ function GenerateCreatable({formData,fieldkey, field, socket, setData}){
     const handleChange = (selectedOptions) => {
         const selectedValues = selectedOptions ? selectedOptions.map(option => option.value) : [];
         setData({...formData, [fieldkey]:selectedValues})
-
     };
     return(
         <div key={fieldkey} className="mb-2 ">
@@ -429,6 +433,12 @@ function SuperSelect({ formData, fieldkey, socket, field, setData}){
     const [categories, setCategories] = useState([]);
     const [options, setOptions] = useState([]);
 
+    useEffect(() => {
+        if(formData[fieldkey]){
+            setCategories(formData[fieldkey])
+        }
+    }, [formData[fieldkey]])
+
     // Fetch options based on the collection
     useEffect(() => {
         const collection = field.source; // Assuming `data.source` has the collection name
@@ -448,7 +458,7 @@ function SuperSelect({ formData, fieldkey, socket, field, setData}){
     const addCategory = () => {
         const newCategory = { id: Date.now(), label: "", value: [] };
         const updatedCategories = [...categories, newCategory];
-        setCategories(updatedCategories);
+        //setCategories(updatedCategories);
         setData({...formData, [fieldkey]:updatedCategories})
     };
 
@@ -456,7 +466,7 @@ function SuperSelect({ formData, fieldkey, socket, field, setData}){
     const updateCategoryName = (index, name) => {
         const updatedCategories = [...categories];
         updatedCategories[index].label = name;
-        setCategories(updatedCategories);
+        //setCategories(updatedCategories);
         setData({...formData, [fieldkey]:updatedCategories})
     };
 
@@ -464,14 +474,14 @@ function SuperSelect({ formData, fieldkey, socket, field, setData}){
     const updateSelections = (index, selected) => {
         const updatedCategories = [...categories];
         updatedCategories[index].value = selected.map(option => option.value);
-        setCategories(updatedCategories);
+        //setCategories(updatedCategories);
         setData({...formData, [fieldkey]:updatedCategories})
     };
 
     // Remove a category from the list
     const removeCategory = (index) => {
         const updatedCategories = categories.filter((_, i) => i !== index);
-        setCategories(updatedCategories);
+        //setCategories(updatedCategories);
         setData({...formData, [fieldkey]:updatedCategories})
     };
 
@@ -536,32 +546,34 @@ function SuperSelect({ formData, fieldkey, socket, field, setData}){
 
 
 function GenerateTextCreatable({formData, fieldkey, field, setData}){
-    const textCreatableValues = formData[fieldkey] ? formData[fieldkey].map(val => ({
-        label: val,  // Use the string itself as the label
-        value: val   // Store the string as the value
-    })) : [];
-
-    // State for handling input and dynamic creation of options
+    const [selectedValues, setSelectedValues] = useState([])
     const [inputValue, setInputValue] = useState('');
-    const [selectedValues, setSelectedValues] = useState(textCreatableValues);
-
+    const components = {
+        DropdownIndicator: null,
+    };
+    useEffect(() => {
+        if(formData[fieldkey]){
+            const temp = formData[fieldkey].map(val => ({
+                label: val,  // Use the string itself as the label
+                value: val   // Store the string as the value
+            })) 
+            setSelectedValues(temp)
+        }
+    }, [formData[fieldkey]])
+    // State for handling input and dynamic creation of options
     const handleInputChange = (newInputValue) => {
         setInputValue(newInputValue);
     };
-
     const handleKeyDown = (event) => {
         if (!inputValue) return;
         switch (event.key) {
             case 'Enter':
             case 'Tab':
-                const newOption = {
-                    label: inputValue,
-                    value: inputValue,
-                };
-                
                 // Add new option to selected values
-                setSelectedValues((prev) => [...prev, newOption]);
-                const updatedValues = [...(value || []), inputValue];
+                const previousValues = selectedValues ? selectedValues.map(option => option.value) : [];
+                //const newOption = {label:inputValue, value:inputValue}
+                const updatedValues = [...previousValues, inputValue]
+                //setSelectedValues((prev) => [...prev, newOption])
                 setData({...formData, [fieldkey]:updatedValues})
                 setInputValue(''); // Clear input field
                 event.preventDefault();
@@ -569,70 +581,81 @@ function GenerateTextCreatable({formData, fieldkey, field, setData}){
             default:
                 break;
             }
-};
-
-return (
-    <div key={fieldkey} className="mb-2 ">
-        <label htmlFor={fieldkey}>{field.label}</label>
-        <Creatable
-                name={fieldkey}
-                isMulti
-                options={selectedValues} // Use selectedValues as options, so it contains both initial and dynamically added options
-                value={selectedValues}
-                onChange={(newValue) => {
-                    setSelectedValues(newValue);
-                    const updatedValues = newValue.map(opt => opt.value);
-                    setData({...formData, [fieldkey]:updatedValues})
-
-                }}
-                onInputChange={handleInputChange}
-                onKeyDown={handleKeyDown}
-                inputValue={inputValue}
-                placeholder="Type and press Enter to add new item..."
-                className="form-control"
-            />
-    </div>
-);
+    };
+    const handleChange = (selectedOptions) => {
+        //setSelectedValues(selectedOptions)
+        const selected = selectedOptions ? selectedOptions.map(option => option.value) : [];
+        setData({...formData, [fieldkey]:selected})
+    };
+    return (
+        <div key={fieldkey} className="mb-2 ">
+            <label htmlFor={fieldkey}>{field.label}</label>
+            <Creatable
+                    name={fieldkey}
+                    components={components}
+                    isMulti
+                    options={selectedValues} // Use selectedValues as options, so it contains both initial and dynamically added options
+                    value={selectedValues}
+                    menuIsOpen={false}
+                    onChange={handleChange}
+                    onInputChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    inputValue={inputValue}
+                    placeholder="Type and press Enter to add new item..."
+                    className="form-control"
+                />
+        </div>
+    );
 }
 
 
 
 function GenerateModifyOthers({formData, fieldkey, field, socket,  setData}){
     const [options, setOptions] = useState([]);
-    const id = formData.id
+    const [id, setId] = useState(null)
+    useEffect(() => {
+        if(formData.id){
+            setId(formData.id)
+        }
+    }, [formData.id])
+
 
     useEffect(() => {
         const collection = field.list
+        const id = formData.id
         const url = selectSources[field.source]
         if(id && field.method === "remove"){
-            const query = {filter:{[collection]:id}}
+            const query = {filter:{[collection]:[id]}}
             socket.subscribe({
                 url,
                 type:"getOptions",
                 collection:field.source,
                 setData:setOptions,
+                commandId: fieldkey,
                 query
-
             })
         }
         else if(field.method === "add"){
             const filter = {}
             if(id){
-                filter[`excludes${collection}`] = id
+                filter[`excludes${collection}`] = [id]
             }
             const query = {filter}
             socket.subscribe({
                 url,
                 type:"getOptions",
                 collection:field.source,
+                commandId: fieldkey,
                 setData:setOptions,
                 query
 
             })
         }
-    },[field, formData[id],  socket])
+    },[field, id,  socket])
     const handleChange = (selectedOption) => {
+
         const selected = (selectedOption|| []).map(opt => opt.value) || [];
+
         setData({...formData, [fieldkey]:selected})
     };
     if(field.method === "remove" && !id){
@@ -653,7 +676,7 @@ function GenerateModifyOthers({formData, fieldkey, field, socket,  setData}){
     </div>
 )}
 
-const Section = ({ section, updateSection, removeSection }) => {
+function Section({ section, updateSection, removeSection }){
     const handleChange = (fieldkey, value) => {
         updateSection({ ...section, [fieldkey]: value });
     };
@@ -714,20 +737,26 @@ const Section = ({ section, updateSection, removeSection }) => {
 
 
 function SectionAdder({formData, fieldkey, setData, field}){
-    const [sections, setSections] = useState(formData[fieldkey] || []);
+    const [sections, setSections] = useState([]);
+
+    useEffect(() => {
+        if(formData[fieldkey]){
+            setSections(formData[fieldkey])
+        }
+    }, [formData[fieldkey]])
+
     const addSection = () => {
         const newSection = { id: Date.now(), section: "", text: "", subsections: [] };
         const newSections = [...sections, newSection]
-        setSections(newSections);
+        //setSections(newSections);
         setData({ ...formData, [fieldkey]: newSections });  // immediately update parent
     };
-
+    
     const updateSection = (index, updatedSection) => {
         const newSections = [...sections];
         newSections[index] = updatedSection;
-        setSections(newSections);
+        //setSections(newSections);
         setData({ ...formData, [fieldkey]: newSections });  // immediately update parent
-
     };
 
     const removeSection = (index) => {
@@ -739,8 +768,6 @@ function SectionAdder({formData, fieldkey, setData, field}){
         <div key={fieldkey} className="mb-2 ">
             <label htmlFor={fieldkey}>{field.label}</label>
             <div name ={fieldkey} className="formData-editor">
-                
-            <Button onClick={addSection} className="btn btn-primary">Add Section</Button>
                 {sections.map((section, i) => (
                     <Section
                         key={section.id}
@@ -749,14 +776,14 @@ function SectionAdder({formData, fieldkey, setData, field}){
                         removeSection={() => removeSection(i)}
                     />
                 ))}
+                <Button onClick={addSection} className="btn btn-primary">Add Section</Button>
+                
             </div>
         </div>
-            
     );
-
 }
 
-function GenerateForm({formData, form, socket, setData}){
+function GenerateForm({formData, form, socket, setData, id}){
     const renderField = (fieldkey, field) => {
         switch(field.type){
             case 'text':
@@ -865,7 +892,7 @@ function GenerateForm({formData, form, socket, setData}){
 
                     field={field} 
                     socket={socket} 
-                    setData={setData} 
+                    setData={setData}
                 />
             case "section-adder":
                 return <SectionAdder 
@@ -909,6 +936,11 @@ function GenerateForm({formData, form, socket, setData}){
 
 function CustomAdder({ formData, setData, field, fieldkey, socket }) {
     const [customFields, setCustomFields] = useState(formData[fieldkey] || []);
+    useEffect(() => {
+        if(formData[fieldkey]){
+            setCustomFields(formData[fieldkey])
+        }
+    }, [formData[fieldkey]])
     const addCustomField = () => {
         const newCustom = {
             id: Date.now(),
@@ -918,20 +950,20 @@ function CustomAdder({ formData, setData, field, fieldkey, socket }) {
             values: [],
         };
         const newList = [...customFields, newCustom];
-        setCustomFields(newList);
+        //setCustomFields(newList);
         setData({ ...formData, [fieldkey]: newList });
     };
 
     const updateCustomField = (index, updated) => {
         const newList = [...customFields];
         newList[index] = updated;
-        setCustomFields(newList);
+        //setCustomFields(newList);
         setData({ ...formData, [fieldkey]: newList });
     };
 
     const removeCustomField = (index) => {
         const newList = customFields.filter((_, i) => i !== index);
-        setCustomFields(newList);
+        //setCustomFields(newList);
         setData({ ...formData, [fieldkey]: newList });
     };
     return (
@@ -952,15 +984,12 @@ function CustomAdder({ formData, setData, field, fieldkey, socket }) {
             </div>
         </div>
     );
-
 }
 
 function CustomSelect({ custom, index, socket, updateCustom }) {
     const [options, setOptions] = useState([]);
     const { source, values = [] } = custom;
-
     const prevCommandIdRef = useRef(null);
-
     const prevUrlRef = useRef(null);
 
     

@@ -63,7 +63,7 @@ racesRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
         }
     }
     catch(e){
-        res.status(e.status || 500).send({msg:e.message})
+        res.status(e.statusCode || 500).send({msg:e.message})
     }
 })
 
@@ -95,7 +95,7 @@ racesRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
         }
     }
     catch(e){
-        return res.status(e.status || 500).send({msg:e.message})
+        return res.status(e.statusCode || 500).send({msg:e.message})
     }
 });
 
@@ -121,7 +121,7 @@ racesRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
         }
     }
     catch(e){
-        return res.status(e.status || 500).send({msg:e.message})
+        return res.status(e.statusCode || 500).send({msg:e.message})
     }
 });
 
@@ -141,7 +141,7 @@ racesRouter.patch(`${urlPrefix}:list/:method`, verifyAuth, async (req, res) => {
         return res.send({msg:"success"})
     }
     catch(e){
-        res.status(e.status || 500).send({msg:e.message})
+        res.status(e.statusCode || 500).send({msg:e.message})
     }
 });
 module.exports = racesRouter;

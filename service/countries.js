@@ -18,7 +18,8 @@ const {
     optionsMap,
     getCards,
     getEditable,
-    getUserByToken
+    getUserByToken,
+    raceUnwindFields
     
  } = require('./database.js')
 
@@ -86,7 +87,10 @@ countriesRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
         const country = await getEditable(urlPrefix, author, id, {
                 lookupFields:countryFullLookups,
                 fields:institutionFullFields,
-                projectionFields:countryEditFields
+                projectionFields:countryEditFields,
+                unwindFields:raceUnwindFields
+                
+
             }
         );
         if(country){
@@ -97,7 +101,7 @@ countriesRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
         }
     }
     catch(e){
-        res.status(e.status || 500).send({msg:e.message})
+        res.status(e.statusCode || 500).send({msg:e.message})
     }
 })
 
@@ -132,7 +136,7 @@ countriesRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
         }
     }
     catch(e){
-        return res.status(e.status || 500).send({msg:e.message})
+        return res.status(e.statusCode || 500).send({msg:e.message})
     }
 });
 
@@ -158,7 +162,7 @@ countriesRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
         }
     }
     catch(e){
-        return res.status(e.status || 500).send({msg:e.message})
+        return res.status(e.statusCode || 500).send({msg:e.message})
     }
 });
 
@@ -170,7 +174,7 @@ countriesRouter.patch(`${urlPrefix}:list/:method`, verifyAuth, async (req, res) 
         return res.send({msg:"success"})
     }
     catch(e){
-        res.status(e.status || 500).send({msg:e.message})
+        res.status(e.statusCode || 500).send({msg:e.message})
     }
 });
 

@@ -84,7 +84,7 @@ storiesRouter.get(`${urlPrefix}chapter/:chapterID`, verifyAuth, async (req, res)
         }
     }
     catch(e){
-        res.status(e.status || 500).send({msg:e.message})
+        res.status(e.statusCode || 500).send({msg:e.message})
     }
 })
 storiesRouter.get(`${urlPrefix}:storyID`, verifyAuth, async (req, res) => {
@@ -104,7 +104,7 @@ storiesRouter.get(`${urlPrefix}:storyID`, verifyAuth, async (req, res) => {
         }
     }
     catch(e){
-        res.status(e.status || 500).send({msg:e.message})
+        res.status(e.statusCode || 500).send({msg:e.message})
 
     }
 })
@@ -133,7 +133,7 @@ storiesRouter.post(urlPrefix, verifyAuth, async (req, res) => {
         
     }
     catch(e){
-        res.status(e.status || 500).send({msg:e.message})
+        res.status(e.statusCode || 500).send({msg:e.message})
     }
 })
 
@@ -154,7 +154,7 @@ storiesRouter.post(`${urlPrefix}:storyID`, verifyAuth, async (req, res) => {
             res.send({title:chapter.title, url:chapter.url, id:chapter.id})
     }
     catch(e){
-        res.status(e.status || 500).send({msg:e.message})
+        res.status(e.statusCode || 500).send({msg:e.message})
     }
 })
 
@@ -192,7 +192,7 @@ storiesRouter.put(`${urlPrefix}:storyID/:chapterID?`, verifyAuth, async (req, re
         }
     }
     catch(e){
-        res.status(e.status || 500).send({msg:e.message})
+        res.status(e.statusCode || 500).send({msg:e.message})
     }});
 
 // Helper function to fetch a story by a field and value

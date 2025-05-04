@@ -164,7 +164,7 @@ export function CategoryPage(props) {
                             <button onClick={handleClose}type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                         </OffcanvasHeader>
                         <OffcanvasBody className="new">
-                            <FormGenerator handleClose={handleClose} setError={setError}/>
+                            <FormGenerator handleClose={handleClose} />
 
                             
                         </OffcanvasBody>

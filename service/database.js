@@ -233,7 +233,7 @@ async function processFilters(rawFilters){
         const isAll = /all/i.test(key);
 
         const field = key.replace(/excludes|all/gi, "").trim();
-        const temp = ensureArray(await convertIDs(key, value))
+        const temp = await convertIDs(field, ensureArray(value))
         const operator = isExclusion ? "$nin" : isAll ? "$all" : "$in";
         if(temp.length && field){
             if(processed[field]){
@@ -871,7 +871,7 @@ async function getEditable(collectionKey, author, id, {
     for (const field of unwindFields){
         ensureUnwind(pipeline, field)
     }
-    const project = {_id:0}
+    const project = {_id:0, id:1}
     for(const field of fields){
         project[field] = 1;
     }
@@ -879,14 +879,14 @@ async function getEditable(collectionKey, author, id, {
     pipeline.push({ $project: project });
 
     const result = await collection.aggregate(pipeline).toArray();
-    if(result.length === 0){
+    if(!result.length){
         throw createError("Data not found or you are not the author", 409)
     }
     const data = result[0];
-    if(data.family){
+    if(data.family && Array.isArray(data.family) && data.family.length){
         data.family = await processFamilyToEditable(data.family);
     }
-    if(data.custom){
+    if(data.custom && Array.isArray(data.custom) && data.custom.length){
         data.custom = await processCustomToEditable(data.custom);
     }
     return data;
@@ -963,9 +963,9 @@ async function addOne(collectionKey, data, {preProcessing = {}, postProcessing =
     return result
 }
 async function preprocessData(inputData, preProcessing) {
-    const passThroughFields = ['id', 'url', 'author']; // These fields will just be passed through
+    const passThroughFields = ['id', 'url', 'author', 'created']; // These fields will just be passed through
 
-    let processedData = {};
+    const processedData = {};
 
     for (const key of passThroughFields) {
         if (inputData.hasOwnProperty(key)) {
@@ -973,7 +973,7 @@ async function preprocessData(inputData, preProcessing) {
         }
     }
     if (processedData.author && typeof processedData.author === 'string') {
-        processedData.author = convertIDs("author",processedData.author);
+        processedData.author = await convertIDs("author",processedData.author);
     }
     for (const key in preProcessing) {
         processedData[key] = await preProcessing[key](inputData[key], inputData);
@@ -982,20 +982,15 @@ async function preprocessData(inputData, preProcessing) {
 }
 
 async function updateOne(collectionKey, data, author, {preProcessing = {}, postProcessing = {}}){
-    await Promise.all(
-        Object.keys(data).map(async (key) => {
-            data[key] = await convertIDs(key, data[key]);
-        })
-    );
     const collection = getCollection(collectionKey);
     const original = await collection.findOne({id: data.id, author:author})
     if(!original){
         throw createError("Data does not exist or you are not the Author", 401);
     }
-    const preProcessedData = preprocessData(data, preProcessing)
-    data.modified = new Date().toJSON();
+    const preProcessedData = await preprocessData(data, preProcessing)
+    preProcessedData.modified = new Date().toJSON();
     if(collection === organizationsCollection){
-        data.listUsersAsMembers = original.listUsersAsMembers
+        preProcessedData.listUsersAsMembers = original.listUsersAsMembers
     }
     const result = await collection.findOneAndUpdate({_id: original._id, author:author}, {$set:preProcessedData}, {returnDocument: 'after'})
     await Promise.all(
@@ -1092,6 +1087,9 @@ async function  modifyMany(collectionKey, ids, list, data, method){
 
 
 function sanitizeText(text){
+    if(!text){
+        return ""
+    }
     if(Array.isArray(text)){
         return text.map((item) => sanitizeText(item))
     }
@@ -1180,6 +1178,24 @@ function createProjection(field, type="displayable"){
     }
 }
 
+function sanitizeSections(sections, sectionPrefix=""){
+    if(!Array.isArray(sections)){
+        return sanitizeSections(ensureArray(sections), sectionPrefix)
+    }
+    const processedSections = []
+    sections.forEach((data, index) => {
+        if(typeof data === "object"){
+            const section = sanitizeText(data.section)
+            const prefix = `${sectionPrefix}${index}`
+            const id = sanitizeId(`${prefix}-${section}`)
+            const subsections = sanitizeSections(data.subsections, `${prefix}.`)
+            const text = sanitizeText(data.text)
+            processedSections.push({section, prefix, id, subsections, text})
+        }
+    })
+    return processedSections
+}
+
 const createCombiner = (primaryKey, secondaryKey) => (full) => [full[primaryKey], ...(full[secondaryKey] || [])]
 const combinedWorlds = createCombiner("originWorld", "otherWorlds")
 const combinedBiomes = createCombiner("originBiome", "otherBiomes");
@@ -1187,6 +1203,7 @@ const preProcessText = (value) => sanitizeText(unArray("whatever", value))
 const preProcessTextArray = (value) => sanitizeText(ensureArray(value))
 const processSingleID = async (value, collectionKey) => await convertIDs(collectionKey, unArray("whatever", value))
 const processIDArray = async (value, collectionKey) => await convertIDs(collectionKey, ensureArray(value))
+
 
 const processBoolean = (value) => {
     if (typeof value === "boolean") return value;
@@ -1327,7 +1344,7 @@ const connectChapters = async (full) => {
 const basePreProcessing = {
     name:(value, _full) => preProcessText(value),
     description:(value, _full) => preProcessText(value),
-    sections:(value, _full) => preProcessTextArray(value),
+    sections:(value, _full) => sanitizeSections(value),
     custom:(value, _full) => processCustomToIDs(value)
 }
 const baseFields = [

@@ -96,7 +96,8 @@ characterRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
         const character = await getEditable(urlPrefix, author, id, {
                 lookupFields:characterFullLookupFields,
                 fields:characterFullFields,
-                projectionFields:characterEditProjectionFields
+                projectionFields:characterEditProjectionFields,
+                unwindFields:characterUnwindFields
             }
         );
         if(character){
@@ -107,7 +108,7 @@ characterRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
         }
     }
     catch(e){
-        res.status(e.status || 500).send({msg:e.message})
+        res.status(e.statusCode || 500).send({msg:e.message})
     }
 })
 
@@ -136,7 +137,7 @@ characterRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
         }
     }
     catch(e){
-        return res.status(e.status || 500).send({msg:e.message})
+        return res.status(e.statusCode || 500).send({msg:e.message})
     }
 });
 
@@ -162,7 +163,7 @@ characterRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
         }
     }
     catch(e){
-        return res.status(e.status || 500).send({msg:e.message})
+        return res.status(e.statusCode || 500).send({msg:e.message})
     }
 });
 
@@ -182,7 +183,7 @@ characterRouter.patch(`${urlPrefix}:list/:method`, verifyAuth, async (req, res) 
         return res.send({msg:"success"})
     }
     catch(e){
-        res.status(e.status || 500).send({msg:e.message})
+        res.status(e.statusCode || 500).send({msg:e.message})
     }
 });
 

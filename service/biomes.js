@@ -9,7 +9,8 @@ const {
     baseFullFields,
     addOne,
     updateOne,
-    getUserByToken
+    getUserByToken,
+    baseUnwindFields
 } = require('./database.js')
 const urlPrefix = "/worldbuilding/biomes/";
 
@@ -43,12 +44,13 @@ biomesRouter.get(`${urlPrefix}author/:id`,async (req, res)=>{
 // 🚀 Router: Fetch biomes or individual biome
 biomesRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
     const { id } = req.params;
-    const { author } = req.usid 
+    const author  = req.usid 
     try{
         const biome = await getEditable(urlPrefix, author, id, {
                 lookupFields:biomeLookupFields,
                 fields:baseFullFields,
-                projectionFields:biomeEditProjectionFields
+                projectionFields:biomeEditProjectionFields,
+                unwindFields:baseUnwindFields
             }
         );
         if(biome){
@@ -59,7 +61,7 @@ biomesRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
         }
     }
     catch(e){
-        res.status(e.status || 500).send({msg:e.message})
+        res.status(e.statusCode || 500).send({msg:e.message})
     }
     
 });

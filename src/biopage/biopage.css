@@ -17,6 +17,9 @@
     text-align:center;
 
 }
+.with-subnav {
+    padding-top: 4rem!important; 
+}
 .bio{
     justify-content: start;
     display: block ;

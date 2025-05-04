@@ -13,7 +13,8 @@ const {
     addOne,
     updateOne,
     getEditable,
-    getUserByToken
+    getUserByToken,
+    livingThingUnwindFields
     
  } = require('./database.js')
 
@@ -43,7 +44,9 @@ floraRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
         const flora = await getEditable(urlPrefix, author, id, {
                 lookupFields:livingThingFullLookups,
                 fields:fullBio,
-                projectionFields:livingThingEditProjectionFields
+                projectionFields:livingThingEditProjectionFields,
+                unwindFields:livingThingUnwindFields
+                
             }
         );
         if(flora){
@@ -54,7 +57,7 @@ floraRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
         }
     }
     catch(e){
-        res.status(e.status || 500).send({msg:e.message})
+        res.status(e.statusCode || 500).send({msg:e.message})
     }
 })
 
@@ -86,7 +89,7 @@ floraRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
         }
     }
     catch(e){
-        return res.status(e.status || 500).send({msg:e.message})
+        return res.status(e.statusCode || 500).send({msg:e.message})
     }
 });
 
@@ -112,7 +115,7 @@ floraRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
         }
     }
     catch(e){
-        return res.status(e.status || 500).send({msg:e.message})
+        return res.status(e.statusCode || 500).send({msg:e.message})
     }
 });
 
@@ -132,7 +135,7 @@ floraRouter.patch(`${urlPrefix}:list/:method`, verifyAuth, async (req, res) => {
         return res.send({msg:"success"})
     }
     catch(e){
-        res.status(e.status || 500).send({msg:e.message})
+        res.status(e.statusCode || 500).send({msg:e.message})
     }
 });
 module.exports = floraRouter;

@@ -121,7 +121,7 @@ apiRouter.post('/writingadvice', verifyAuth, async (req, res) => {
     
     }
     catch(e){
-        res.status(e.status || 500).send({msg:e.message});
+        res.status(e.statusCode || 500).send({msg:e.message});
 
     }
 });
@@ -145,7 +145,7 @@ apiRouter.post('/writingprompts', verifyAuth, async (req, res) => {
         }
     }
     catch(e){
-        res.status(e.status || 500).send({msg:e.message});
+        res.status(e.statusCode || 500).send({msg:e.message});
     }
 });
 

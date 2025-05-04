@@ -8,7 +8,8 @@ const { createID,
     baseLookupFields,
     baseEditProjectionFields,
     baseUnwindFields,
-    getUserByToken
+    getUserByToken,
+    getEditable
  } = require("./database.js")
 const urlPrefix = "/worldbuilding/worlds/";
 
@@ -54,7 +55,7 @@ worldsRouter.get(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
         }
     }
     catch(e){
-        res.status(e.status || 500).send({msg:e.message})
+        res.status(e.statusCode || 500).send({msg:e.message})
     }
 })
 
@@ -84,7 +85,7 @@ worldsRouter.post(`${urlPrefix}`, verifyAuth, async (req,res) => {
         }
     }
     catch(e){
-        return res.status(e.status || 500).send({msg:e.message})
+        return res.status(e.statusCode || 500).send({msg:e.message})
     }
 });
 
@@ -110,7 +111,7 @@ worldsRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
         }
     }
     catch(e){
-        return res.status(e.status || 500).send({msg:e.message})
+        return res.status(e.statusCode || 500).send({msg:e.message})
     }
 });
 
