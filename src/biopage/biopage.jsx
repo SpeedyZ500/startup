@@ -1,10 +1,11 @@
-import React, {Fragment, useEffect, useState, useRef} from "react";
+import React, {Fragment, useEffect, useState, useRef, useMemo} from "react";
 
 import {NavLink, useLocation} from 'react-router-dom';
 
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Table from 'react-bootstrap/Table';
+import "./../app.css"
 import "./biopage.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -12,7 +13,7 @@ import Accordion from 'react-bootstrap/Accordion';
 import {sanitizeId, formatJSONDate, filterProfanity} from'../utility/utility.js';
 import { ButtonGroup } from "react-bootstrap";
 import Button from 'react-bootstrap/Button';
-import {extractIDfromURL, FormGenerator} from './../utility/form.jsx'
+import {extractIDfromURL, FormGenerator, selectSources} from './../utility/form.jsx'
 import {CardsRenderer, useWebSocketFacade} from './../utility/utility.jsx'
 
 
@@ -144,12 +145,11 @@ function generateCardTable(data){
         if(typeof value !== "object"){
             return generateRow({value, rowKey})
         }
-        return generateRow({label:value.label, label:value.value, rowKey})
+        return generateRow({label:value.label, value:value.value, rowKey})
     })
 }
 
 function generateCustomRows(custom, rowKey){
-    console.log(rowKey);
     if(!custom || !Array.isArray(custom)) return null;
     return custom.map((value, index) => {
         if(typeof value !== "object"){
@@ -189,12 +189,9 @@ function renderCardSegment(data, formatting){
             return
         }
         if (typeof config !== "object") {
-            console.log("I got here")
-            console.log(JSON.stringify(row))
             return generateRow({ label: config, value: row, rowKey:`${key}${i}`});
         }
         if(config.format && config.format === "table"){
-            console.log("I got here Table")
 
             return(
                 <tr key={`${key}${i}`}>
@@ -217,7 +214,6 @@ function renderCardSegment(data, formatting){
             )
         }
         if(config.format === "custom"){
-            console.log("I got to custom")
             return generateCustomRows(row, `${key}${i}`)
         }
         if(config.append){
@@ -263,19 +259,19 @@ function InfoCard({cardFormatter, data}) {
 
 };
 
-function NavGen({data, cleanData, sectionPref=""}){
+function NavGen({data}){
     if (!data || !data.length) return null;
     return data.map((entry, index) =>{
         return(
             <Fragment key={index}>
                 <li>
-                    <NavLink to={`#${sectionPref}${index}-${sanitizeId(entry.section)}`}>
-                        {`${sectionPref}${index}-${cleanData[index].section}`}
+                    <NavLink to={`#${entry.id}`}>
+                        {`${entry.prefix}-${entry.section}`}
                     </NavLink>
                 </li>
                 {entry.subsections && Array.isArray(entry.subsections) && entry.subsections.length > 0&&(
                     <ul className="internal-menu">
-                        <NavGen data= {entry.subsections} cleanData={cleanData[index].subsections} sectionPref={`${sectionPref}${index}.`} />
+                        <NavGen data= {entry.subsections} />
                     </ul>
                 )}
             </Fragment>
@@ -284,17 +280,17 @@ function NavGen({data, cleanData, sectionPref=""}){
     }) 
 }
 
-function SectionsParse({data, level=2, sectionPref="", cleanData}){
+function SectionsParse({data, level=2}){
     if (!data || !data.length  ) return null;
     return data.map((entry, index)=>{
         return(
-            <Fragment key={index}>
-                <Heading level={level} id={`${sectionPref}${index}-${sanitizeId(entry.section)}`}>{cleanData[index].section}</Heading>
-                {cleanData[index].text && <p>{cleanData[index].text}</p>}
+            <div key={index} id={entry.id}>
+                <Heading level={level} >{entry.section}</Heading>
+                {entry.text && <p>{entry.text}</p>}
                 {Array.isArray(entry.subsections) && entry.subsections.length > 0 && (
-                    <SectionsParse data={entry.subsections} cleanData={cleanData[index].subsections} level={level + 1} sectionPref={`${sectionPref}${index}.`}/>
+                    <SectionsParse data={entry.subsections}  level={level + 1} />
                 )}
-            </Fragment>
+            </div>
         )
     })
 }
@@ -304,25 +300,25 @@ function generateCardGroupIDs({index, label, value, groupKey}){
 }
 function generateCardGroupLabels({index, label, join, value}){
     if(join){
-        return `${index}-${label} ${join} ${value}`
+        return index || index === 0 ? `${index}-${label} ${join} ${value}` : `${label} ${join} ${value}`
     }
-    return `${index}-${label} ${value}`
+    return index || index === 0 ? `${index}-${label} ${value}` : `${label} ${value}`
 
 }
 
 function generateCardGroup({label, join, list, cleanList, groupKey}){
-    if(!Array.isArray(list) || !list.length) return
+    if(!Array.isArray(list) || !list.length || !Array.isArray(cleanList) || !list.length) return
     const result = list.map((value, index) => {
         const id =  generateCardGroupIDs({index, label, join, value, groupKey})
-        const nav =  generateCardGroupIDs({index, label, join, value, groupKey})
-                return(<li key={`cards-${index},-${groupKey}`}>
+        const nav =  generateCardGroupLabels({index, label, join, value:cleanList[index]})
+                return(<li key={`cards-${index}-${groupKey}`}>
                     <NavLink  to={`#${id}`}>
                         {nav}
                     </NavLink>
                 </li>)
     })
     const finalId = generateCardGroupIDs({index:list.length, label:"all", value:label, groupKey})
-    const finalNav = generateCardGroupLabels({index:list.length, label:"all", value:label})
+    const finalNav = generateCardGroupLabels({index:list.length, label:"All", value:label})
     result.push(<li key={`cards-final-${groupKey}`}>
                     <NavLink  to={`#${finalId}`}>
                         {finalNav}
@@ -378,12 +374,214 @@ function CardSectionNavGen({cardSections, data, cleanData}){
 
 }
 
-function parseCardSections({}){
+function ProcessAppend({appendData, bio, socket, commandId, nextIndex=1, appendArray, updateData}){
+    const [data, setData] = useState([])
+    const [append, setAppend] = useState([])
+    
+    useEffect(() => {
+        if (appendData.condition && !processCondition(appendData.condition, bio)) {
+            setData([]); // skip processing by sending empty
+            return
+        }
+        const filter = {}
+        const {collection, sort} = appendData
+        const url =selectSources[collection]
+
+        if(appendData.filter){
+            const tempFilter = appendData.filter
+            Object.entries(tempFilter).forEach(([key, entry]) => {
+                if(typeof entry !== "object"){
+                    filter[key] = bio[entry]
+                }
+                else{
+                    filter[key] = entry.literal
+                }
+            })
+        }
+        const query = { filter, sort}
+        socket.subscribe({
+            url,
+            type:"getCards",
+            collection,
+            commandId,
+            query,
+            setData,
+        });    
+    }, [appendData, bio])
+    useEffect(() => {
+        if(Array.isArray(data) && Array.isArray(append)){
+            updateData([...data, ...append])
+        }
+        else if(Array.isArray(data)){
+            updateData([...data])
+        }
+        else if(Array.isArray(append)){
+            updateData([...append])
+        }
+        
+    }, [data, append])
+    if(appendArray.length < nextIndex || !appendArray.length || (nextIndex === 0 && !appendData.append )) return null
+    return <ProcessAppend 
+        appendData={appendArray[nextIndex]} 
+        nextIndex={nextIndex+1} 
+        updateData={setAppend} 
+        bio={bio}
+        socket={socket}
+        appendArray={appendArray}
+        commandId={`${commandId}${nextIndex}`}
+    />
+}
+
+function ParseCardSection({cardKey="", cardSection={}, bio={}, currFilter,  profanity=true, socket }){
+    const [cards, setCards] = useState([])
+    const [data, setData] = useState([])
+    const [append, setAppend] = useState([])
+    useEffect(() => {
+        const filter = {...currFilter}
+        const {collection, sort} = cardSection
+        const url =selectSources[collection]
+
+        if(cardSection.filter){
+            const tempFilter = cardSection.filter
+            Object.entries(tempFilter).forEach(([key, entry]) => {
+                if(typeof entry !== "object"){
+                    filter[key] = bio[entry]
+                }
+                else{
+                    filter[key] = entry.literal
+                }
+            })
+        }
+        const query = { filter, sort}
+        socket.subscribe({
+            url,
+            type:"getCards",
+            collection,
+            commandId:cardKey,
+            query,
+            setData,
+        });    
+    }, [cardSection, bio, currFilter])
+    useEffect(() => {
+        if(Array.isArray(data) && Array.isArray(append)){
+            setCards([...data, ...append])
+        }
+        else if(Array.isArray(data)){
+            setCards([...data])
+        }
+        else if(Array.isArray(append)){
+            setCards([...append])
+        }
+        
+    }, [data, append])
+
+    const stableAppendData = useMemo(() => cardSection, [cardSection]);
+    const stableBio = useMemo(() => bio, [bio]);
+    const appendArray = stableAppendData.append
+    const stabelCommandId = useMemo(() => cardKey, [cardKey]);
+    return(<>
+        {cardSection.append && cardSection.append.length && <ProcessAppend 
+        
+        appendData={cardSection.append[0]} 
+        bio={stableBio}
+        commandId={`${stabelCommandId}0`}
+        socket={socket}
+        updateData={setAppend}
+        appendArray={appendArray }
+    />}
+        
+        <CardsRenderer cards={cards} profanity={profanity} />
+    </>)
+}
+
+function ParseCardGroup({cardKey, cardSection, data, cleanData, profanity, socket}){
+    const { group, label } = cardSection;
+    if (!group) return null;
+    let groupValues = [];
+    let cleanGroupValues = [];
+    let join = ""
+    if (typeof group === "string") {
+        groupValues = data[group];
+        cleanGroupValues = cleanData[group];
+    } else if (typeof group === "object" && group.by) {
+        groupValues = data[group.by];
+        cleanGroupValues = cleanData[group.by];
+        join = group.labelJoin
+    }
+    if (!Array.isArray(groupValues) || !Array.isArray(cleanGroupValues)) return null;
+    const result = groupValues.map((value, index) => {
+        const id =  generateCardGroupIDs({index, label, join, value, groupKey:cardKey})
+        const nav =  generateCardGroupLabels({label, join, value:cleanGroupValues[index]})
+        const filter = {[group.by]:value}
+                return(<div className="card-sections" key={`cards-${index}-${cardKey}`} id={id} >
+                    <h3 >{nav}</h3>
+                    <MemoizedParseCardSection
+                        cardKey={`${cardKey}${value}`}
+                        cardSection={cardSection}
+                        bio={data}
+                        profanity={profanity}
+                        socket={socket}
+                        currFilter={filter}
+                    />
+
+                </div>)
+    })
+    const finalId = generateCardGroupIDs({index:groupValues.length, label:"all", value:label, groupKey:cardKey})
+    const finalNav = generateCardGroupLabels({ label:"All", value:label})
+    result.push(<h3 key={`cards-final-${cardKey}`} id={finalId}>{finalNav}</h3>)
+    return result
+}
+
+function ParseCardSections({cardSections, data, cleanData, profanity, socket}){
+    
+    if (!cardSections || 
+        typeof cardSections !== "object" || 
+        !Object.keys(cardSections).length || 
+        !data || 
+        typeof data !== "object" ||
+        !Object.keys(data).length || 
+        !cleanData ||
+        typeof cleanData !== "object" ||
+        !Object.keys(cleanData).length 
+    ) return null;
+    return  Object.entries(cardSections).map(([key, entry], index) => {
+        if(entry && entry.condition && !processCondition(entry.condition, data)){
+            return null
+        }
+        return (
+            <div className="card-sections" key={index} id={`cards-${key}`}>
+                <h2>{entry.label}</h2>
+                {entry.group &&  <div className="card-sections"> <MemoizedParseCardGroup 
+                    cardKey={key} 
+                    cardSection={entry} 
+                    data={data} 
+                    cleanData={cleanData}
+                    profanity={profanity}
+                    socket={socket}
+                /> 
+                </div>}
+                <MemoizedParseCardSection
+                    cardKey={key} 
+                    cardSection={entry} 
+                    bio={data} 
+                    cleanData={cleanData}
+                    profanity={profanity}
+                    socket={socket}
+                    currFilter={{}}
+                />
+            </div>
+        )
+    })
 
 }
 
 const MemoizedNavGen = React.memo(NavGen);
 const MemoizedSectionsParse = React.memo(SectionsParse);
+const MemoizedParseCardSections = React.memo(ParseCardSections);
+const MemoizedParseCardGroup = React.memo(ParseCardGroup);
+const MemoizedParseCardSection= React.memo(ParseCardSection);
+const MemoizedProcessAppend= React.memo(ProcessAppend);
+
 
 export function BioPage(props){
     const location = useLocation();
@@ -399,17 +597,13 @@ export function BioPage(props){
     const [loading, setLoading] = useState(true);
     const [isAuthor, setIsAuthor] = useState(false); // Track if the logged-in user is the author
     const [editing, setEditing] = useState(false);
-    const webSocket = useWebSocketFacade()
+    const socket = useWebSocketFacade()
 
     function toggleEditing(){
-        console.log("toggling editing")
         setEditing(prevEditing => !prevEditing);
-        console.log(editing)
-
     }
     
     useEffect(() => {
-        console.log("checking if author")
         fetch(`/api${url}/author/${id}`)
         .then(res => {
             if(!res.ok){
@@ -418,19 +612,15 @@ export function BioPage(props){
             return res.json();
         })
         .then((data) => {
-            console.log(JSON.stringify(data))
             setIsAuthor(data.isAuthor)
         })
         .catch(e => {
-            console.log("what happened")
-
             setIsAuthor(false)
         })
     }, [url, id, props.user])
 
     
     useEffect(() => {
-        console.log(JSON.stringify(url))
         fetch(`/data/bio${url}.json`)
         .then((res) => res.json())
         .then((data) => {
@@ -445,16 +635,15 @@ export function BioPage(props){
     }, [url, id])
 
     useEffect(() => {
+        socket.changePageSameFile()
         const collection = url.startsWith("/worldbuilding/")
         ? url.replace("/worldbuilding/", "")
         : url.replace(/^\//, "");  
-        console.log(JSON.stringify(collection))
-        webSocket.subscribe({url:path, type:"getDisplayable", collection, commandId:"getDisplayable", id,setData:setBio})
+        socket.subscribe({url:path, type:"getDisplayable", collection, commandId:"getDisplayable", id,setData:setBio})
     }, [path, id, url])
 
     useEffect(() => {
-        console.log(JSON.stringify(bio))
-       async function runFilter() {
+        async function runFilter() {
             const tempBio = await filterProfanity(bio, profanity);
             setCleanBio(tempBio);
         }
@@ -494,7 +683,7 @@ export function BioPage(props){
                                 <nav>
 
                                     <menu className="internal-menu">
-                                        {formatter.sections && cleanBio.sections && <MemoizedNavGen data={bio.sections} cleanData={cleanBio.sections}/>}
+                                        {formatter.sections && cleanBio.sections && <MemoizedNavGen data={cleanBio.sections}/>}
                                         {formatter.cardSections && <CardSectionNavGen cardSections={formatter.cardSections} data={bio} cleanData={cleanBio}/>}
                                     </menu>
                                 </nav>
@@ -503,7 +692,14 @@ export function BioPage(props){
                     </Accordion>
                 )
             }
-            {formatter.sections && cleanBio.sections && <MemoizedSectionsParse data={bio.sections} cleanData={cleanBio.sections}/>}
+            {formatter.sections && cleanBio.sections && <MemoizedSectionsParse data={cleanBio.sections}/>}
+
+            {formatter.cardSections && 
+            <div className="card-sections">
+                <MemoizedParseCardSections cardSections={formatter.cardSections} data={bio} cleanData={cleanBio} profanity={profanity} socket={socket}/>
+
+            </div>
+            }
         </main>
     )
 }

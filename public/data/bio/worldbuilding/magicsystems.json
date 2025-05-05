@@ -2,7 +2,7 @@
     "card":{
         "head":{
             "name":"",
-            "author":"author"
+            "author":"Author"
         },
         "body":{
             "types":"Type",
@@ -19,6 +19,7 @@
     "sections":{"format":"sections"},
     "cardSections":{
         "characters":{
+            "collection":"characters",
             "label":"Practitioners",
             "type":"getCards",
             "url":"/characters",
@@ -30,6 +31,7 @@
             }
         },
         "races":{
+            "collection":"races",
             "label":"Races With Natrual Talent",
             "type":"getCards",
             "url":"/worldbuilding/races",
@@ -41,6 +43,7 @@
             }
         },
         "wildlife":{
+            "collection":"wildlife",
             "label":"Natural Practitioners",
             "type":"getCards",
             "url":"/worldbuilding/wildlife",
@@ -52,6 +55,8 @@
             }
         },
         "flora":{
+            "collection":"flora",
+
             "label":"Plant Practitioners and/or ingredients",
             "type":"getCards",
             "url":"/worldbuilding/flora",

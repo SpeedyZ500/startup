@@ -10,7 +10,8 @@ const {
     addOne,
     updateOne,
     getUserByToken,
-    baseUnwindFields
+    baseUnwindFields,
+    modifyMany
 } = require('./database.js')
 const urlPrefix = "/worldbuilding/biomes/";
 
@@ -90,7 +91,7 @@ biomesRouter.post(`${urlPrefix}`, verifyAuth, async (req, res) => {
         }
     }
     catch(e){
-        return res.status(e.status || 500).send({msg:e.message})
+        return res.status(e.statusCode || 500).send({msg:e.message})
     }
 });
 
@@ -114,7 +115,7 @@ biomesRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
         }
     }
     catch(e){
-        return res.status(e.status || 500).send({msg:e.message})
+        return res.status(e.statusCode || 500).send({msg:e.message})
     }
 });
 
@@ -123,13 +124,13 @@ biomesRouter.put(`${urlPrefix}:id`, verifyAuth, async (req, res) => {
 // 🚀 Router: Modify a country field (add/put/delete references)
 biomesRouter.patch(`${urlPrefix}:list/:method`, verifyAuth, async (req, res) => {
     const { list, method } = req.params;
-    const { biomes, id } = req.body;
+    const { ids, id } = req.body;
     try{
-        await modifyMany(urlPrefix, biomes, list, id, method)
+        await modifyMany(urlPrefix, ids, list, id, method)
         return res.send({msg:"success"})
     }
     catch(e){
-        res.status(e.status || 500).send({msg:e.message})
+        res.status(e.statusCode || 500).send({msg:e.message})
     }
 });
 

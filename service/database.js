@@ -288,9 +288,10 @@ async function processCustomToIDs(custom){
     for(const field of customArray) {
         const edit = field.edit;
         const label = sanitizeText(field.label)
+        const id = sanitizeText(field.id)
         if(textEdits.includes(edit)){
             const value =  sanitizeText(field.value)
-            newCustom.push({label, value, edit})
+            newCustom.push({label, value,id, edit})
         }
         else if (edit === "super-select"){
             const source = field.source;
@@ -300,12 +301,12 @@ async function processCustomToIDs(custom){
                 const values = await convertIDs(source, customRelation.value);
                 value.push({label:sanitizedLabel, value:values})
             }
-            newCustom.push({source, value, edit, label});
+            newCustom.push({source, value, edit, label, id});
         }
         else{
             const source = field.source;
             const value = await convertIDs(source, field.value)
-            newCustom.push({source, value, edit, label:label});
+            newCustom.push({source, value, edit, label:label, id});
         }
     }
     return newCustom
@@ -419,11 +420,11 @@ async function processFamilyToEditable(family){
 }
 
 async function processCustomToEditable(custom){
-    const customArray = ensrueArray(custom)
+    const customArray = ensureArray(custom)
     const newCustom = []
     
     for(const field of customArray) {
-        const { label, value, edit, source } = field;
+        const { label, value, edit, source, id} = field;
         if(textEdits.includes(edit)){
             newCustom.push(field)
             continue
@@ -439,7 +440,7 @@ async function processCustomToEditable(custom){
         }
         else{
             const converted = await convertToEditable(source, value)
-            newCustom.push({source, value:converted, edit, label});
+            newCustom.push({source, id, value:converted, edit, label});
         }
     }
     return newCustom
@@ -842,17 +843,46 @@ async function getGraph(id, filter={}){
         $project:{
             _id:0,
             id:1,
-            data:{title:1, genres:1, url:1, contentWarnings:1, description:1}
+            title:1, 
+            genres:1, 
+            url:1, 
+            contentWarnings:1, 
+            description:1
         }
     })
-    const nodes = await chapterCollection.aggregate(pipeline).toArray()
 
-    const nodeIds = nodes.map(c => c.id);
+    pipeline.push({
+        $addFields:{
+            data: {
+                title: "$title",
+                genres: "$genres",
+                url: "$url",
+                contentWarnings: "$contentWarnings",
+                description: "$description"
+            },
+            width:100,
+            height:50,
+            type:"chapterCard"
+        }
+    })
+
+    pipeline.push({
+        $project: {
+          id: 1,
+          data: 1,
+          width: 1,
+          height: 1,
+          type: 1
+        }
+    });
+    const children = await chapterCollection.aggregate(pipeline).toArray()
+
+    const nodeIds = children.map(c => c.id);
     const edges = await edgeCollection
         .find({ source: { $in: nodeIds }, target: { $in: nodeIds } }).project({_id:0})
         .toArray();
 
-    return {nodes, edges}
+    return {children, edges}
 }
 
 async function getEditable(collectionKey, author, id, {    
@@ -1025,24 +1055,25 @@ async function  modifyMany(collectionKey, ids, list, data, method){
     if (!Array.isArray(ids) || !data ||  typeof list !== "string") {
         throw createError("Invalid Input", 400)
     }
-    const collection = db.collection(collectionKey)
+    const collection = getCollection(collectionKey)
     if(modificationRestrictedCollections.includes(collection)){
         throw createError("This collection cannot be modified in this manner", 400);
     }
     if(restrictedKeys.includes(list)){
         throw createError(`Field ${list} cannot be modified in this manner, it is an author managed list`, 400);
     }
-    const values = convertIDs(collectionKey, ids);
+    const values = await convertIDs(collectionKey, ids);
     if (!values.length) {
         throw createError("No valid IDs provided for update", 400);
     }
-    const sample = await collection.findOne({ _id: values[0] });
+    const temp = values[0]
+    const sample = await collection.findOne({_id:temp});
     if (!sample || !Array.isArray(sample[list])) {
         throw createError(`${list} is not a list on this type`, 400);
     }
     let finalList = list
     const match = list.match(/^other(.+)/|/^altForms$/);
-    if (!match) {
+    if (!match && collection !== biomesCollection) {
         let otherField = `other${list[0].toUpperCase()}${list.slice(1)}`;
         if (sample[otherField]) {
             finalList = otherField
@@ -1059,9 +1090,11 @@ async function  modifyMany(collectionKey, ids, list, data, method){
         ? "races"
         : finalList.replace(/^other/, "").toLowerCase();
         
-    const items = ensureArray(convertIDs(base, data));
+    const items = await convertIDs(base, ensureArray(data));
     const query = { _id: { $in: values } };
-    const stuffToOperate = {$each: items}
+    const stuffToOperate = method === "add"
+    ? { $each: items }
+    : { $in: items };
     const updateOp = method === "add" ? "$addToSet" : "$pull";
     const payloadPart = {[finalList]:  stuffToOperate}
     if(base !== finalList){

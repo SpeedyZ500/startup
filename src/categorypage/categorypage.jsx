@@ -113,6 +113,7 @@ export function CategoryPage(props) {
    
     
     useEffect(() => {
+        socket.changePageSameFile()
         let paths = path;
         if (!paths.startsWith("/")) {
             paths = "/" + paths.replace(/\/$/, '').trim();

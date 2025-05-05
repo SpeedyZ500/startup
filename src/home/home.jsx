@@ -14,13 +14,31 @@ import Card from 'react-bootstrap/Card';
 export function Home(props) {
     const [stories, setStories] = useState([])
     const [prompts, setPrompts] = useState([])
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const path = window.location.pathname;
+    const storiesFormat  = {
+        "header":{
+            "title":{
+                "url":"url"
+            }
+        },
+        "body":{
+            "author":"Author",
+            "body":""
+        },
+        "footer":{
+            "genres":"Genres",
+            "contentWarnings":"Content Warnings"
+        }
+    }
+    const promptsFormat  = {"body":{
+        "description":""
+    }}
     const socket = useWebSocketFacade()
     
     useEffect(() => {
-        
+        socket.subscribe({url:"/stories", type:"getCards", collection:"stories", commandId:"getStoryCards", query:{ sort:{created:-1}},setData:setStories})
+
+        socket.subscribe({url:"/prompts", type:"getCards", collection:"prompts", commandId:"getPromptCards", query:{ sort:{created:-1}},setData:setPrompts})
+
     }, [])
     return (
     <main>
@@ -29,20 +47,16 @@ export function Home(props) {
             <hr />
             <h2 className="theme-h adaptive text-center expanded">Writing Prompts</h2>
             <div id="prompts" >
-                <CardsRenderer cards={prompts} profanity={props.profanityFilter}/>
+                <CardsRenderer cards={prompts} profanity={props.profanityFilter} formatting={promptsFormat}/>
                 
             </div>
             <hr />
             <h2 className="theme-h adaptive text-center expanded ">Stories</h2>
             <h2 className="theme-h adaptive text-center expanded">New</h2>
             <div className ="new">
-                <CardsRenderer cards={stories} profanity={props.profanityFilter}/>
+                <CardsRenderer cards={stories} profanity={props.profanityFilter} formatting={storiesFormat}/>
 
             </div>
-            <h2 className="theme-h adaptive expanded">Popular</h2>
-            <div className="popular" >
-                <CardsRenderer cards={stories} profanity={props.profanityFilter}/>
-
-            </div>
+            
     </main>);
 }

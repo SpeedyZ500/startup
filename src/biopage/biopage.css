@@ -26,6 +26,12 @@
     margin-left: 50px;
     margin-right: 50px;
 }
+.card-sections {
+    display: flex ;
+    flex-direction: column;
+    flex: 0 1 !important;
+
+}
 
 @media (prefers-color-scheme: dark){
     .table>:not(caption)>*>*{

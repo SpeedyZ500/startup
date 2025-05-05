@@ -2,7 +2,7 @@
     "card":{
         "head":{
             "name":"",
-            "author":"author"    
+            "author":"Author"    
         },
         "body":{
             "continents":"Continents",
@@ -17,6 +17,7 @@
     "sections":{"format":"sections"},
     "cardSections":{
         "biomes":{
+            "collection":"biomes",
             "label":"Biomes",
             "type":"getCards",
             "url":"/worldbuilding/biomes",
@@ -28,6 +29,7 @@
             }
         },
         "flora":{
+            "collection":"flora",
             "label":"Flora",
             "type":"getCards",
             "url":"/worldbuilding/flora",
@@ -39,6 +41,7 @@
             }
         },
         "wildlife":{
+            "collection":"wildlife",
             "label":"Wildlife",
             "type":"getCards",
             "url":"/worldbuilding/wildlife",
@@ -50,6 +53,7 @@
             }
         },
         "countries":{
+            "collection":"countries",
             "label":"Countries",
             "type":"getCards",
             "url":"/worldbuilding/countries",
@@ -65,6 +69,7 @@
             }     
         },
         "magicsystems":{
+            "collection":"magicsystems",
             "label":"Magic Systems",
             "url":"/worldbuilding/magicsystems",
             "filter":{
@@ -75,6 +80,8 @@
             }
         },
         "races":{
+            "collection":"races",
+
             "label":"Races",
             "type":"getCards",
             "url":"/worldbuilding/races",
@@ -85,31 +92,35 @@
                 "name":1
             }
         },
-        "religions":{
+        "religion":{
+            "collection":"organizations",
+
             "label":"Religions",
             "type":"getCards",
             "url":"/worldbuilding/organizations",
             "filter":{
                 "worlds":"id",
-                "types":"Religion"
+                "types":{"literal":"Religion"}
             },
             "sort":{
                 "name":1
             }
         },
         "organizations":{
+            "collection":"organizations",
             "label":"Organizations",
             "type":"getCards",
             "url":"/worldbuilding/organizations",
             "filter":{
                 "worlds":"id",
-                "excludesTypes":"Religion"
+                "excludestypes":{"literal":"Religion"}
             },
             "sort":{
                 "name":1
             }
         },
         "characters":{
+            "collection":"characters",
             "label":"Characters seen here",
             "type":"getCards",
             "url":"/characters",

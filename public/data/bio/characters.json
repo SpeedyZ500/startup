@@ -2,7 +2,7 @@
     "card":{
         "head":{
             "name":"",
-            "author":"author"
+            "author":"Author"
         },
         "body":{
             "family":{

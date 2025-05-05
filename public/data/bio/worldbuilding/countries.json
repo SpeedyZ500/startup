@@ -2,7 +2,7 @@
     "card":{
         "head":{
             "name":"",
-            "author":"author"
+            "author":"Author"
         },
         "body":{
             "types":"Type",
@@ -28,6 +28,7 @@
     "sections":{"format":"sections"},
     "cardSections":{
         "characters":{
+            "collection":"characters",
             "label":"Citizens",
             "type":"getCards",
             "url":"/characters",
@@ -39,6 +40,7 @@
             }
         },
         "races":{
+            "collection":"races",
             "label":"Races",
             "type":"getCards",
             "url":"/worldbuilding/races",

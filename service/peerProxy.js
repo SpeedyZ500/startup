@@ -5,7 +5,7 @@ const socketHandlers = {
     async getCards(socket, message){
         try{
             const collection = message.collection.replace(/\//g, '');
-            const params = cardsMap[message.collection]
+            const params = cardsMap[collection]
             if(!params){
                 return socket.send(JSON.stringify({
                     type:message.type,

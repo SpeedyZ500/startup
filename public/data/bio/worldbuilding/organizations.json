@@ -2,7 +2,7 @@
     "card":{
         "head":{
             "name":"",
-            "author":"author"
+            "author":"Author"
         },
         "body":{
             "types":"Type",
@@ -25,6 +25,7 @@
     "sections":{"format":"sections"},
     "cardSections":{
         "characters":{
+            "collection":"characters",
             "label":"Members",
             "type":"getCards",
             "url":"/characters",
@@ -36,8 +37,8 @@
             },
             "append":[
                 {
-                    "condition":{"if":"listUsersAsMembers"},
-                    "category":"users",
+                    "condition":"listUsersAsMembers",
+                    "collection":"users",
                     "type":"getCards",
                     "url":"/users",
                     "sort":{
@@ -48,6 +49,7 @@
         },
         "character":{
             "label":"Belivers",
+            "collection":"characters",
             "condition":{"types":{"includes":"Religion"}},
             "type":"getCards",
             "url":"/characters",

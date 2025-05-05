@@ -278,6 +278,21 @@ nav{
     font-weight: bold;
 }
 
+.with-subnav [id] {
+    scroll-margin-top: 4rem;
+}
+
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem; /* optional spacing */
+    justify-content: flex-start; /* or center */
+  }
+  
+  .card-container .card {
+    flex: 0 1 250px; /* grow: 0, shrink: 1, base width: 250px */
+    max-width: 100%;
+  }
 
 @media screen and (min-width: 0px) and (max-width: 1140px){
     .page-title  {
@@ -296,6 +311,8 @@ nav{
     .with-subnav {
         padding-top: 0rem; 
     }
-     
+    .with-subnav [id] {
+        scroll-margin-top: 0rem;
+    }
 }
 

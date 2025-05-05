@@ -2,7 +2,7 @@
     "card":{
         "head":{
             "name":"",
-            "author":"author"
+            "author":"Author"
         },
         "body":{ 
             "worlds":"Worlds",
@@ -17,6 +17,7 @@
     "sections":{"format":"sections"},
     "cardSections":{
         "countries":{
+            "collection":"countries",
             "label":"Countries",
             "type":"getCards",
             "url":"/worldbuilding/countries",
@@ -28,6 +29,7 @@
             }
         },
         "wildlife":{
+            "collection":"wildlife",
             "label":"Wildlife",
             "type":"getCards",
             "url":"/worldbuilding/wildlife",
@@ -40,6 +42,7 @@
 
         },
         "flora":{
+            "collection":"flora",
             "label":"Flora",
             "type":"getCards",
             "url":"/worldbuilding/flora",

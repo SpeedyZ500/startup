@@ -40,6 +40,11 @@ export class WebSocketFacade {
         this._safeSend({ type: 'UNSUBSCRIBE', url, commandId });
     }
 
+    changePageSameFile(){
+        this._safeSend({ type: "UNSUBSCRIBE" });
+        this.handlers.clear();
+    }
+
     handleMessage(event) {
         const data = JSON.parse(event.data);
         const handler = this.handlers.get(data.commandId);
@@ -49,6 +54,7 @@ export class WebSocketFacade {
     }
 
     cleanup() {
+
         this._safeSend({ type: "UNSUBSCRIBE" });
         this.socket.close();
         this.handlers.clear();

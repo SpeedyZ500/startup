@@ -2,7 +2,7 @@
     "card":{
         "head":{
             "name":"",
-            "author":"author"
+            "author":"Author"
         },
         "body":{
             "types":"Type",
@@ -21,6 +21,7 @@
     "sections":{"format":"sections"},
     "cardSections":{
         "characters":{
+            "collection":"characters",
             "label":"Members (and tenchnical members) of this Race",
             "type":"getCards",
             "url":"/charcaters",

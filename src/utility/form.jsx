@@ -64,11 +64,14 @@ const handleErrors = async (res) => {
 
 const handleModify = async (id, formData, form, socket) => {
     if(id){
-        for(const fieldkey in form){
+        console.log("handling modify")
+        for(const fieldkey of Object.keys(form)){
+            console.log(fieldkey)
             if(form[fieldkey].type === "modify-others"){
                 const {method, source, list} = form[fieldkey];
                 const ids = formData[fieldkey]
                 const url = selectSources[source]
+                console.log(JSON.stringify(ids))
                 if(method && source && url && id && ids && (!Array.isArray(ids) || ids.length > 0)){
                     fetch(`/api${url}/${list}/${method}`, {
                         method:"PATCH",
@@ -79,8 +82,8 @@ const handleModify = async (id, formData, form, socket) => {
                     .then (() => {
                         const affectedIds = Array.isArray(ids) ? ids : [ids];
                         affectedIds.forEach(modifiedId => {
-                        socket.notify?.({
-                            collection: url,
+                        socket.notify({
+                            collection:url,
                             type: "PATCH",
                             id: modifiedId
                         });
@@ -169,7 +172,7 @@ export function FormGenerator({handleClose}){
                 console.log(`successfully updated ${id}`)
 
                 socket.notify({collection:url, type:"PUT", id:data.id})
-                handleModify(data.id,formData,form,socket)
+                handleModify(data.id,formData,form.fields,socket)
                 handleClose?.()
             })
             .catch((error) =>{
@@ -569,7 +572,7 @@ function GenerateTextCreatable({formData, fieldkey, field, setData}){
         switch (event.key) {
             case 'Enter':
             case 'Tab':
-                // Add new option to selected values
+                // Add new option to selected value
                 const previousValues = selectedValues ? selectedValues.map(option => option.value) : [];
                 //const newOption = {label:inputValue, value:inputValue}
                 const updatedValues = [...previousValues, inputValue]
@@ -924,10 +927,7 @@ function GenerateForm({formData, form, socket, setData, id}){
         <div>
             {form && Object.keys(form).map((fieldkey) => {
                 const field = form[fieldkey];
-                    return (renderField(fieldkey, field)
-
-                       
-                    );
+                    return (renderField(fieldkey, field));
                 })
             }
         </div>
@@ -947,7 +947,7 @@ function CustomAdder({ formData, setData, field, fieldkey, socket }) {
             label: "",
             type: "",  // the edit type
             source: "",
-            values: [],
+            value: [],
         };
         const newList = [...customFields, newCustom];
         //setCustomFields(newList);
@@ -988,7 +988,7 @@ function CustomAdder({ formData, setData, field, fieldkey, socket }) {
 
 function CustomSelect({ custom, index, socket, updateCustom }) {
     const [options, setOptions] = useState([]);
-    const { source, values = [] } = custom;
+    const { source, value = [] } = custom;
     const prevCommandIdRef = useRef(null);
     const prevUrlRef = useRef(null);
 
@@ -1025,10 +1025,10 @@ function CustomSelect({ custom, index, socket, updateCustom }) {
 
     const handleChange = (selected) => {
         const selectedValues = selected?.map(opt => opt.value) || [];
-        updateCustom({ ...custom, values: selectedValues });
+        updateCustom({ ...custom, value: selectedValues });
     };
 
-    const selectedOptions = options.filter(opt => values.includes(opt.value));
+    const selectedOptions = options.filter(opt => value.includes(opt.value));
 
     return (
         <Select
@@ -1036,7 +1036,7 @@ function CustomSelect({ custom, index, socket, updateCustom }) {
             options={options}
             value={selectedOptions}
             onChange={handleChange}
-            placeholder={`Select ${custom.label || 'values'}`}
+            placeholder={`Select ${custom.label || 'value'}`}
             className="form-control"
         />
     );
@@ -1077,7 +1077,7 @@ function CustomField({ custom, updateCustom, removeCustom, socket, index}) {
       };
 
     return (
-        <div className="custom-field">
+        <div key={index} className="custom-field">
           <input
             type="text"
             placeholder="Label"
@@ -1108,9 +1108,9 @@ function CustomField({ custom, updateCustom, removeCustom, socket, index}) {
         <input
             type="text"
             className="mb-2"
-            value={custom.values?.[0] || ""}
+            value={Array.isArray(custom.value) ? custom.value?.[0] || "" : custom.value}
             onChange={(e) =>
-            updateCustom({ ...custom, values: [e.target.value] })
+            updateCustom({ ...custom, value: [e.target.value] })
             }
             placeholder="Enter value"
         />
@@ -1119,9 +1119,9 @@ function CustomField({ custom, updateCustom, removeCustom, socket, index}) {
         {edit === "text-area" && (
         <textarea
             className="form-control mb-2"
-            value={custom.values?.[0] || ""}
+            value={Array.isArray(custom.value) ? custom.value?.[0] || "" : custom.value}
             onChange={(e) =>
-            updateCustom({ ...custom, values: [e.target.value] })
+            updateCustom({ ...custom, value: [e.target.value] })
             }
             placeholder="Enter text"
         />
