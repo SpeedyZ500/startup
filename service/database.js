@@ -1267,7 +1267,7 @@ const addLeaders = async (val, full, key) => {
 
 const expandStory = async (full) => {
     const timestamp = new Date().toJSON();
-    await storyCollections.updateOne(
+    await storiesCollection.updateOne(
         { _id: full.storyID },
         { $set: { expanded: timestamp } }
     );
@@ -1328,7 +1328,7 @@ const connectChapters = async (full) => {
         }
     );
 
-    const previousIDs = chapterCollection.aggregate([
+    const previousIDs = await chapterCollection.aggregate([
         {$match: { _id: { $in: previous } }},
         {
             $project:{
@@ -1340,7 +1340,7 @@ const connectChapters = async (full) => {
     ]).toArray()
     
 
-    const nextIDs = chapterCollection.aggregate([
+    const nextIDs = await chapterCollection.aggregate([
         {$match: { _id: { $in: next } }},
         {
             $project:{

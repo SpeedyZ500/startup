@@ -396,21 +396,15 @@ function GenerateCreatable({formData,fieldkey, field, socket, setData}){
         updateOptions([...gotOptions, ...createdOptions]);
     }, [gotOptions, createdOptions]);
     const handleCreateOption = (newOptionValue) => {
-
         const newOption = {
             value: newOptionValue,
             label: newOptionValue
         };
-
-
         // Add new option to created options list
         updateCreatedOptions(prevOptions => [...prevOptions, newOption]);
         // You may want to also update formData here if required
         const selected = [...(formData[fieldkey] || []), newOption.value];
-
         setData({...formData, [fieldkey]:selected})
-
-
     };
     const handleChange = (selectedOptions) => {
         const selectedValues = selectedOptions ? selectedOptions.map(option => option.value) : [];
@@ -801,7 +795,6 @@ function GenerateForm({formData, form, socket, setData, id}){
                             onChange={(e) => setData({...formData, [fieldkey]:e.target.value})}
                         />
                     </div>
-                    
                 )
             case 'text-area':
                 return(

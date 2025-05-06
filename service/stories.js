@@ -90,7 +90,7 @@ storiesRouter.get(`${urlPrefix}chapter/:chapterID`, verifyAuth, async (req, res)
 storiesRouter.get(`${urlPrefix}:storyID`, verifyAuth, async (req, res) => {
     const { storyID } = req.params;
     try{
-        const story = await getEditable(urlPrefix,req.params.usid,storyID,{ 
+        const story = await getEditable(urlPrefix,req.usid,storyID,{ 
             lookupFields:baseLookupFields, 
             projectionFields:baseEditProjectionFields,
             fields:storyFields,
