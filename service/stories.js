@@ -144,14 +144,15 @@ storiesRouter.post(`${urlPrefix}:storyID`, verifyAuth, async (req, res) => {
     const createData = req.body
     try{
         createData.storyID = storyID
-            const id = await createID(`${storyID}_${title}`, author)
-            createData.id = id
-            createData.url = `${urlPrefix}${storyID}/${id}`
-            const chapter = await addOne("chapters",createData,{
-                preProcessing:chaptersPreProcessing,
-                postProcessing:chaptersPostProcessing
-            })
-            res.send({title:chapter.title, url:chapter.url, id:chapter.id})
+        const id = await createID(`${storyID}_${title}`, author)
+        createData.id = id
+        createData.url = `${urlPrefix}${storyID}/${id}`
+        createData.author=author
+        const chapter = await addOne("chapters",createData,{
+            preProcessing:chaptersPreProcessing,
+            postProcessing:chaptersPostProcessing
+        })
+        res.send({title:chapter.title, url:chapter.url, id:chapter.id})
     }
     catch(e){
         res.status(e.statusCode || 500).send({msg:e.message})

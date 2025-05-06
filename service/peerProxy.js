@@ -90,7 +90,7 @@ const socketHandlers = {
                 requestId: message.requestId,
                 commandId:message.commandId,
                 success: true,
-                data,
+                data
               }));
         
         }

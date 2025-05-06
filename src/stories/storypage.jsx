@@ -1,9 +1,12 @@
 import React, {Fragment, useEffect, useState } from "react";
 import { useParams, useNavigate, NavLink} from "react-router-dom";
-import ReactFlow, {MiniMap, Controls, Background, Handle} from "reactflow";
+import ReactFlow, {MiniMap, Controls, Background, Handle, StraightEdge} from "reactflow";
 import { ButtonGroup } from 'react-bootstrap';
+import ELK from 'elkjs/lib/elk.bundled.js';
 
-import 'bootstrap/dist/css/bootstrap.min.css';
+
+
+
 import Button from 'react-bootstrap/Button';
 
 //import { AuthState } from '../login/authState.js';
@@ -12,11 +15,16 @@ import Creatable from 'react-select/creatable';
 
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { OffcanvasBody, OffcanvasHeader } from 'react-bootstrap';
+import 'reactflow/dist/style.css';
 
-import "../app.css"
 
 import {sanitizeId, formatJSONDate, filterProfanity} from'../utility/utility.js';
 import { useWebSocketFacade } from'../utility/utility.jsx';
+import Popover from 'react-bootstrap/Popover';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+
+import "../app.css"
+
 const handleErrors = async (res) => {
     if (!res.ok) {
         const body = await res.json().catch(() => ({}));
@@ -24,80 +32,11 @@ const handleErrors = async (res) => {
     }
     return res.json();
 };
-const NavLinkNode = ({ data, id }) => {
-    return (
-      <div className="navlink-node">
-        <Handle type="target" position="top" />
-        <h3>{data.label}</h3>
-        <NavLink to={data.path}>Go to {data.label}</NavLink>
-         <Handle type="source" position="bottom" />
-      </div>
-    );
-  };
 
-const CustomNode = ({data}) => {
-    const navigate = useNavigate();
 
-    return(<div className="bg-white border border-gray-300 px-4 py-2 rounded shadow text-center"
-    onClick={(e) => {e.stopPropagation()}}
-    >
-        <Handle type="target" position="top" />
-        <span onClick={() => navigate(data.path)}>{data.label}</span>
-       
-        <Handle type="source" position="bottom" />
-    </div>);
-}
-const generateGraph = (chapters) => {
-    const nodes = chapters.map((chapter) => ({
-      id: chapter.chapterId.toString(),
-      type:"custom",
-      position: { x: chapter.chapterId * 200, y: (chapter.chapterNumber - 1) * 100 },
-      data: { label: `${chapter.chapterNumber}: ${chapter.title}`, path: chapter.path },
-    }));
-  
-    const edges = [];
-    chapters.forEach((chapter) => {
-      if (chapter.previous) {
-        edges.push({
-          id: `e${chapter.previous}-${chapter.chapterId}`,
-          source: chapter.previous.toString(),
-          target: chapter.chapterId.toString(),
-        });
-      }
-      chapter.branches.forEach((branchId) => {
-        edges.push({
-          id: `e${chapter.chapterId}-${branchId}`,
-          source: chapter.chapterId.toString(),
-          target: branchId.toString(),
-        });
-      });
-    });
-  
-    return { nodes, edges };
-  };
 
   
-function StoryFlow({list}){
-    const { nodes, edges } = generateGraph(list);
-    
 
-    const handleNodeClick = (_, node) => navigate(`/${node.data.path}`);
-
-
-    return(
-        <ReactFlow 
-        nodes={nodes} 
-        edges={edges}         
-        onNodeClick={handleNodeClick} 
-        nodeTypes={{ custom: NavLinkNode }} 
-        fitView>
-            <MiniMap />
-            <Controls />
-            <Background />
-        </ReactFlow>
-    );
-
-}
 
 export function ChapterForm({ handleClose, storyId, chapterId, profanity}){
     const socket = useWebSocketFacade()
@@ -486,6 +425,183 @@ function StoryEditForm({socket, handleClose, storyId, genreOptions, contentWarni
     </div>)
 
 }
+
+const elk = new ELK()
+
+const NavLinkNode = ({ data, id }) => {
+    return (
+      <div className="bg-white border border-gray-300 px-4 py-2 rounded shadow text-center">
+        <Handle type="target" position="top" />
+        <h3>{data.label}</h3>
+        <NavLink to={data.url}>Go to {data.label}</NavLink>
+         <Handle type="source" position="bottom" />
+      </div>
+    );
+  };
+
+const CustomNode = ({data}) => {
+    const navigate = useNavigate();
+
+    return(<div className="bg-white border border-gray-300 px-4 py-2 rounded shadow text-center"
+    onClick={(e) => {e.stopPropagation()}}
+    >
+        <Handle type="target" position="top" />
+        <span onClick={() => navigate(data.path)}>{data.label}</span>
+       
+        <Handle type="source" position="bottom" />
+    </div>);
+}
+
+function ChapterCardNode({data}){
+    return(
+        <div className="chapter-node">
+            <Handle type="target" position="top" />
+            <h4> <NavLink to={data.url}>{data.title}</NavLink></h4>
+            <h6>By: {data.author}</h6>
+            <p className="scrollable">{data.description}</p>
+            <ButtonGroup className="button-footer">
+                <OverlayTrigger 
+                    trigger="click"
+                    placement="bottom"
+                    overlay={
+                        <Popover>
+                            <Popover.Header as="h4">Genres:</Popover.Header>
+                            <Popover.Body>
+                                {data.genres.join(', ') }
+                            </Popover.Body>
+                        </Popover>
+                    }
+                >
+                    <Button variant="secondary">Genres</Button>
+                </OverlayTrigger>
+                <OverlayTrigger 
+                    trigger="click"
+                    placement="bottom"
+                    overlay={
+                        <Popover>
+                            <Popover.Header as="h4">Content Warnings: </Popover.Header>
+                            <Popover.Body>
+                                {data.contentWarnings.join(', ') }
+                            </Popover.Body>
+                        </Popover>
+                    }
+                >
+                    <Button variant="secondary">Content Warnings</Button>
+                </OverlayTrigger>
+            </ButtonGroup>
+            <Handle type="source" position="bottom" />
+        </div>
+    )
+}
+
+const myNodes = { chapterCard: ChapterCardNode }
+const edgeTypes = {elkEdge:ElkEdge}
+
+const getPathFromSection = (section) => {
+    const { startPoint, bendPoints = [], endPoint } = section;
+    const points = [startPoint, ...bendPoints, endPoint];
+  
+    return `M ${points.map(p => `${p.x},${p.y}`).join(' L ')}`;
+};
+
+function ElkEdge({id, data}){
+    console.log(JSON.stringify(data))
+    const path = getPathFromSection(data.section);
+
+    return (
+        <g className="elk-edge">
+          <path id={id} d={path} className="custom-edge-path" />
+        </g>
+      );
+}
+function ChapterGraph({socket, profanity, filter, id}){
+    const [graphData, setGraphData] = useState({})
+    const [children, setChildren] = useState([])
+    const [edges, setEdges] = useState([])
+    const [flow, setFlow] = useState({})
+    useEffect(()=> {
+        if(id && socket){
+            socket.subscribe({url:"/stories",commandId:"getStoryGraph", type:"getGraph", id, filter, setData:setGraphData})
+        }
+    }, [socket, filter, id])
+
+    useEffect(() => {
+        async function runFilter() {
+            const cleanChildren = await filterProfanity(graphData.children, profanity);
+            setChildren(cleanChildren);
+        }
+        if(graphData.children && graphData.edges){
+            runFilter();
+            setEdges(graphData.edges)
+        }
+    }, [profanity, graphData])
+    useEffect(() => {
+        if(children.length && edges.length){
+            const graph ={
+                id: 'root',
+                layoutOptions: {
+                    'elk.algorithm': 'layered',
+                    'elk.direction': 'DOWN',
+                    "elk.layered.nodePlacement.strategy": "SIMPLE",  // Simple placement encourages tree-like spacing
+
+                    'elk.spacing.nodeNode': '50',
+                    'elk.spacing.edgeEdge': '20',
+                    'elk.spacing.edgeNode': '20',
+                    'elk.layered.spacing.nodeNodeBetweenLayers': '100',
+                    
+                    "elk.layered.edgeStraightening": "IMPROVE_STRAIGHTNESS",
+                    "elk.layered.edgeRouting": "POLYLINE",                
+                    'elk.layered.allowNonFlowPorts': true,
+                    'elk.layered.considerModelOrder.strategy': 'NODES_AND_EDGES',
+                    "elk.layered.crossingMinimization.strategy": "LAYER_SWAP" // Try minimizing messy edge routing
+
+                  
+                },
+                children,
+                edges
+            }
+            elk
+            .layout(graph)
+            .then((layoutedGraph) => {
+                const nodes = layoutedGraph.children.map((node) => ({
+                    ...node,
+                    position:{x: node.x, y: node.y}
+                }))
+                const flowEdges = layoutedGraph.edges.map((edge) => ({
+                    ...edge,
+                    data:{
+                        section:edge.sections[0]
+                    },
+                    type:"elkEdge"
+                }))
+                setFlow({nodes, edges:flowEdges})
+                //setFlow({nodes, edges:layoutedGraph.edges})
+            })
+        }
+    }, [children, edges])
+    useEffect(() => {
+        console.log(JSON.stringify(flow))
+
+    }, [flow])
+    
+
+    return(
+        <div className="flow-graph-container">
+            <ReactFlow
+                nodes={flow.nodes}
+                edges={flow.edges}
+                nodeTypes={myNodes}
+                edgeTypes={edgeTypes}
+                fitView
+            >
+                <Controls/>
+                <MiniMap/>
+            </ReactFlow>
+        </div>
+            
+    )
+}
+
 export function StoryPage(props) {
     const socket = useWebSocketFacade()
     const [authorOptions, setAuthorOptions] = useState([])
@@ -559,7 +675,7 @@ export function StoryPage(props) {
 
 
         
-    }, [storyId]);
+    }, [storyId, path]);
     useEffect(() => {
         async function runFilter() {
             const cleanOptions = await filterProfanity(authorOptions, profanity, true);
@@ -640,6 +756,24 @@ export function StoryPage(props) {
                             })}</td>
                         </tr>
                         }
+                        {story.created && 
+                        <tr>
+                            <th>Created</th>
+                            <td>{formatJSONDate(story.created)}</td>
+                        </tr>
+                        }
+                        {story.modified && 
+                        <tr>
+                            <th>Modified</th>
+                            <td>{formatJSONDate(story.modified)}</td>
+                        </tr>
+                        }
+                        {story.expanded && 
+                        <tr>
+                            <th>Expanded</th>
+                            <td>{formatJSONDate(story.expanded)}</td>
+                        </tr>
+                        }
                     </tbody>
                 </table>
                 <div className="textbody">
@@ -685,9 +819,10 @@ export function StoryPage(props) {
                         />
                     </div>
                 </div>
-                
-                <div style={{ width: "100vw", height: "90vh" }}>
+                <div className="flow-view-container" >
+                    <ChapterGraph id={storyId} profanity={profanity} filter={filter} socket={socket}/>
                 </div>
+                
                 
             
         

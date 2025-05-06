@@ -170,8 +170,10 @@ const collectionsMap = {
     
 
     chapters: chapterCollection,
+    chapter: chapterCollection,
+
     stories: storiesCollection,
-    storyID: storiesCollection,
+    storyid: storiesCollection,
 
 
     originbiome:biomesCollection,
@@ -633,7 +635,7 @@ async function getOptions(collectionKey, { query }){
     }
     else if(storyCollections.includes(collection)){
         if(collection === chapterCollection){
-            return await getCatagoryOptions(storiesCollection, {query, labelField:"title", qualifierField:"storyID"})
+            return await getCatagoryOptions(chapterCollection, {query, labelField:"title", qualifierField:"storyID"})
         }
         return await getCatagoryOptions(storiesCollection, {query, labelField:"title"})
     }
@@ -824,7 +826,7 @@ async function getCards(collectionKey, {
 
 async function getGraph(id, filter={}){
     const pipeline = []
-    const storyID = convertIDs("storyID", id);
+    const storyID = await convertIDs("storyID", id);
     let match = {storyID}
     if (Object.keys(filter).length) {
         const processedFilter = await processFilters(filter);
@@ -839,6 +841,9 @@ async function getGraph(id, filter={}){
     }
 
     pipeline.push({ $match: match });
+    ensureLookup(pipeline, "author")
+    ensureUnwind(pipeline, "authorDetails")
+
     pipeline.push({
         $project:{
             _id:0,
@@ -847,7 +852,8 @@ async function getGraph(id, filter={}){
             genres:1, 
             url:1, 
             contentWarnings:1, 
-            description:1
+            description:1,
+            author:"$authorDetails.displayname"
         }
     })
 
@@ -858,10 +864,11 @@ async function getGraph(id, filter={}){
                 genres: "$genres",
                 url: "$url",
                 contentWarnings: "$contentWarnings",
-                description: "$description"
+                description: "$description",
+                author:"$author"
             },
-            width:100,
-            height:50,
+            width:250,
+            height:300,
             type:"chapterCard"
         }
     })
@@ -1006,7 +1013,7 @@ async function preprocessData(inputData, preProcessing) {
         processedData.author = await convertIDs("author",processedData.author);
     }
     for (const key in preProcessing) {
-        processedData[key] = await preProcessing[key](inputData[key], inputData);
+        processedData[key] = await preProcessing[key](inputData[key], processedData);
     }
     return processedData;
 }
@@ -1933,11 +1940,11 @@ const displayableMap = {
     stories:{
         lookupFields:baseLookupFields, 
         projectionFields:baseProjectionFields,
-        fields:storyFields,
+        fields:[...storyFields, "created", "modified", "expanded"],
         unwindFields:baseUnwindFields,
     },
     chapter:{
-        fields:[...storyFields, "description"],
+        fields:[...storyFields, "description", "created", "modified"],
         lookupFields:chapterLookupFields,
         projectionFields:chapterProjectFields,
         unwindFields:chapterUnwindFields

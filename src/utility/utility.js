@@ -1,6 +1,5 @@
 
 // Sanitizes the ids to make it so that it can be used for file paths and stuff
-
 function sanitizeId(id){
     return id
         .trim()
@@ -188,10 +187,9 @@ export async function filterProfanity(json, profanityFilterEnabled, isOptions=fa
             const updatedJson = json
             const keys = Object.keys(json)
             for(const key of keys){
-                if(["url", "id", "username", "qualifier"].includes(key) || (isOptions && key === "value")){
+                if(["url", "id", "username", "qualifier", "width", "height", "type"].includes(key) || (isOptions && key === "value")){
                     updatedJson[key] = json[key]
                 }
-                
                 else{
                     updatedJson[key] = await filterProfanity(json[key], profanityFilterEnabled)
                 }

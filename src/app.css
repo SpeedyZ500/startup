@@ -6,65 +6,8 @@
     font-family: Arial, Helvetica, sans-serif;
 }
 
-@media (prefers-color-scheme: dark){
-    .dropdown-item.active{
-        color: white!important;
-        background-color: black;
-    }
-    .dropdown-item{
-        color: lightgrey;
-    }
-    .nav-item{
-        color: lightgrey
-    }
-    .nav-item.active{
-        color: white;
-    }
-    .theme.adaptive{
-        background: black;
-        color: white;
-        main:a:link{color:#87a9f9;};
-        main:a:visited{color: #c9a0f4};
-    }
-    .theme-h.adaptive{
-        border-bottom: solid white thin;
-        a:link{color:white;};
-        a:visited{color:white;};
-        background-color: black;
-        
-    }
-    .theme-c.adaptive{
-        background-color:darkgrey;
-    }
-    .dropdown-menu{
 
-     background-color: black !important;
-    }
-    .dropdown-item{
-        background-color: black !important;
-    }
-    .dropdown-divider{
-        border-color:white !important;
-       color:white !important;
-    }
-    .offcanvas-body{
-        background-color: black !important;
-    }
-    .offcanvas-header{
-        background-color: black !important;
-    }
-    .btn-close{
-       filter:invert(100%);
-    }
-    .navbar-toggler-icon{
-        filter:invert(100%);
-    }
-    label{
-        color: white !important;
-        background: black !important;
-    
-     }
-}
+
 .filterAndSort{
     flex: 1;
     display: flex;
@@ -78,8 +21,14 @@
     
 
 }
+.custom-edge-path{
+    stroke:black;
+    stroke-width: 2px;
+    fill: none
+}
 .scrollable{
     padding-top: 0;
+    overflow: scroll;
 
 }
 header {
@@ -144,9 +93,37 @@ menu div{
     display: flex;
     flex-direction: row !important;
 }
+
+.chapter-node {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;  
+    padding: 0;
+    background: white;
+    border: 1px solid black;
+    border-radius: 0.5rem;
+    box-sizing: border-box;
+    width: 250px;
+    height: 300px;
+}
+.button-footer {
+    margin-top: auto;
+    margin-bottom: 2px;
+  }
+.react-flow__edge-path {
+    stroke: var(--edge-color, black); /* Use a custom CSS var for theming if needed */
+    fill: none;
+}
+.react-flow {
+    width:100%;
+    height:100%;
+    box-sizing: border-box;
+
+}
 menu {
     flex: 1;
     display: flex;
+
     
     /*  overwrite Bootstrap so the menu does not wrap */
     flex-direction: row !important;
@@ -167,7 +144,24 @@ menu {
 }
 
 
+.flow-view-container{
+    width: 100vw ;
+    height: 90vh ;
+    position: relative ; /* Required for correct node/edge placement */
+    overflow: hidden ;    /* Prevents scrollbars from accidental overflow */
+    display: block;  
+    box-sizing: border-box;
 
+}
+.flow-graph-container{
+    width: 100% ;
+    height: 100% ;
+    position: relative ; /* Required for correct node/edge placement */
+    overflow: hidden;    /* Prevents scrollbars from accidental overflow */
+    display: block;  
+    box-sizing: border-box;
+
+}
 menu .navbar-nav{
     padding-top: 0 !important;
 }
@@ -316,3 +310,81 @@ nav{
     }
 }
 
+@media (prefers-color-scheme: dark){
+    .dropdown-item.active{
+        color: white!important;
+        background-color: black;
+    }
+    .dropdown-item{
+        color: lightgrey;
+    }
+    .nav-item{
+        color: lightgrey
+    }
+    .nav-item.active{
+        color: white;
+    }
+    .theme.adaptive{
+        background: black;
+        color: white;
+        main:a:link{color:#87a9f9;};
+        main:a:visited{color: #c9a0f4};
+    }
+    .theme-h.adaptive{
+        border-bottom: solid white thin;
+        a:link{color:white;};
+        a:visited{color:white;};
+        background-color: black;
+        
+    }
+    .react-flow__edge-path {
+        stroke: var(--edge-color, whitesmoke); /* Use a custom CSS var for theming if needed */
+        fill: none;
+      }
+    .theme-c.adaptive{
+        background-color:darkgrey;
+    }
+    .dropdown-menu{
+
+     background-color: black !important;
+    }
+    .dropdown-item{
+        background-color: black !important;
+    }
+    .dropdown-divider{
+        border-color:white !important;
+       color:white !important;
+    }
+    .offcanvas-body{
+        background-color: black !important;
+    }
+    .offcanvas-header{
+        background-color: black !important;
+    }
+    .btn-close{
+       filter:invert(100%);
+    }
+    .navbar-toggler-icon{
+        filter:invert(100%);
+    }
+    label{
+        color: white ;
+        background: black ;
+    
+     }
+    .chapter-node{
+        background-color: black;
+        color: white;
+        border-color: whitesmoke;
+
+    }
+    .custom-edge-path{
+        stroke:whitesmoke;
+    }
+    .input-group-text{
+        background-color: black !important;
+        color: white!important;
+
+
+    }
+}
