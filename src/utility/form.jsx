@@ -8,7 +8,7 @@ import Button from 'react-bootstrap/Button';
 import Table from 'react-bootstrap/Table';
 import { ButtonGroup } from 'react-bootstrap';
 import './form.css';
-
+import './../select.css'
 
 export const selectSources = {
     races:"/worldbuilding/races",
@@ -314,7 +314,9 @@ function GenerateMultiSelect({formData, fieldkey, field, socket, setData}){
                 options={options}
                 value={selectedOptions}
                 onChange={(selected) => handleChange(selected)}
-                className="form-control"
+                className="form-control react-select-container" 
+                classNamePrefix="react-select"
+    
         />
     </div>
 )}
@@ -377,8 +379,9 @@ function GenerateSelect({formData, fieldkey, field, socket, setData}){
                 options={options}
                 value={(options|| []).find(opt => formData[fieldkey] && opt.value === formData[fieldkey]) || null}
                 onChange={(selected) => handleChange(selected)}
-                className="form-control"
-            />
+                className="form-control react-select-container" 
+                classNamePrefix="react-select"
+/>
         </div>
 )}
 
@@ -420,8 +423,9 @@ function GenerateCreatable({formData,fieldkey, field, socket, setData}){
                     value={options.filter(opt => formData[fieldkey]?.includes(opt.value)) || []}
                     onChange={handleChange}
                     onCreateOption={handleCreateOption} // Handle new options being created
-                    className="form-control"
-            />
+                    className="form-control react-select-container" 
+                    classNamePrefix="react-select"
+    />
         </div>
     )
 }
@@ -518,7 +522,8 @@ function SuperSelect({ formData, fieldkey, socket, field, setData}){
                                             label: options.find(option => option.id === val)?.name,
                                         }))}
                                         onChange={(selected) => updateSelections(index, selected)}
-                                        className="form-control"
+                                        className="form-control react-select-container" 
+                                        classNamePrefix="react-select"
                                     />
                                 </td>
                                 <td>
@@ -588,19 +593,20 @@ function GenerateTextCreatable({formData, fieldkey, field, setData}){
         <div key={fieldkey} className="mb-2 ">
             <label htmlFor={fieldkey}>{field.label}</label>
             <Creatable
-                    name={fieldkey}
-                    components={components}
-                    isMulti
-                    options={selectedValues} // Use selectedValues as options, so it contains both initial and dynamically added options
-                    value={selectedValues}
-                    menuIsOpen={false}
-                    onChange={handleChange}
-                    onInputChange={handleInputChange}
-                    onKeyDown={handleKeyDown}
-                    inputValue={inputValue}
-                    placeholder="Type and press Enter to add new item..."
-                    className="form-control"
-                />
+                name={fieldkey}
+                components={components}
+                isMulti
+                options={selectedValues} // Use selectedValues as options, so it contains both initial and dynamically added options
+                value={selectedValues}
+                menuIsOpen={false}
+                onChange={handleChange}
+                onInputChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+                inputValue={inputValue}
+                placeholder="Type and press Enter to add new item..."
+                className="form-control react-select-container" 
+                classNamePrefix="react-select"
+            />
         </div>
     );
 }
@@ -668,7 +674,8 @@ function GenerateModifyOthers({formData, fieldkey, field, socket,  setData}){
             options={options}
             value={options.filter(opt => (formData[fieldkey] || []).includes(opt.value))}
             onChange={(selected) => handleChange(selected)}
-            className="form-control"
+            className="form-control react-select-container" 
+            classNamePrefix="react-select"
         />
     </div>
 )}
@@ -1030,7 +1037,8 @@ function CustomSelect({ custom, index, socket, updateCustom }) {
             value={selectedOptions}
             onChange={handleChange}
             placeholder={`Select ${custom.label || 'value'}`}
-            className="form-control"
+            className="form-control react-select-container" 
+            classNamePrefix="react-select"
         />
     );
 }
@@ -1084,8 +1092,9 @@ function CustomField({ custom, updateCustom, removeCustom, socket, index}) {
             value={editOptions.find(opt => opt.value === edit)}
             onChange={(selected) => handleChange("edit", selected?.value)}
             placeholder="Select Edit Type"
-            className="mb-2"
-          />
+            className="mb-2 react-select-container" 
+            classNamePrefix="react-select"
+/>
     
           {edit === "select" && (
             <Select
@@ -1093,7 +1102,8 @@ function CustomField({ custom, updateCustom, removeCustom, socket, index}) {
               value={sourceOptions.find(opt => opt.value === source)}
               onChange={(selected) => handleChange("source", selected?.value)}
               placeholder="Select Source"
-              className="mb-2"
+              className="mb-2 react-select-container" 
+              classNamePrefix="react-select"
             />
           )}
 

@@ -32,8 +32,8 @@ textarea::placeholder {
     }
     input::placeholder,
     textarea::placeholder {
-        color: whitesmoke !important;
-        opacity: 1; /* full opacity */
+        color: #6f6f6f !important;
+        opacity: .5;
     }
     .form-control{
         background:black;

@@ -24,6 +24,8 @@ import Popover from 'react-bootstrap/Popover';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 
 import "../app.css"
+import "../utility/form.css"
+import "../select.css"
 
 const handleErrors = async (res) => {
     if (!res.ok) {
@@ -120,7 +122,6 @@ export function ChapterForm({ handleClose, storyId, chapterId, profanity}){
         })
         .then((res) => {
             if(!res.ok){
-
                 handleClose();
             }
         })
@@ -129,7 +130,7 @@ export function ChapterForm({ handleClose, storyId, chapterId, profanity}){
             handleClose?.();
         });
         if(chapterId){
-            fetch(`/api/story/chapter/${chapterId}`, {
+            fetch(`/api/stories/chapter/${chapterId}`, {
                 method:"GET",
                 headers:{'Content-Type': 'application/json'}
             })
@@ -230,8 +231,9 @@ export function ChapterForm({ handleClose, storyId, chapterId, profanity}){
                         value={fullGenreOptions.filter(opt => formData.genres?.includes(opt.value)) || []}
                         onChange={(selectedOptions) => handleSelectionChange("genres", selectedOptions)}
                         onCreateOption={handleCreateGenre} // Handle new options being created
-                        className="form-control"
-                />
+                        className="form-control react-select-container" 
+                        classNamePrefix="react-select"
+            />
             </div>
             <div  className="mb-2 ">
                 <label htmlFor='warnings'>Content Warnings</label>
@@ -242,8 +244,9 @@ export function ChapterForm({ handleClose, storyId, chapterId, profanity}){
                         value={fullWarningOptions.filter(opt => formData.contentWarnings?.includes(opt.value)) || []}
                         onChange={(selectedOptions) => handleSelectionChange("contentWarnings", selectedOptions)}
                         onCreateOption={handleCreateWarning} // Handle new options being created
-                        className="form-control"
-                />
+                        className="form-control react-select-container" 
+                        classNamePrefix="react-select"
+            />
             </div>
             <div  className="mb-2 ">
                 <label htmlFor='samePrevious'>Previous Chapters Same Story</label>
@@ -253,8 +256,9 @@ export function ChapterForm({ handleClose, storyId, chapterId, profanity}){
                         options={sameStoryOptions}
                         value={sameStoryOptions.filter(opt => formData.samePrevious?.includes(opt.value)) || []}
                         onChange={(selectedOptions) => handleSelectionChange("samePrevious", selectedOptions)}
-                        className="form-control"
-                />
+                        className="form-control react-select-container" 
+                        classNamePrefix="react-select"
+            />
             </div>
             <div  className="mb-2 ">
                 <label htmlFor='anyPrevious'>Previous Chapters Any Story</label>
@@ -264,8 +268,9 @@ export function ChapterForm({ handleClose, storyId, chapterId, profanity}){
                         options={chapterOptions}
                         value={chapterOptions.filter(opt => formData.anyPrevious?.includes(opt.value)) || []}
                         onChange={(selectedOptions) => handleSelectionChange("anyPrevious", selectedOptions)}
-                        className="form-control"
-                />
+                        className="form-control react-select-container" 
+                        classNamePrefix="react-select"
+            />
             </div>
             <div  className="mb-2 ">
                 <label htmlFor='sameNext'>Next Chapters Same Story</label>
@@ -275,8 +280,9 @@ export function ChapterForm({ handleClose, storyId, chapterId, profanity}){
                         options={sameStoryOptions}
                         value={sameStoryOptions.filter(opt => formData.sameNext?.includes(opt.value)) || []}
                         onChange={(selectedOptions) => handleSelectionChange("sameNext", selectedOptions)}
-                        className="form-control"
-                />
+                        className="form-control react-select-container" 
+                        classNamePrefix="react-select"
+            />
             </div>
             <div  className="mb-2 ">
                 <label htmlFor='anyNext'>Next Chapters Any Story</label>
@@ -286,8 +292,9 @@ export function ChapterForm({ handleClose, storyId, chapterId, profanity}){
                         options={chapterOptions}
                         value={chapterOptions.filter(opt => formData.anyNext?.includes(opt.value)) || []}
                         onChange={(selectedOptions) => handleSelectionChange("anyNext", selectedOptions)}
-                        className="form-control"
-                />
+                        className="form-control react-select-container" 
+                        classNamePrefix="react-select"
+            />
             </div>
             <ButtonGroup>
                 <Button onClick={handleSubmit} variant='primary'>Submit</Button>
@@ -454,7 +461,7 @@ const CustomNode = ({data}) => {
 
 function ChapterCardNode({data}){
     return(
-        <div className="chapter-node">
+        <div className="chapter-node" >
             <Handle type="target" position="top" />
             <h4> <NavLink to={data.url}>{data.title}</NavLink></h4>
             <h6>By: {data.author}</h6>
@@ -536,7 +543,7 @@ function ChapterGraph({socket, profanity, filter, id}){
         }
     }, [profanity, graphData])
     useEffect(() => {
-        if(children.length && edges.length){
+        if(children.length){
             const graph ={
                 id: 'root',
                 layoutOptions: {
@@ -577,6 +584,9 @@ function ChapterGraph({socket, profanity, filter, id}){
                 setFlow({nodes, edges:flowEdges})
                 //setFlow({nodes, edges:layoutedGraph.edges})
             })
+        }
+        else{
+            setFlow({})
         }
     }, [children, edges])
     useEffect(() => {
@@ -752,8 +762,9 @@ export function StoryPage(props) {
                         <tr>
                             <th>Content Warnings</th>
                             <td>{cleanStory.contentWarnings.map((value, index) =>{
-                                return <span key={index}>{value} {index < cleanStory.contentWarnings.length - 1 && <span>, </span>}</span>
-                            })}</td>
+                                    return <span key={index}>{value} {index < cleanStory.contentWarnings.length - 1 && <span>, </span>}</span>
+                                })}
+                            </td>
                         </tr>
                         }
                         {story.created && 
@@ -779,7 +790,7 @@ export function StoryPage(props) {
                 <div className="textbody">
                     <p>{cleanStory.body}</p>
                 </div>
-                <div className="filterAndSort theme-h adaptive">
+                <div className="filterAndSort theme-h adaptive expanded">
                     <h4>Filter:</h4> 
                     <div className="input-group" key="author">
                         <label className="input-group-text" htmlFor="author">
@@ -788,9 +799,11 @@ export function StoryPage(props) {
                         <Select 
                             isMulti 
                             options={cleanAuthorOptions} 
-                            className="form-control" 
                             onChange={(selectedOptions) => handleFilterChange("author", selectedOptions)}
                             name="author"
+                            className="form-control react-select-container" 
+                            classNamePrefix="react-select"
+
                         />
                     </div>
                     <div className="input-group" key="genre">
@@ -800,9 +813,11 @@ export function StoryPage(props) {
                         <Select 
                             isMulti 
                             options={cleanGenreOptions} 
-                            className="form-control" 
                             name="genre"
                             onChange={(selectedOptions) => handleFilterChange("genres", selectedOptions)}
+                            className="form-control react-select-container" 
+                            classNamePrefix="react-select"
+
                         />
                     </div>
                     <div className="input-group" key="contentwarning">
@@ -812,9 +827,11 @@ export function StoryPage(props) {
                         <Select 
                             isMulti 
                             options={cleanContentWarningOptions} 
-                            className="form-control" 
                             name="contentwarning"
                             onChange={(selectedOptions) => handleFilterChange("contentwarnings", selectedOptions)}
+                            className="form-control react-select-container" 
+                            classNamePrefix="react-select"
+
     
                         />
                     </div>

@@ -1,0 +1,77 @@
+@media (prefers-color-scheme: dark){
+    .react-select-container{
+        background-color: black;
+        color:white
+    }
+    .react-select__control{
+        background-color: black;
+        color:white
+    }
+    .react-select__value-container{
+        background-color: black;
+        color:white
+    }
+    .react-select__indicators{
+        background-color: black;
+        color:white
+    }
+    .react-select__menu{
+        background-color: #2f2f2f;
+    }
+    .react-select__menu-list{
+        background-color: black;
+        color:white;
+        border-color: whitesmoke;
+    }
+    .react-select__option{
+        border-color: whitesmoke !important;
+        color:white
+    }
+    .react-select__control {
+        background-color: darkslategrey;
+        color:white
+
+    }
+    .react-select__placeholder{
+        color: #6f6f6f !important;
+    }
+    .react-select__option--is-focused{
+        background-color: darkslategrey !important;
+    }
+
+    .react-select__control--is-focused{
+        background-color: darkslategrey;
+        color:white;
+        border-color: #888
+
+    }
+    .react-select__option--is-selected{
+        background-color: darkgray !important;
+        color:white;
+        border-color: #888;
+        font-weight: bold;
+
+    }
+
+    .react-select__control--is-selected{
+        background-color: darkslategrey;
+        color:white
+    }
+    .react-select__multi-value{
+        background-color: darkslategrey !important;
+        color:white
+    }
+    .react-select__multi-value__label{
+        background-color: darkslategrey;
+        color:white !important;
+    }
+    .react-select__multi-value__remove{
+        background-color: darkslategrey;
+        color:white
+
+    }
+    .react-select__single-value{
+        color: whitesmoke !important;
+    }
+
+}

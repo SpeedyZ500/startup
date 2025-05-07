@@ -10,13 +10,7 @@
 .content-body{
     float:left;
 }
-.infocard{
-    float:right;
-    width: 22em;
-    margin-left: 0.5em;
-    text-align:center;
 
-}
 .with-subnav {
     padding-top: 4rem!important; 
 }

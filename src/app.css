@@ -146,7 +146,7 @@ menu {
 
 .flow-view-container{
     width: 100vw ;
-    height: 90vh ;
+    height: 75vh ;
     position: relative ; /* Required for correct node/edge placement */
     overflow: hidden ;    /* Prevents scrollbars from accidental overflow */
     display: block;  
@@ -289,6 +289,9 @@ nav{
   }
 
 @media screen and (min-width: 0px) and (max-width: 1140px){
+    .filterAndSort{
+        flex-direction: column;
+    }
     .page-title  {
         display: none;
     }
@@ -309,8 +312,22 @@ nav{
         scroll-margin-top: 0rem;
     }
 }
+.infocard{
+    float:right;
+    width: 22em;
+    margin-left: 0.5em;
+    text-align:center;
 
+}
 @media (prefers-color-scheme: dark){
+    .table>:not(caption)>*>*{
+        color: white;
+        background-color: black;
+    }
+    th{
+        color: white;
+        background-color: black;
+    }
     .dropdown-item.active{
         color: white!important;
         background-color: black;
@@ -350,6 +367,7 @@ nav{
     }
     .dropdown-item{
         background-color: black !important;
+        color:whitesmoke !important;
     }
     .dropdown-divider{
         border-color:white !important;
@@ -383,8 +401,7 @@ nav{
     }
     .input-group-text{
         background-color: black !important;
-        color: white!important;
-
+        color: white !important;
 
     }
 }

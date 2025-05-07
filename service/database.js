@@ -137,6 +137,9 @@ const collectionsMap = {
 
     characters:charactersCollection,
     character:charactersCollection,
+    
+    
+
     family:charactersCollection,
     enemies:charactersCollection,
     allies:charactersCollection,
@@ -171,6 +174,12 @@ const collectionsMap = {
 
     chapters: chapterCollection,
     chapter: chapterCollection,
+    next:chapterCollection,
+    previous:chapterCollection,
+    samenext:chapterCollection,
+    sameprevious:chapterCollection,
+    anynext:chapterCollection,
+    anyprevious:chapterCollection,
 
     stories: storiesCollection,
     storyid: storiesCollection,
@@ -640,7 +649,7 @@ async function getOptions(collectionKey, { query }){
         return await getCatagoryOptions(storiesCollection, {query, labelField:"title"})
     }
     else if(collection === userCollection){
-        return await getCatagoryOptions(collection, {query, labelField:"displayname", valueField:"username"})
+        return await getCatagoryOptions(collection, {query, labelField:"displayname", valueField:"username", appendAuthor:false})
     }
     else{
         return await getCatagoryOptions(collection, {query})
@@ -668,13 +677,13 @@ async function getCatagoryOptions(collection,
         query = {},
         labelField = "name",
         valueField = "id",
-        qualifierField = "types"
+        qualifierField = "types",
+        appendAuthor = true
     } = {}
     ){
     const pipeline = [];
 
     const {filter = {}, sort = {}} = query
-
     if (Object.keys(filter).length) {
         const processedFilter = await processFilters(filter)
         if(processedFilter){
@@ -684,8 +693,14 @@ async function getCatagoryOptions(collection,
     if (Object.keys(sort).length) {
         await processSort(pipeline, sort)
     }
+    if(appendAuthor){
+        ensureLookup(pipeline, "author")
+        ensureUnwind(pipeline, "authorDetails")
+    }
     const project = {
-        label: `$${labelField}`,
+        label: appendAuthor ? 
+        { $concat: [`$${labelField}`, ' by ', { $ifNull: ['$authorDetails.displayname', 'Unknown'] }] }
+        : `$${labelField}`,
         value: `$${valueField}`,
         _id: 0
     };
@@ -1009,9 +1024,6 @@ async function preprocessData(inputData, preProcessing) {
             processedData[key] = inputData[key];
         }
     }
-    if (processedData.author && typeof processedData.author === 'string') {
-        processedData.author = await convertIDs("author",processedData.author);
-    }
     for (const key in preProcessing) {
         processedData[key] = await preProcessing[key](inputData[key], processedData);
     }
@@ -1024,8 +1036,11 @@ async function updateOne(collectionKey, data, author, {preProcessing = {}, postP
     if(!original){
         throw createError("Data does not exist or you are not the Author", 401);
     }
+    data.author = author
     const preProcessedData = await preprocessData(data, preProcessing)
     preProcessedData.modified = new Date().toJSON();
+    preProcessedData.created = original.created
+    preProcessedData.url = original.url
     if(collection === organizationsCollection){
         preProcessedData.listUsersAsMembers = original.listUsersAsMembers
     }
@@ -1179,8 +1194,11 @@ function createMap(field, mode = 'display') {
                 //     value: "$$item.id",
                 //     qualifier: "$$item.types"
                 // }
-                : {
-                    value: "$$item.name" || "$$item.title",
+                : mode === 'chapter' ? {
+                    value: "$$item.title",
+                    url: "$$item.url"
+                }: {
+                    value: "$$item.name",
                     url: "$$item.url"
                 }
         }
@@ -1202,7 +1220,7 @@ function optionsMap(field){
 }
 
 function createProjection(field, type="displayable"){
-    if(type == 'edit'){
+    if(type === 'edit'){
         return `$${field}Details.id`
         // {
         //     value:`$${field}Details.id`,
@@ -1210,9 +1228,15 @@ function createProjection(field, type="displayable"){
         //     qualifier: `$${field}Details.types`
         // }
     }
+    else if(type === "story"){
+        return {
+            value: `$${field}Details.title`,
+            url:`$${field}Details.url`
+        }
+    }
     else{
         return {
-            value:`$${field}Details.name` || `$${field}Details.title`,
+            value:`$${field}Details.name`,
             url:`$${field}Details.url`
         }
     }
@@ -1464,9 +1488,9 @@ const chapterLookupFields=[
 ]
 const chapterProjectFields = {
     ...baseProjectionFields,
-    storyID:createProjection("storyID"),
-    previous:createMap("previous"),
-    next:createMap("next"),
+    storyID:createProjection("storyID", "story"),
+    previous:createMap("previous", "edit"),
+    next:createMap("next", "edit"),
 }
 const chapterEditLookupFields=[
     ...baseLookupFields,
@@ -1865,6 +1889,12 @@ const cardsMap = {
         projectionFields:baseProjectionFields,
         unwindFields:baseUnwindFields,
         fields:storyFields
+    },
+    chapter:{
+        lookupFields:baseLookupFields, 
+        projectionFields:baseProjectionFields,
+        unwindFields:baseUnwindFields,
+        fields:["title","url", "id"]
     },
     worlds:{
         lookupFields:baseLookupFields,

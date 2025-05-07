@@ -14,7 +14,7 @@ import { AuthState } from '../login/authState.js';
 import { FormGenerator, selectSources,  mapOptions, creatableSources} from '../utility/form';
 import './../app.css'
 import { WebSocketFacade, webSocket } from '../utility/websocketfacade.js';
-
+import './../select.css'
 
 const filterSources = {...selectSources, ...creatableSources, users:"/users"}
 
@@ -50,7 +50,8 @@ function FilterOptions({filter, attribute, onFilterChange, socket, profanity}){
             <Select 
                 isMulti 
                 options={filteredOptions} 
-                className="form-control" 
+                className="form-control react-select-container" 
+                classNamePrefix="react-select"
                 onChange={(selectedOptions) => handleChange(selectedOptions, attribute)}
                 name={attribute}
             />
@@ -184,7 +185,8 @@ export function CategoryPage(props) {
                             <Select 
                                 options={page &&page.sort}
                                 value={sortOptions}
-                                className="form-control" 
+                                className="form-control react-select-container" 
+                                classNamePrefix="react-select"
                                 id="sort" 
                                 name="varSort" 
                                 onChange={setSortOptions}

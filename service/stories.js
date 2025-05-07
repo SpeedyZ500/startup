@@ -35,7 +35,7 @@ storiesRouter.get(`${urlPrefix}author/chapter/:id`,async (req, res)=>{
     const id = req.params.id
     const author = user._id
     try{
-        await getEditable(urlPrefix, author, id, {
+        await getEditable("chapters", author, id, {
             fields:["id"]
         })
         return res.send({isAuthor:true})
