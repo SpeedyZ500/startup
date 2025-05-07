@@ -71,7 +71,17 @@ function renderSection(card, cardId, formatting) {
 
         // Handle basic string label config
         if (typeof config !== "object") {
-            return renderItem({ label: config, value: data }, cardId);
+            if(typeof data === "object"){
+                return renderItem({ 
+                    label: config, 
+                    value: data.name || data.title || data.value || data.toString(),
+                    url: data.url
+                  }, cardId);
+            }
+            else{
+                return renderItem({ label: config, value: data }, cardId);
+
+            }
         }
 
         // Handle full config object
@@ -139,6 +149,7 @@ export function CardsRenderer({cards, profanity=true, formatting={body:{name:{ur
    
 
     useEffect(() => {
+        console.log(JSON.stringify(cards))
         if (prevCards.current === cards && prevProfanity.current === profanity) {
             return; // No changes, avoid unnecessary updates
         }
