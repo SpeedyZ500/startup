@@ -158,7 +158,7 @@ const collectionsMap = {
     racestypes:raceTypeCollection,
     racetype:raceTypeCollection,
 
-    abilites:magicSystemsCollection,
+    abilities:magicSystemsCollection,
     magic: magicSystemsCollection,
     magicsystem: magicSystemsCollection,
     magicsystems: magicSystemsCollection,
