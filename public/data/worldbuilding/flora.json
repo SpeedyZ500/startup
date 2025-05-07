@@ -34,7 +34,7 @@
                     "key":"originWorld",
                     "as":"worlds"
                 },
-                "soruce":"biomes"
+                "source":"biomes"
             },
             "otherWorlds":{
                 "label":"Other Worlds",
