@@ -582,7 +582,21 @@ const MemoizedParseCardGroup = React.memo(ParseCardGroup);
 const MemoizedParseCardSection= React.memo(ParseCardSection);
 const MemoizedProcessAppend= React.memo(ProcessAppend);
 
+function ScrollToHash() {
+    const { hash } = useLocation();
+  
+    useEffect(() => {
+        if (hash) {
+        const id = hash.replace('#', '');
+        const element = document.getElementById(id);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
+        }
+    }, [hash]);
 
+    return null;
+}
 export function BioPage(props){
     const location = useLocation();
     const isWorldbuilding = location.pathname.startsWith("/worldbuilding");
@@ -662,6 +676,7 @@ export function BioPage(props){
     }
     return(
         <main className={`bio ${isWorldbuilding ? "with-subnav" : ""}`}>
+            <ScrollToHash/>
             {formatter.card && <InfoCard cardFormatter={formatter.card} data={cleanBio} />}
             {isAuthor && (
                 <Button variant ="primary" onClick={toggleEditing}>
