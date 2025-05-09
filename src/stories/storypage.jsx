@@ -136,7 +136,7 @@ export function ChapterForm({ handleClose, storyId, chapterId, profanity}){
             })
             .then(handleErrors)
             .then((data) => {
-                console.log(JSON.stringify(data))
+                // console.log(JSON.stringify(data))
                 setData(data)
             })
             .catch((error) =>{
@@ -162,7 +162,7 @@ export function ChapterForm({ handleClose, storyId, chapterId, profanity}){
             })
             .then(handleErrors)
             .then(data => {
-                console.log(`successfully updated ${id}`)
+                // console.log(`successfully updated ${id}`)
                 socket.notify({collection:"/stories", type:"PUT", storyID:storyId, chapterID:data.id})
                 handleClose?.()
             })
@@ -368,7 +368,7 @@ function StoryEditForm({socket, handleClose, storyId, genreOptions, contentWarni
             })
             .then(handleErrors)
             .then((data) => {
-                console.log(JSON.stringify(data))
+                // console.log(JSON.stringify(data))
                 setData(data)
             })
             .catch((error) =>{
@@ -512,7 +512,7 @@ const getPathFromSection = (section) => {
 };
 
 function ElkEdge({id, data}){
-    console.log(JSON.stringify(data))
+    // console.log(JSON.stringify(data))
     const path = getPathFromSection(data.section);
 
     return (
@@ -589,10 +589,10 @@ function ChapterGraph({socket, profanity, filter, id}){
             setFlow({})
         }
     }, [children, edges])
-    useEffect(() => {
-        console.log(JSON.stringify(flow))
+    // useEffect(() => {
+    //     // console.log(JSON.stringify(flow))
 
-    }, [flow])
+    // }, [flow])
     
 
     return(

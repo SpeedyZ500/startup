@@ -149,7 +149,7 @@ export function CardsRenderer({cards, profanity=true, formatting={body:{name:{ur
    
 
     useEffect(() => {
-        console.log(JSON.stringify(cards))
+        //console.log(JSON.stringify(cards))
         if (prevCards.current === cards && prevProfanity.current === profanity) {
             return; // No changes, avoid unnecessary updates
         }

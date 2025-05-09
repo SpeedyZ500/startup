@@ -1791,7 +1791,7 @@ const raceFullLookups = [
 ]
 
 const baseInstitutionCards = [
-    baseFields,
+    ...baseFields,
     "authorIsLeader",
 ]
 

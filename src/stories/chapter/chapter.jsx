@@ -71,7 +71,7 @@ export function Chapter(props) {
                 return res.json();
             })
             .then((data) => {
-                console.log('I got here')
+                // console.log('I got here')
                 setIsAuthor(data.isAuthor)
             })
             .catch(e => {
@@ -86,7 +86,7 @@ export function Chapter(props) {
         socket.subscribe({url:paths, type:"getDisplayable", collection:"chapter", commandId:"getChapter", id:chapterId,setData:setChapter})
     }, [path, storyId, chapterId])
     useEffect(() => {
-        console.log(JSON.stringify(chapter))
+        // console.log(JSON.stringify(chapter))
         async function runFilter() {
             const cleanOptions = await filterProfanity(chapter, profanity);
             setCleanChapter(cleanOptions);
@@ -94,7 +94,7 @@ export function Chapter(props) {
         runFilter();
     }, [chapter, profanity])
     useEffect(() => {
-        console.log(JSON.stringify(previous))
+        // console.log(JSON.stringify(previous))
         async function runFilter() {
             const cleanOptions = await filterProfanity(previous, profanity);
             setCleanPrevious(cleanOptions);
@@ -102,7 +102,7 @@ export function Chapter(props) {
         runFilter();
     }, [previous, profanity])
     useEffect(() => {
-        console.log(JSON.stringify(next))
+        // console.log(JSON.stringify(next))
         async function runFilter() {
             const cleanOptions = await filterProfanity(next, profanity);
             setCleanNext(cleanOptions);

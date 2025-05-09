@@ -64,14 +64,14 @@ const handleErrors = async (res) => {
 
 const handleModify = async (id, formData, form, socket) => {
     if(id){
-        console.log("handling modify")
+        // console.log("handling modify")
         for(const fieldkey of Object.keys(form)){
-            console.log(fieldkey)
+            // console.log(fieldkey)
             if(form[fieldkey].type === "modify-others"){
                 const {method, source, list} = form[fieldkey];
                 const ids = formData[fieldkey]
                 const url = selectSources[source]
-                console.log(JSON.stringify(ids))
+                // console.log(JSON.stringify(ids))
                 if(method && source && url && id && ids && (!Array.isArray(ids) || ids.length > 0)){
                     fetch(`/api${url}/${list}/${method}`, {
                         method:"PATCH",
@@ -146,7 +146,7 @@ export function FormGenerator({handleClose}){
             })
             .then(handleErrors)
             .then((data) => {
-                console.log(JSON.stringify(data))
+                //console.log(JSON.stringify(data))
                 setData(data)
             })
             .catch((error) =>{
@@ -159,8 +159,8 @@ export function FormGenerator({handleClose}){
 
     const handleSubmit = () => {
         if(id){
-            console.log(JSON.stringify(formData))
-            console.log(`updating ${id}`)
+            // console.log(JSON.stringify(formData))
+            // console.log(`updating ${id}`)
             fetch(`/api${url}/${id}`,{
                 method:"PUT",
                 headers: {"content-type": "application/json"},
@@ -169,7 +169,7 @@ export function FormGenerator({handleClose}){
             })
             .then(handleErrors)
             .then(data => {
-                console.log(`successfully updated ${id}`)
+                // console.log(`successfully updated ${id}`)
 
                 socket.notify({collection:url, type:"PUT", id:data.id})
                 handleModify(data.id,formData,form.fields,socket)
