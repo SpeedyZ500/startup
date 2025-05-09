@@ -379,7 +379,7 @@ function ProcessAppend({appendData, bio, socket, commandId, nextIndex=1, appendA
     const [append, setAppend] = useState([])
     
     useEffect(() => {
-        if (appendData.condition && !processCondition(appendData.condition, bio)) {
+        if (!appendData || (appendData.condition && !processCondition(appendData.condition, bio))) {
             setData([]); // skip processing by sending empty
             return
         }

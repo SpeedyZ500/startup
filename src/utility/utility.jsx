@@ -135,7 +135,7 @@ function renderCard(cards, formatting){
         }) 
     );
 }
-export function CardsRenderer({cards, profanity=true, formatting={body:{name:{url:"url"}, title:{url:"url"}, displayName:""}}}){
+export function CardsRenderer({cards, profanity=true, formatting={body:{name:{url:"url"}, title:{url:"url"}, displayname:""}}}){
     //const currSort = useEffect(() => console.log(JSON.stringify(sort)), [sort]);
     
     
