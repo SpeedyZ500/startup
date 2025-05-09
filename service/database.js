@@ -1992,9 +1992,9 @@ const displayableMap = {
         unwindFields:livingThingUnwindFields
     },
     flora:{
-        lookupFields:livingThingCardLookups,
+        lookupFields:livingThingFullLookups,
         fields:fullBio,
-        projectionFields:livingThingProjectionFields,
+        projectionFields:livingThingBioProjectionFields,
         unwindFields:livingThingUnwindFields
     },
     races:{
