@@ -15,7 +15,7 @@ const {
     updateOne,
     getEditable,
     raceUnwindFields,
-    getUserByToken
+    getAuth
 
 
     
@@ -25,12 +25,11 @@ const {
 
 racesRouter.get(`${urlPrefix}author/:id`,async (req, res)=>{
     const token = req.cookies[authCookieName];
-    const user = await getUserByToken(token)
+    const author = await getAuth(token)
     if(!user){
         return res.send({isAuthor:false})
     }
     const id = req.params.id
-    const author = user._id
     try{
         await getEditable(urlPrefix, author, id, {
             fields:["id"]

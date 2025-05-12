@@ -5,6 +5,7 @@ import Button from 'react-bootstrap/Button';
 
 import { MessageDialog } from './messageDialog';
 import { Link, useNavigate} from 'react-router-dom'; 
+import { EdgeLabelRenderer } from 'reactflow';
 
 
 
@@ -13,41 +14,80 @@ export function Login(props) {
     const [username, setUsername] = React.useState('');
 
     const [password, setPassword] = React.useState('');
+    const [rememberMe, setRememberMe] = React.useState(false);
+
     const [displayError, setDisplayError] = React.useState(null);
     const navigate = useNavigate();
 
     async function handleLogin() {
-        const json = ({username:username, password:password});
+        const json = ({username:username, password:password, rememberMe});
         await createAuth('PUT', json, "login", setDisplayError, navigate, props.onLogin);
     }
     return (
         <main className="container-fluid text-center">
-            <fieldset className="theme-l adaptive">
-                    <legend>Log-In</legend>
-                    <div className="input-group mp-3">
-                        <span className="input-group-text">Username/Email:</span>
-                        <input className="form-control" value={username} onChange={(e) => setUsername(e.target.value)} type="text" placeholder="username/your@email.com"/>
-                    </div>
-                    <div className="input-group mp-3">
-                        <span className="input-group-text">Password:</span>
-                        <input className="form-control" type="password" onChange={(e) => setPassword(e.target.value)} placeholder="password"/>
-                    </div>
-                    
-                    
-                        <div className="btn-group">
-                            <button onClick={handleLogin} className="btn btn-primary" disabled={!username || !password} >Login</button>
-                            <button className="btn btn-secondary" onClick={()=> navigate('/login/register') }>Create</button>
+            <form
+                autoComplete="on"
+                onSubmit={(e) => {
+                    e.preventDefault()
+                    handleLogin()
+                }}
+            >
+                <fieldset className="theme-l adaptive">
+                        <legend>Log-In</legend>
+                        <div className="input-group mp-3">
+
+                            <label className="input-group-text" htmlFor="login-username">Username/Email:</label>
+                            <input
+                                id="login-username"
+                                className="form-control"
+                                name="username"
+                                type="text"
+                                placeholder="username/your@email.com"
+                                autoComplete="username"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                required
+                            />
+                            </div>
+
+                            <div className="input-group mp-3">
+                            <label className="input-group-text" htmlFor="login-password">Password:</label>
+                            <input
+                                id="login-password"
+                                className="form-control"
+                                name="password"
+                                type="password"
+                                placeholder="password"
+                                autoComplete="current-password"
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                            />
+                            </div>
+                        
+                        
+                            <div className="btn-group">
+                                <button type="submit" className="btn btn-primary">
+                                    Login
+                                </button>
+                                <button className="btn btn-secondary" onClick={()=> navigate('/login/register') }>Create</button>
+                            </div>
+                        
+                        
+                        <div>
+                            <label htmlFor="remember-me">Stay Signed in?</label>
+                            <input 
+                                type="checkbox"
+                                id="remember-me"
+                                checked={rememberMe}
+                                onChange={(e) => setRememberMe(e.target.checked)}
+                            />
                         </div>
-                    
-                    
-                    <div>
-                        <span>Stay Signed in?</span>
-                        <input type="checkbox" />
-                    </div>
 
-                    {displayError && <MessageDialog message={displayError} onHide={() => setDisplayError(null)} />}
+                        {displayError && <MessageDialog message={displayError} onHide={() => setDisplayError(null)} />}
 
-            </fieldset>
+                </fieldset>
+            </form>
+            
         </main>);
 }
 
@@ -86,15 +126,26 @@ export function Register(props){
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirm, setConfirm] = useState('');
+    const [rememberMe, setRememberMe] = React.useState(false);
+
 
     const [displayname, setDisplayname] = useState('');
     const [displayError, setDisplayError] = React.useState(null);
     const navigate = useNavigate();
-
+    function isFormValid() {
+        return (
+          email &&
+          username &&
+          password &&
+          confirm &&
+          password === confirm &&
+          password.length >= 8 // You can add more checks here
+        );
+      }
 
     async function handleRegister() {
         if(password === confirm){
-            const json = ({email, username, password, displayname});
+            const json = ({email, username, password, displayname, rememberMe});
             await createAuth('POST', json, "register", setDisplayError, navigate, props.onLogin);
         }
         else{
@@ -104,32 +155,39 @@ export function Register(props){
 
     return (
         <main className="container-fluid text-center">
-            <fieldset className="theme-l adaptive">
+            <form 
+                autoComplete="on"
+                onSubmit={(e) => {
+                e.preventDefault()
+                handleRegister()
+            }}
+            >
+                <fieldset className="theme-l adaptive">
                     <legend>Register</legend>
                     <div className="input-group mp-3">
-                        <span className="input-group-text">Email:</span>
-                        <input className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} type="text" placeholder="your@email.com"/>
+                        <label htmlFor="email" className="input-group-text">Email:</label>
+                        <input id="email" className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} type="text" placeholder="your@email.com" autoComplete='email' required/>
                     </div>
                     <div className="input-group mp-3">
-                        <span className="input-group-text">Username:</span>
-                        <input className="form-control" value={username} onChange={(e) => setUsername(e.target.value)} type="text" placeholder="username"/>
+                        <label htmlFor="username" className="input-group-text">Username:</label>
+                        <input autoComplete="off" id="username" className="form-control" value={username} onChange={(e) => setUsername(e.target.value)} type="text" placeholder="username" required/>
                     </div>
                     <div className="input-group mp-3">
-                        <span className="input-group-text">Display Name:</span>
-                        <input className="form-control" value={displayname} onChange={(e) => setDisplayname(e.target.value)} type="text" placeholder="username"/>
+                        <label htmlFor="displayname" className="input-group-text">Display Name:</label>
+                        <input id="displayname" className="form-control" value={displayname} onChange={(e) => setDisplayname(e.target.value)} type="text" placeholder="Display Name"/>
                     </div>
                     <div className="input-group mp-3">
-                        <span className="input-group-text">Password:</span>
-                        <input className="form-control" type="password" onChange={(e) => setPassword(e.target.value)} placeholder="password"/>
+                        <label htmlFor="new-password" className="input-group-text">Password:</label>
+                        <input id="new-password" autoComplete='new-password' className="form-control" type="password" onChange={(e) => setPassword(e.target.value)} placeholder="password" required/>
                     </div>
                     <div className="input-group mp-3">
-                        <span className="input-group-text">Confirm Password:</span>
-                        <input className="form-control" type="password" onChange={(e) => setConfirm(e.target.value)} placeholder="Confirm password"/>
+                        <span htmlFor="confirm-password" className="input-group-text">Confirm Password:</span>
+                        <input id="confirm-password" className="form-control" autoComplete='new-password' type="password" onChange={(e) => setConfirm(e.target.value)} placeholder="Confirm password" required/>
                     </div>
                     
                     
                         <div className="btn-group">
-                            <Button onClick={handleRegister} variant="primary" disabled={!username || !password || password !== confirm || !email} >
+                            <Button type="submit" variant="primary" disabled={isFormValid()} >
                                 Register
                             </Button>
                             <Button variant="secondary" onClick={()=> navigate('/login') }>Cancel</Button>
@@ -137,13 +195,19 @@ export function Register(props){
                     
                     
                     <div>
-                        <span>Stay Signed in?</span>
-                        <input type="checkbox" />
+                        <label htmlFor="remember-me">Stay Signed in?</label>
+                        <input 
+                            type="checkbox"
+                            id="remember-me"
+                            checked={rememberMe}
+                            onChange={(e) => setRememberMe(e.target.checked)}
+                        />
                     </div>
 
                     {displayError && <MessageDialog message={displayError} onHide={() => setDisplayError(null)} />}
 
-            </fieldset>
+                </fieldset>
+            </form>
         </main>
         );
 }

@@ -18,7 +18,7 @@ const {
     optionsMap,
     getCards,
     getEditable,
-    getUserByToken,
+    getAuth,
     raceUnwindFields
     
  } = require('./database.js')
@@ -62,12 +62,11 @@ countriesRouter.get(`${urlPrefix}options`, async (req, res) => {
 
 countriesRouter.get(`${urlPrefix}author/:id`,async (req, res)=>{
     const token = req.cookies[authCookieName];
-    const user = await getUserByToken(token)
-    if(!user){
+    const author = await getAuth(token)
+    if(!author){
         return res.send({isAuthor:false})
     }
     const id = req.params.id
-    const author = user._id
     try{
         await getEditable(urlPrefix, author, id, {
             fields:["id"]

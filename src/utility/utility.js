@@ -180,11 +180,11 @@ export async function filterProfanity(json, profanityFilterEnabled, isOptions=fa
         }
         else if(Array.isArray(json)){
             return await Promise.all(
-                json.map(item => filterProfanity(item, profanityFilterEnabled))
+                json.map((item) => filterProfanity(item, profanityFilterEnabled))
             )
         }
         else{
-            const updatedJson = json
+            const updatedJson = {...json}
             const keys = Object.keys(json)
             for(const key of keys){
                 if(["url", "id", "username", "qualifier", "width", "height", "type"].includes(key) || (isOptions && key === "value")){

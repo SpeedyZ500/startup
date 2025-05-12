@@ -44,9 +44,9 @@ function FilterOptions({filter, attribute, onFilterChange, socket, profanity}){
     }, [options, profanity])
     return(
         <div className="input-group" key={attribute}>
-            <label className="input-group-text" htmlFor={attribute}>
+            <span className="input-group-text" >
                 {filter.label}
-            </label>
+            </span>
             <Select 
                 isMulti 
                 options={filteredOptions} 
@@ -159,7 +159,7 @@ export function CategoryPage(props) {
                         <h1>{page && page.title}</h1>
                         <p>{page && page.description}</p>
                 </div>
-                    <button onClick={handleOpen} disabled={props.authState !== AuthState.Authenticated}className="btn btn-primary button-align"  data-bs-toggle="offcanvas" data-bs-target="#offcanvas" aria-controls="offcanvas">{page && page.buttonLabel || "new"}</button>
+                    <button onClick={handleOpen} disabled={props.authState !== AuthState.Authenticated} className="btn btn-primary button-align"  data-bs-toggle="offcanvas" data-bs-target="#offcanvas" aria-controls="offcanvas">{page && page.buttonLabel || "new"}</button>
                     <Offcanvas show={visible} className="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabIndex="-1" id="offcanvas" aria-labelledby="offcanvasLabel">
                         
                         <OffcanvasHeader className="offcanvas-header">
@@ -181,7 +181,8 @@ export function CategoryPage(props) {
                         }
 
                         <div className="input-group mb-3">
-                            <label className="input-group-text" htmlFor="sort" name="varSort" >Sort </label>
+                            <span className="input-group-text"  name="varSort" >Sort </span>
+                            
                             <Select 
                                 options={page &&page.sort}
                                 value={sortOptions}

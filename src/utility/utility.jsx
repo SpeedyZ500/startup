@@ -14,6 +14,8 @@ import { filterProfanity
 
 
 function renderItem(item, cardId){
+    console.log(JSON.stringify(item))
+
     if(Array.isArray(item.value)){
         return(
             <OverlayTrigger 
@@ -46,8 +48,9 @@ function renderItem(item, cardId){
             </OverlayTrigger>
         )
     }
-    
+
     else if(item.url){
+
         if(item.label){
             return<p key={`${item.value}-${cardId}`} >
                 {item.label}: <NavLink to={item.url}>{item.value}</NavLink>
@@ -58,7 +61,6 @@ function renderItem(item, cardId){
         }
     }
     else{
-        
         return <p key={`${item.value}-${cardId}`} >{item.label && `${item.label}: `}{item.value}</p>
     }
 }
@@ -74,7 +76,7 @@ function renderSection(card, cardId, formatting) {
             if(typeof data === "object"){
                 return renderItem({ 
                     label: config, 
-                    value: data.name || data.title || data.value || data.toString(),
+                    value: data.name || data.title || data.value || Array.isArray(data) ? data : data.toString(),
                     url: data.url
                   }, cardId);
             }
@@ -149,6 +151,7 @@ export function CardsRenderer({cards, profanity=true, formatting={body:{name:{ur
    
 
     useEffect(() => {
+
         //console.log(JSON.stringify(cards))
         if (prevCards.current === cards && prevProfanity.current === profanity) {
             return; // No changes, avoid unnecessary updates

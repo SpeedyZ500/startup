@@ -223,7 +223,7 @@ export function ChapterForm({ handleClose, storyId, chapterId, profanity}){
                 />
             </div>
             <div  className="mb-2 ">
-                <label htmlFor='genres'>Genres</label>
+                <span>Genres</span>
                 <Creatable 
                         isMulti
                         id="genres"
@@ -236,7 +236,7 @@ export function ChapterForm({ handleClose, storyId, chapterId, profanity}){
             />
             </div>
             <div  className="mb-2 ">
-                <label htmlFor='warnings'>Content Warnings</label>
+                <span >Content Warnings</span>
                 <Creatable 
                         isMulti
                         id="warnings"
@@ -249,7 +249,7 @@ export function ChapterForm({ handleClose, storyId, chapterId, profanity}){
             />
             </div>
             <div  className="mb-2 ">
-                <label htmlFor='samePrevious'>Previous Chapters Same Story</label>
+                <span >Previous Chapters Same Story</span>
                 <Select 
                         isMulti
                         id="samePrevious"
@@ -261,7 +261,7 @@ export function ChapterForm({ handleClose, storyId, chapterId, profanity}){
             />
             </div>
             <div  className="mb-2 ">
-                <label htmlFor='anyPrevious'>Previous Chapters Any Story</label>
+                <span >Previous Chapters Any Story</span>
                 <Select 
                         isMulti
                         id="anyPrevious"
@@ -273,7 +273,7 @@ export function ChapterForm({ handleClose, storyId, chapterId, profanity}){
             />
             </div>
             <div  className="mb-2 ">
-                <label htmlFor='sameNext'>Next Chapters Same Story</label>
+                <span >Next Chapters Same Story</span>
                 <Select 
                         isMulti
                         id="sameNext"
@@ -285,7 +285,7 @@ export function ChapterForm({ handleClose, storyId, chapterId, profanity}){
             />
             </div>
             <div  className="mb-2 ">
-                <label htmlFor='anyNext'>Next Chapters Any Story</label>
+                <span >Next Chapters Any Story</span>
                 <Select 
                         isMulti
                         id="anyNext"
@@ -402,7 +402,7 @@ function StoryEditForm({socket, handleClose, storyId, genreOptions, contentWarni
             />
         </div>
         <div  className="mb-2 ">
-            <label htmlFor='genres'>Genres</label>
+            <span >Genres</span>
             <Creatable 
                     isMulti
                     id="genres"
@@ -414,7 +414,7 @@ function StoryEditForm({socket, handleClose, storyId, genreOptions, contentWarni
             />
         </div>
         <div  className="mb-2 ">
-            <label htmlFor='warnings'>Content Warnings</label>
+            <span >Content Warnings</span>
             <Creatable 
                     isMulti
                     id="warnings"
@@ -793,9 +793,9 @@ export function StoryPage(props) {
                 <div className="filterAndSort theme-h adaptive expanded">
                     <h4>Filter:</h4> 
                     <div className="input-group" key="author">
-                        <label className="input-group-text" htmlFor="author">
+                        <span className="input-group-text" >
                             Author
-                        </label>
+                        </span>
                         <Select 
                             isMulti 
                             options={cleanAuthorOptions} 
@@ -807,9 +807,9 @@ export function StoryPage(props) {
                         />
                     </div>
                     <div className="input-group" key="genre">
-                        <label className="input-group-text" htmlFor="genre">
+                        <span className="input-group-text" >
                             Genre
-                        </label>
+                        </span>
                         <Select 
                             isMulti 
                             options={cleanGenreOptions} 
@@ -821,9 +821,9 @@ export function StoryPage(props) {
                         />
                     </div>
                     <div className="input-group" key="contentwarning">
-                        <label className="input-group-text" htmlFor="contentwarning">
+                        <span className="input-group-text">
                             Content Warning
-                        </label>
+                        </span>
                         <Select 
                             isMulti 
                             options={cleanContentWarningOptions} 

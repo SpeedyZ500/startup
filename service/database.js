@@ -1,5 +1,6 @@
 const { MongoClient } = require('mongodb');
 const config = require('./dbConfig.json');
+const crypto = require('crypto')
 
 const url = `mongodb+srv://${config.userName}:${config.password}@${config.hostname}`;
 const client = new MongoClient(url);
@@ -54,7 +55,7 @@ const genreCollection = db.collection('genres');
 const contentWarningCollection = db.collection('contentwarnings');
 const chapterCollection = db.collection('chapter');
 const edgeCollection = db.collection('edge')
-
+const authCollection = db.collection('auth')
 async function initializeDatabase(){
     await userCollection.createIndex({username:1}, {unique:true})
     await userCollection.createIndex({email:1}, {unique:true})
@@ -77,6 +78,7 @@ async function initializeDatabase(){
     await storiesCollection.createIndex({id:1}, {unique:true})
     await chapterCollection.createIndex({id:1}, {unique:true})
     await chapterCollection.createIndex({storyID:1})
+    await authCollection.createIndex({token:1}, {unique:true})
 
     await genreCollection.createIndex({value:1}, {unique:true})
     await contentWarningCollection.createIndex({value:1}, {unique:true})
@@ -743,13 +745,39 @@ async function getUserByUsername(username){
 async function getUserByEmail(email){
     return await userCollection.findOne({email:email});
 }
-function getUserByToken(token){
-    return userCollection.findOne({token:token})
-}
 
 async function addUser(user){
-    await userCollection.insertOne(user)
+    const result = await userCollection.insertOne(user)
+    return await userCollection.findOne({ _id: result.insertedId })
 }
+async function removeExpired(){
+    const expires = new Date().toJSON()
+    await authCollection.deleteMany({expires:{$lt:expires}})
+}
+async function addAuth(user, token, rememberMe=false){
+    await removeExpired()
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+    const expires = new Date()
+    expires.setDate(expires.getDate() + (rememberMe ? 30 : 1))
+    await authCollection.insertOne({token:hashedToken, user:user._id, expires:expires.toJSON()})
+}
+async function removeAuth(token){
+    await removeExpired()
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+    await authCollection.deleteOne({token:hashedToken})
+
+}
+async function getAuth(token){
+    await removeExpired()
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+    const authDoc = await authCollection.findOne({token:hashedToken})
+    return authDoc ? authDoc.user : null;
+}
+async function getUserByToken(token){
+    const id = await getAuth(token)
+    return id ? await userCollection.findOne({ _id: id }) : null;
+}
+
 
 async function addWritingPrompt(prompt){
     prompt.description = sanitizeText(unArray("whatever", prompt.description))
@@ -2162,7 +2190,10 @@ module.exports = {
     baseFullFields,
     bioWithTypes,
     institutionBioProjectionFields,
-    institutionEditProjectionFields
+    institutionEditProjectionFields,
+    addAuth,
+    removeAuth,
+    getAuth
 
 
 }

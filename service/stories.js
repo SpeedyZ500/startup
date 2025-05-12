@@ -18,7 +18,7 @@ const {
     chaptersPreProcessing,
     baseUnwindFields,
     chapterUnwindFields,
-    getUserByToken
+    getAuth
 } = require('./database.js');
 
 const urlPrefix = "/stories/"
@@ -28,12 +28,11 @@ const storiesRouter = express.Router();
 
 storiesRouter.get(`${urlPrefix}author/chapter/:id`,async (req, res)=>{
     const token = req.cookies[authCookieName];
-    const user = await getUserByToken(token)
+    const author = await getAuth(token)
     if(!user){
         return res.send({isAuthor:false})
     }
     const id = req.params.id
-    const author = user._id
     try{
         await getEditable("chapters", author, id, {
             fields:["id"]

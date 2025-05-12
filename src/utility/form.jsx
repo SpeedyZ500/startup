@@ -307,9 +307,10 @@ function GenerateMultiSelect({formData, fieldkey, field, socket, setData}){
     }
     return (
     <div key={fieldkey} className="mb-2 ">
-        <label htmlFor={fieldkey}>{field.label}</label>
+        <span >{field.span}</span>
         <Select 
                 name={fieldkey}
+                id={fieldkey}
                 isMulti
                 options={options}
                 value={selectedOptions}
@@ -373,15 +374,16 @@ function GenerateSelect({formData, fieldkey, field, socket, setData}){
 
     return (
         <div>
-            <label htmlFor={fieldkey}>{field.label}</label>
+            <span >{field.label}</span>
             <Select 
+                id={fieldkey}
                 name={fieldkey}
                 options={options}
                 value={(options|| []).find(opt => formData[fieldkey] && opt.value === formData[fieldkey]) || null}
                 onChange={(selected) => handleChange(selected)}
                 className="form-control react-select-container" 
                 classNamePrefix="react-select"
-/>
+            />
         </div>
 )}
 
@@ -415,9 +417,10 @@ function GenerateCreatable({formData,fieldkey, field, socket, setData}){
     };
     return(
         <div key={fieldkey} className="mb-2 ">
-            <label htmlFor={fieldkey}>{field.label}</label>
+            <span >{field.label}</span>
             <Creatable 
                     isMulti
+                    id={fieldkey}
                     name={fieldkey}
                     options={options}
                     value={options.filter(opt => formData[fieldkey]?.includes(opt.value)) || []}
@@ -488,8 +491,8 @@ function SuperSelect({ formData, fieldkey, socket, field, setData}){
 
     return (
         <div key={fieldkey} className="mb-2 ">
-            <label htmlFor={fieldkey}>{field.label}</label>
-            <div className="input-group" name={fieldkey}>
+            <span >{field.label}</span>
+            <div className="input-group" id={fieldkey} name={fieldkey}>
                 <Table bordered>
                     <thead>
                         <tr>
@@ -591,9 +594,10 @@ function GenerateTextCreatable({formData, fieldkey, field, setData}){
     };
     return (
         <div key={fieldkey} className="mb-2 ">
-            <label htmlFor={fieldkey}>{field.label}</label>
+            <span >{field.label}</span>
             <Creatable
                 name={fieldkey}
+                id={fieldkey}
                 components={components}
                 isMulti
                 options={selectedValues} // Use selectedValues as options, so it contains both initial and dynamically added options
@@ -667,9 +671,10 @@ function GenerateModifyOthers({formData, fieldkey, field, socket,  setData}){
     
     return (
     <div key={fieldkey} className="mb-2 ">
-        <label htmlFor={fieldkey}>{field.label}</label>
+        <span >{field.label}</span>
         <Select 
             name={fieldkey}
+            id={fieldkey}
             isMulti
             options={options}
             value={options.filter(opt => (formData[fieldkey] || []).includes(opt.value))}
@@ -770,9 +775,11 @@ function SectionAdder({formData, fieldkey, setData, field}){
     };
     return (
         <div key={fieldkey} className="mb-2 ">
-            <label htmlFor={fieldkey}>{field.label}</label>
-            <div name ={fieldkey} className="formData-editor">
-                {sections.map((section, i) => (
+            <span >{field.label}</span>
+            <div name ={fieldkey} id={fieldkey} className="formData-editor">
+                <Button onClick={addSection} className="btn btn-primary">Add Section</Button>
+
+                {(formData[fieldkey] || []).map((section, i) => (
                     <Section
                         key={section.id}
                         section={section}
@@ -780,7 +787,6 @@ function SectionAdder({formData, fieldkey, setData, field}){
                         removeSection={() => removeSection(i)}
                     />
                 ))}
-                <Button onClick={addSection} className="btn btn-primary">Add Section</Button>
                 
             </div>
         </div>
@@ -796,11 +802,14 @@ function GenerateForm({formData, form, socket, setData, id}){
                         <label htmlFor={fieldkey}>{field.label}</label>
                         <input 
                             name={fieldkey}
+                            id={fieldkey}
                             type="text"
                             className="form-control"
                             value={formData[fieldkey] || ''}
                             onChange={(e) => setData({...formData, [fieldkey]:e.target.value})}
+                            autoComplete='off'
                         />
+
                     </div>
                 )
             case 'text-area':
@@ -810,6 +819,7 @@ function GenerateForm({formData, form, socket, setData, id}){
                         <textarea 
                             name={fieldkey}
                             type="text"
+                            id={fieldkey}
                             className="form-control"
                             value={formData[fieldkey] || ''}
                             onChange={(e) => setData({...formData, [fieldkey]:e.target.value})}
@@ -847,7 +857,7 @@ function GenerateForm({formData, form, socket, setData, id}){
                         <input
                                 type="checkbox"
                                 className="form-check-input"
-                              
+                                id={fieldkey}
                                 name={fieldkey}
                                 checked={formData[fieldkey] || false}
                                 onChange={(e) => setData({ ...formData, [fieldkey]: e.target.checked })}
@@ -968,8 +978,8 @@ function CustomAdder({ formData, setData, field, fieldkey, socket }) {
     };
     return (
         <div key={fieldkey} className="mb-2 ">
-            <label htmlFor={fieldkey}>{field.label}</label>
-            <div className="formData-editor" name={fieldkey}>
+            <span >{field.label}</span>
+            <div id={fieldkey} className="formData-editor" name={fieldkey}>
                 <Button onClick={addCustomField} className="btn btn-primary">Add Custom Field</Button>
                 {customFields.map((item, i) => (
                     <CustomField

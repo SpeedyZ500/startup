@@ -8,7 +8,7 @@ const { createID,
     baseLookupFields,
     baseEditProjectionFields,
     baseUnwindFields,
-    getUserByToken,
+    getAuth,
     getEditable
  } = require("./database.js")
 const urlPrefix = "/worldbuilding/worlds/";
@@ -17,12 +17,11 @@ const worldsRouter = express.Router();
 
 worldsRouter.get(`${urlPrefix}author/:id`,async (req, res)=>{
     const token = req.cookies[authCookieName];
-    const user = await getUserByToken(token)
-    if(!user){
+    const author = await getAuth(token)
+    if(!author){
         return res.send({isAuthor:false})
     }
     const id = req.params.id
-    const author = user._id
     try{
         await getEditable(urlPrefix, author, id, {
             fields:["id"]

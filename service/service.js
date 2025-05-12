@@ -12,10 +12,12 @@ const {
     updateUser,
     getUserById,
     getOptions,
-    getCards,
     listUserDisplay,
     addWritingAdvice,
-    addWritingPrompt,sanitizeId
+    addWritingPrompt,sanitizeId,
+    getAuth,
+    removeAuth,
+    addAuth
  } = require('./database');  // Import database functions
 
 app.use(express.json());
@@ -39,7 +41,6 @@ async function createUser(email, username, password, displayname) {
     else{
         user.displayname = username;
     }
-    user.token = uuid.v4();
     await addUser(user);
     return user
 }
@@ -84,9 +85,9 @@ async function getUser(field, value){
 const verifyAuth = async (req, res, next) => {
 
     const token = req.cookies[authCookieName];
-    const user = await getUserByToken(token)
+    const user = await getAuth(token)
     if (user) {
-        req.usid = user._id;
+        req.usid = user;
       next();
     } else {
       res.status(401).send({ msg: 'Unauthorized' });
@@ -162,7 +163,6 @@ apiRouter.post('/auth/register', async (req, res) => {
     }
     if(!isValidEmail(req.body.email)){
         return res.status(400).send({ msg: "Please provide a valid email." });
-
     }
     if(req.body.username !== await sanitizeId(req.body.username)){
         return res.status(400).send({ msg: "Your username has invalid characters"});
@@ -175,7 +175,7 @@ apiRouter.post('/auth/register', async (req, res) => {
     } else{
         const user = await createUser(req.body.email, req.body.username, req.body.password, req.body.displayname);
         if(user){
-            await setAuthCookie(res, user.token);
+            await setAuthCookie(res, user, req.body.rememberMe);
             await delay(500);
             return res.send({email:user.email, username:user.username, displayname:user.displayname, profanityFilter:user.profanityFilter});    
         }
@@ -194,9 +194,8 @@ apiRouter.put('/auth/login', async (req, res) => {
 
     const user = await getUser(isEmail ? "email" : "username", identifier);
     if (user && (await bcrypt.compare(req.body.password, user.password))){
-        user.token = uuid.v4();
         await updateUser(user)
-        await setAuthCookie(res, user.token);  
+        await setAuthCookie(res, user, req.body.rememberMe);  
         res.send({email:user.email, username:user.username, displayname:user.displayname, profanityFilter:user.profanityFilter});
     }
     else{
@@ -321,19 +320,20 @@ apiRouter.put('/user/pass', verifyAuth, async(req, res) => {
 });
 
 // Set auth cookie
-async function setAuthCookie(res, token){
+async function setAuthCookie(res, user, rememberMe = false){
+    const token = uuid.v4();
+    await addAuth(user, token, rememberMe)
     res.cookie(authCookieName, token, {
         secure: true,
         httpOnly: true,
         sameSite: 'Strict',
-        maxAge: 1000 * 60 * 60 * 24 * 7 
+        maxAge:  1000 * 60 * 60 * 24 * (rememberMe ? 30 : 1)
     });
 }
 
 // Clear auth cookie
-async function clearAuthCookie(res, user){
-    delete user.token;
-    await updateUser(user)
+async function clearAuthCookie(res, token){
+    await removeAuth(token)
     res.clearCookie('token')
 }
 

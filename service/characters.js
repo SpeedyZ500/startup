@@ -11,7 +11,7 @@ const{ createID, getCards, getDisplayable, getEditable, getOptions,
     characterFullLookupFields,
     characterProjectionFields,
     characterUnwindFields,
-    getUserByToken
+    getAuth
     
 } = require('./database.js')
 const urlPrefix = "/characters/"
@@ -73,12 +73,11 @@ characterRouter.get(`${urlPrefix}:id/bio`, async (req, res) => {
 
 characterRouter.get(`${urlPrefix}author/:id`,async (req, res)=>{
     const token = req.cookies[authCookieName];
-    const user = await getUserByToken(token)
-    if(!user){
+    const author = await getAuth(token)
+    if(!author){
         return res.send({isAuthor:false})
     }
     const id = req.params.id
-    const author = user._id
     try{
         await getEditable(urlPrefix, author, id, {
             fields:["id"]
