@@ -22,7 +22,9 @@ app.use('/api', organizationsRouter);
 app.use('/api', racesRouter);
 app.use('/api', wildlifeRouter);
 app.use('/api', worldsRouter);
-
+app.use('/login*', (_req, res) => {
+  res.sendFile('login.html', { root: 'public' });
+})
 app.use((_req, res) => {
   res.sendFile('index.html', { root: 'public' });
 });

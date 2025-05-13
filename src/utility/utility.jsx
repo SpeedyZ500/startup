@@ -22,7 +22,6 @@ export function HardRedirect({ to }){
             window.location.href = location.pathname + location.search + location.hash;
         }
     }, [to, location]);
-    
     return null;
 }
 function renderItem(item, cardId){

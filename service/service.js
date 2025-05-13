@@ -24,9 +24,6 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use(express.static('public'));
-app.get('/login/*', (_req, res) => {
-    res.sendFile(path.join(__dirname, '/login.html'))
-})
 app.use('/api',express.static('public/data'));
 
 
@@ -210,7 +207,7 @@ apiRouter.delete('/auth/logout', verifyAuth, async (req, res) => {
     const token = req.cookies[authCookieName];
     const user = await getUser('token', token);
     if(user){
-        await clearAuthCookie(res, user);
+        await clearAuthCookie(res, authCookieName);
         res.send({});
     }
     else{
