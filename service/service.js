@@ -41,8 +41,7 @@ async function createUser(email, username, password, displayname) {
     else{
         user.displayname = username;
     }
-    await addUser(user);
-    return user
+    return await addUser(user);
 }
 
 function isValidEmail(email) {

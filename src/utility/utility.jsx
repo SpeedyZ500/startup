@@ -73,10 +73,10 @@ function renderSection(card, cardId, formatting) {
 
         // Handle basic string label config
         if (typeof config !== "object") {
-            if(typeof data === "object"){
+            if(!Array.isArray(data) && typeof data === "object"){
                 return renderItem({ 
                     label: config, 
-                    value: data.name || data.title || data.value || Array.isArray(data) ? data : data.toString(),
+                    value: data.name || data.title || data.value ||  data.toString(),
                     url: data.url
                   }, cardId);
             }
@@ -93,7 +93,7 @@ function renderSection(card, cardId, formatting) {
         };
         
 
-        if (typeof data === "object") {
+        if (!Array.isArray(data) && typeof data === "object") {
             item.url = data.url
             item.value = data.name || data.title || data.value || data.toString();
         }
