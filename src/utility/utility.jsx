@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import React, {Fragment, useMemo, useEffect, useState, useRef} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Card from 'react-bootstrap/Card';
@@ -12,7 +12,19 @@ import { WebSocketFacade }  from './websocketfacade.js';
 import { filterProfanity
 }  from './utility.js';
 
-
+export function HardRedirect({ to }){
+    const location = useLocation();
+    useEffect(() => {
+        if(to){
+            window.location.href = to;
+        }
+        else if(location){
+            window.location.href = location.pathname + location.search + location.hash;
+        }
+    }, [to, location]);
+    
+    return null;
+}
 function renderItem(item, cardId){
     // console.log(JSON.stringify(item))
 

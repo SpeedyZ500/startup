@@ -2,7 +2,7 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 
 import './app.css';
-import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, NavLink, Route, Routes, Navigate } from 'react-router-dom';
 import { Login, Register } from './login/login';
 import { BaseNav, WorldNav, SubNav } from './nav/nav';
 import { Home } from './home/home';
@@ -15,6 +15,7 @@ import NavDropdown from 'react-bootstrap/NavDropdown';
 import { BioPage } from './biopage/biopage';
 import { CategoryPage } from './categorypage/categorypage';
 import { AuthState } from './login/authState';
+import {HardRedirect} from './utility/utility.jsx'
 
 
 
@@ -115,7 +116,8 @@ export default function App() {
         localStorage.setItem("user", JSON.stringify(updateUser));
         setUser(updateUser);
     }
- 
+
+
     return (
         <BrowserRouter>
             <div className='body theme adaptive'>
@@ -134,8 +136,6 @@ export default function App() {
                                 <Routes>
                                     <Route path='/*' element={< BaseNav authState={authState} user={user} logout={logout}/>}/>
                                     <Route path='/worldbuilding/*' element={<WorldNav authState={authState} user={user} logout={logout}/>} />
-                                    <Route path='/login' element={<></>} />
-
                                 </Routes>
                                 
                                 <div id="mobile"> 
@@ -215,20 +215,7 @@ export default function App() {
                 <div className="scrollable">
                     <Routes>
                         <Route path='/' element={< Home/>} />
-                        <Route path='login'> 
-                            <Route path="" element={<Login
-                                user={user}
-                                onLogin={(loginUser) => {
-                                    setUser(loginUser)
-                                }}
-                            />}/>
-                            <Route path="register" element={<Register
-                                user={user}
-                                onLogin={(loginUser) => {
-                                    setUser(loginUser)
-                                }}
-                            />} />
-                        </Route>
+                        <Route path='/login' element={<HardRedirect to="/login"/>}/>
                         <Route path='about' element={<About />} />
                         <Route path='worldbuilding'>
                             <Route path='' element={<WorldBuilding/>} />
@@ -282,3 +269,4 @@ export default function App() {
 function NotFound() {
     return <main className='container-fluid theme adaptive text-center' style={{padding:"20px", margin:"20px"}}>404: Return to sender. Address unknown.</main>;
 }
+

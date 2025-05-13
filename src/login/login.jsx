@@ -1,16 +1,50 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import "./../app.css";
 import "./login.css";
+import {HardRedirect} from './../utility/utility.jsx'
+
 import Button from 'react-bootstrap/Button';
 
 import { MessageDialog } from './messageDialog';
-import { Link, useNavigate} from 'react-router-dom'; 
-import { EdgeLabelRenderer } from 'reactflow';
+import { BrowserRouter, NavLink, Route, Routes, Link, useNavigate} from 'react-router-dom'; 
 
 
+export function LoginRouter(){
+    return(
+        <BrowserRouter>
+                <div className='body theme adaptive'>
+                    <header className="">
+                        <div className="container-fluid fixed-top"  >
+                            <nav className="navbar theme-h adaptive">
+                                <div className="navbar-header">
+                                    <NavLink className="navbar-brand" to="">
+                                        <picture alt="Project Yggdrasil (home)" width="200">
+                                            <source srcSet="/transparentProjectYggdrasil.png" media="(prefers-color-scheme: light)" />
+                                            <source srcSet="/transparentProjectYggdrasilDark.png" media="(prefers-color-scheme: dark)" />
+                                            <img  alt="Project Yggdrasil (home)" src="/transparentProjectYggdrasil.png" width="200" />
+                                        </picture>
+                                    </NavLink>
+                                </div>
+                            </nav>
+                        </div>
+                    </header>
+                    <div>
+                        <Routes>
+                            <Route path='login'> 
+                                <Route path="" element={<Login/>}/>
+                                <Route path="register" element={<Register/>} />
+                            </Route>
+                            <Route path="*" element={<HardRedirect/>}/>
+                        </Routes>          
+                    </div>
+                </div>
+        </BrowserRouter>
+    )
+    
+}
 
-
-export function Login(props) {
+export function Login() {
     const [username, setUsername] = React.useState('');
 
     const [password, setPassword] = React.useState('');
@@ -21,7 +55,7 @@ export function Login(props) {
 
     async function handleLogin() {
         const json = ({username:username, password:password, rememberMe});
-        await createAuth('PUT', json, "login", setDisplayError, navigate, props.onLogin);
+        await createAuth('PUT', json, "login", setDisplayError, navigate);
     }
     return (
         <main className="container-fluid text-center">
@@ -92,7 +126,7 @@ export function Login(props) {
 }
 
 
-async function createAuth(method, json, path, setDisplayError, navigate, onLogin){
+async function createAuth(method, json, path, setDisplayError, navigate){
     try{
         const res = await fetch(`/api/auth/${path}`, {
             method: method,
@@ -102,7 +136,6 @@ async function createAuth(method, json, path, setDisplayError, navigate, onLogin
         if(res.ok){
             const user = await res.json();
             console.log(JSON.stringify(user))
-            onLogin(user);
             navigate('/');
         }
         else{
@@ -121,7 +154,7 @@ async function createAuth(method, json, path, setDisplayError, navigate, onLogin
     }
 }
 
-export function Register(props){
+export function Register(){
     const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -146,7 +179,7 @@ export function Register(props){
     async function handleRegister() {
         if(password === confirm){
             const json = ({email, username, password, displayname, rememberMe});
-            await createAuth('POST', json, "register", setDisplayError, navigate, props.onLogin);
+            await createAuth('POST', json, "register", setDisplayError, navigate);
         }
         else{
             setDisplayError("Your passwords don't match")
