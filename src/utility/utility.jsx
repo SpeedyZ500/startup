@@ -14,7 +14,7 @@ import { filterProfanity
 
 
 function renderItem(item, cardId){
-    console.log(JSON.stringify(item))
+    // console.log(JSON.stringify(item))
 
     if(Array.isArray(item.value)){
         return(
