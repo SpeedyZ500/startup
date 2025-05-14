@@ -215,7 +215,7 @@ export default function App() {
                 <div className="scrollable">
                     <Routes>
                         <Route path='/' element={< Home/>} />
-                        <Route path='/login' element={<HardRedirect to="/login"/>}/>
+                        <Route path='/login/*' element={<HardRedirect to="/login"/>}/>
                         <Route path='about' element={<About />} />
                         <Route path='worldbuilding'>
                             <Route path='' element={<WorldBuilding/>} />
